@@ -1,0 +1,295 @@
+clc
+close all
+
+load('Measurements.mat','R1Xr0','R1Odo','R1Obs','R2Odo','R2Obs')
+
+Config;
+
+DW0_R1 = blkdiag(sigma_0v_R1^2,sigma_0v_R1^2,sigma_0w_R1^2);
+DW0_R2 = blkdiag(sigma_0v_R2^2,sigma_0v_R2^2,sigma_0w_R2^2);
+Xfk_R1 = [];
+Xfk_R2 = [];
+
+DVk_R1 = blkdiag(sigmaz_R1^2,sigmaz_R1^2);
+DVk_R2 = blkdiag(sigmaz_R2^2,sigmaz_R2^2);
+
+R1R = [sigma_uv_R1^2,0;0,sigma_uw_R1^2];
+R2R = [sigma_uv_R2^2,0;sigma_uw_R2^2];
+DWk = blkdiag(R1R, R1Q);
+
+
+
+
+
+for k = 0:num_of_steps
+
+    % k
+
+    R1Obs_k = R1Obs(R1Obs(:,1)==k,2:3);
+    R2Obs_k = R2Obs(R2Obs(:,1)==k,2:3);
+
+    DV_R1 = [];
+    DV_R2 = [];
+
+    GV_R1 = [];
+    GV_R2 = [];
+
+    if k == 0 
+        % R1Xrk: 
+        % first column: data
+        % second column: step number
+        % third column: robot id
+        R1Xr0(3) = wrap(R1Xr0(3));
+        R1Xrk = [ones(3,1), zeros(3,1), R1Xr0];
+
+        % estimate the feature's state vector and at step 0 using the
+        % observation model of R1
+        Xfk_R1 = R1Obs_k;
+        Xfk_R1(1:2:end,2) = R1Xr0(1) + cos(R1Xr0(3))*(R1Obs_k(1:2:end,2)) - sin(R1Xr0(3))*(R1Obs_k(2:2:end,2));
+        Xfk_R1(2:2:end,2) = R1Xr0(2) + sin(R1Xr0(3))*(R1Obs_k(1:2:end,2)) + cos(R1Xr0(3))*(R1Obs_k(2:2:end,2));
+
+        
+        
+        DeltaFX0_R1 = sparse(3+size(Xfk_R1,1),3+size(Xfk_R1,1));
+        DeltaFX0_R1(1:3,1:3) = eye(3);
+        DeltaFX0_R1(4:2:end,1:3) = [repmat([1,0],size(Xfk_R1,1)/2,1), -sin(R1Xr0(3))*R1Obs_k(1:2:end,2) - cos(R1Xr0(3))*R1Obs_k(2:2:end,2)];
+        DeltaFX0_R1(5:2:end,1:3) = [repmat([0,1],size(Xfk_R1,1)/2,1), cos(R1Xr0(3))*R1Obs_k(1:2:end,2) - sin(R1Xr0(3))*R1Obs_k(2:2:end,2)];
+        
+        DV0_R1 = [];
+        for kr1 = 1:size(Xfk_R1)/2
+            DV0_R1 = blkdiag(DV0_R1, DVk_R1);
+            DeltaFX0_R1(3+(kr1-1)*2+(1:2),3+(kr1-1)*2+(1:2)) = [cos(R1Xr0(3)), -sin(R1Xr0(3));
+                sin(R1Xr0(3)), cos(R1Xr0(3))];
+        end
+        
+        Pk0_R1 = blkdiag(DW0_R1,DV0_R1);
+
+        Xk00e_R1 = [R1Xrk; 2*ones(size(Xfk_R1,1),1), Xfk_R1];
+        Pk00_R1 = DeltaFX0_R1 * Pk0_R1 * DeltaFX0_R1';
+       
+        % find the shared observed feature IDs in 2nd robot
+        % ZkR2s_logvec: logical vector of shared feature observation of
+        % 2nd robot
+        ZkR2s_logvec = ismember(R2Obs_k(:,1), Xfk_R1(:,1));
+        % ZkR2s: shared feature observation of 2nd robot
+        ZkR2s = R2Obs_k(find(ZkR2s_logvec),:);
+
+        XfkR1s_logvec = ismember(Xfk_R1(:,1), R2Obs_k(:,1));
+        XfkR1s = Xfk_R1(find(XfkR1s_logvec),:);
+
+        %% use Gauss-Newton iteration to optimize the 2nd robot pose at step 0
+        % use the true value Xr0_true_R2 as the initial value of Xr0_R2 in the GN iteration
+        Xp0_true_R2(3) = wrap(Xp0_true_R2(3));
+        X = Xp0_true_R2';
+        FX = sparse(size(XfkR1s,1),1);
+        JFX = sparse(size(XfkR1s,1),3);
+
+        % PZ = [];
+        % for kr2s = 1:size(ZkR2s,1)/2
+        %     PZ = blkdiag(PZ,DVk_R2);
+        % end
+        for gni_num = 1:100
+            FX(1:2:end, 1) = (XfkR1s(1:2:end,2) - X(1)) * cos(X(3)) + (XfkR1s(2:2:end,2) - X(2)) * sin(X(3));
+            FX(2:2:end, 1) = (XfkR1s(1:2:end,2) - X(1)) * -sin(X(3)) + (XfkR1s(2:2:end,2) - X(2)) * cos(X(3));
+
+            JFX(1:2:end, :) = [repmat([-cos(X(3)), -sin(X(3))], size(XfkR1s,1)/2, 1), -sin(X(3)) * (XfkR1s(1:2:end,2)-X(1)) + cos(X(3)) * (XfkR1s(2:2:end,2)-X(2))];
+            JFX(2:2:end, :) = [repmat([sin(X(3)), -cos(X(3))], size(XfkR1s,1)/2, 1), -cos(X(3)) * (XfkR1s(1:2:end,2)-X(1)) - sin(X(3)) * (XfkR1s(2:2:end,2)-X(2))];
+
+            X_old = X;
+
+            X_b = JFX'*(ZkR2s(:,2) - FX + JFX*X);
+            % X_b = JFX'/PZ*(ZkR2s(:,2) - FX + JFX*X);
+
+            X = (JFX'*JFX)\X_b;
+
+            D = X - X_old;
+            DD = D'*D;
+
+            if DD < CC
+                break
+            end
+        end
+        
+        X(3) = wrap(X(3));
+       
+        
+        
+        %% R2 posture 的协方差矩阵
+        % lambda = trace(inv(PZ))/size(PZ,1);
+        % DW0_R2_e = lambda*eye(3);
+        DW0_R2_e = DW0_R2;
+        
+
+        %% combined Xk00e_R1 and Xk00e_R2n as the feature positions observed by all robots of the state
+        % vector
+        Xk00_e =  [Xk00e_R1(1:3,:);
+            ones(3,1) zeros(3,1) X;
+            Xk00e_R1(4:end,:)];
+
+        % Xk00_e:
+        % first column: robot id;
+        % second column: 1 -> robot posture; 2 -> feature position
+        % third column: posture id or position id
+        % fouth column: data
+
+
+        Pk00 = blkdiag(Pk0_R1(1:3,1:3),DW0_R2_e,Pk0_R1(4:end,4:end));
+        Pk00(1:3,7:end) = Pk0_R1(1:3,4:end);
+        Pk00(7:end,1:3) = Pk0_R1(4:end,1:3);
+        
+    
+        XrR1_full = Xk00_e(1:3,2:3); % save all robot postures of R1
+        XrR2_full = Xk00_e(4:6,2:3); % save all robot postures of R2
+        continue
+    end
+
+    %% Prediction using the motion model
+    Uk_R1 = U_R1(U_R1(:,2)==k,3);
+    Uk_R2 = U_R2(U_R2(:,2)==k,3);
+    
+    Xk00_e([3,6],3) = wrap(Xk00_e([3,6],3));
+    Xk10_e = Xk00_e;
+    Xk10_e(1:6,2) = Xk10_e(1:6,2)+1;
+    Xk10_e(1:3,3) = Xk00_e(1:3,3) + ...
+        [cos(Xk00_e(3,3))*Uk_R1(1) - sin(Xk00_e(3,3))*Uk_R1(2);
+         sin(Xk00_e(3,3))*Uk_R1(1) + cos(Xk00_e(3,3))*Uk_R1(2);
+         Uk_R1(3)];
+    Xk10_e(4:6,3) = Xk00_e(4:6,3) + ...
+        [cos(Xk00_e(6,3))*Uk_R2(1) - sin(Xk00_e(6,3))*Uk_R2(2);
+         sin(Xk00_e(6,3))*Uk_R2(1) + cos(Xk00_e(6,3))*Uk_R2(2);
+         Uk_R2(3)]; 
+
+    Xk10_e([3,6],3) = wrap(Xk10_e([3,6],3));
+
+    DeltaFX = sparse(size(Xk10_e,1),size(Xk10_e,1));
+    DeltaFX(1:6,1:6) = blkdiag([1, 0, -sin(Xk00_e(3,3))*Uk_R1(1) - cos(Xk00_e(3,3))*Uk_R1(2); ...
+        0, 1, cos(Xk00_e(3,3))*Uk_R1(1) - sin(Xk00_e(3,3))*Uk_R1(2); ...
+        0, 0, 1], ...
+        [1, 0, -sin(Xk00_e(6,3))*Uk_R2(1) - cos(Xk00_e(6,3))*Uk_R2(2); ...
+        0, 1, cos(Xk00_e(6,3))*Uk_R2(1) - sin(Xk00_e(6,3))*Uk_R2(2); ...
+        0, 0, 1]);
+    DeltaFX(7:end,7:end) = eye(size(DeltaFX(7:end,7:end)));
+
+    DeltaFW = sparse(size(Xk10_e,1),6);
+    DeltaFW(1:6,1:6) = blkdiag([cos(Xk00_e(3,3)), -sin(Xk00_e(3,3)), 0; ...
+        sin(Xk00_e(3,3)), cos(Xk00_e(3,3)), 0; ...
+        0, 0, 1], ...
+        [cos(Xk00_e(6,3)), -sin(Xk00_e(6,3)), 0; ...
+        sin(Xk00_e(6,3)), cos(Xk00_e(6,3)), 0; ...
+        0, 0, 1]);
+    
+    Pk10 = DeltaFX * Pk00 * DeltaFX' + DeltaFW * DWk * DeltaFW';
+
+    % find the feature observations in R1 from new features of Xk10_e
+    ZkR1n_logvec = ~ismember(R1Obs_k(:,1),Xk10_e(7:end,2));
+    ZkR1n = R1Obs_k(find(ZkR1n_logvec),:);
+    
+    % find the feature observations in R2 from shared features of Xk10_e
+    ZkR2s_logvec = ismember(R2Obs_k(:,1),Xk10_e(7:end,2));
+    ZkR2s = R2Obs_k(find(ZkR2s_logvec),:);
+    Xfk10eR2s_logvec = ismember(Xk10_e(7:end,2), R2Obs_k(:,1));
+    Xfk10eR2s_index = find(Xfk10eR2s_logvec)+6;
+    Xfk10eR2s = Xk10_e(Xfk10eR2s_index,:);
+
+    %% Feature initialization using feature observations from R1
+    if ~isempty(ZkR1n)
+        Xfk10e_n = ZkR1n;
+        Xfk10e_n(1:2:end, 2) = Xk10_e(1,3) + cos(Xk10_e(3,3))*ZkR1n(1:2:end, 2) - sin(Xk10_e(3,3))*ZkR1n(2:2:end, 2);
+        Xfk10e_n(2:2:end, 2) = Xk10_e(2,3) + sin(Xk10_e(3,3))*ZkR1n(1:2:end, 2) + cos(Xk10_e(3,3))*ZkR1n(2:2:end, 2);
+
+
+        Xk10_eS = [Xk10_e;
+            2*ones(size(Xfk10e_n,1),1), Xfk10e_n];
+
+        DeltaGX = sparse(size(Xk10_eS,1),size(Xk10_e,1));
+        DeltaGX(1:size(Xk10_e,1),1:size(Xk10_e,1)) = eye(size(Xk10_e,1));
+        DeltaGX((size(Xk10_e,1)+1):2:end,1:3) = [repmat([1, 0],size(Xfk10e_n,1)/2,1),-sin(Xk10_e(3,3))*ZkR1n(1:2:end, 2)-cos(Xk10_e(3,3))*ZkR1n(2:2:end, 2)];
+        DeltaGX((size(Xk10_e,1)+2):2:end,1:3) = [repmat([0, 1],size(Xfk10e_n,1)/2,1),cos(Xk10_e(3,3))*ZkR1n(1:2:end, 2)-sin(Xk10_e(3,3))*ZkR1n(2:2:end, 2)];
+
+        DeltaGV = sparse(size(Xk10_eS,1),size(Xfk10e_n,1));
+        DV1_S = [];
+        for fken = 1:size(Xfk10e_n,1)/2
+            DV1_S = blkdiag(DV1_S,DVk_R1);
+            DeltaGV(size(Xk10_e,1)+(fken-1)*2+(1:2),(fken-1)*2+(1:2)) = [cos(Xk10_e(3,3)), -sin(Xk10_e(3,3));sin(Xk10_e(3,3)), cos(Xk10_e(3,3))];
+        end
+        Pk10_s = DeltaGX*Pk10*DeltaGX'+DeltaGV*DV1_S*DeltaGV';
+    else
+        Xk10_eS = Xk10_e;
+        Pk10_s = Pk10;
+    end
+
+    %% Update using feature observations from R2
+    % Xk10_e = [Xr_R1;Xr_R2;Xf_R1];
+    if ~isempty(ZkR2s)
+    HX10e_R2 = sparse(size(ZkR2s,1), 1);
+    HX10e_R2(1:2:end,1) = cos(Xk10_eS(6,3))*(Xfk10eR2s(1:2:end,3)-Xk10_eS(4,3))+sin(Xk10_eS(6,3))*(Xfk10eR2s(2:2:end,3)-Xk10_eS(5,3));
+    HX10e_R2(2:2:end,1) = -sin(Xk10_eS(6,3))*(Xfk10eR2s(1:2:end,3)-Xk10_eS(4,3))+cos(Xk10_eS(6,3))*(Xfk10eR2s(2:2:end,3)-Xk10_eS(5,3));
+
+    DeltaHX10e_R2 = sparse(size(ZkR2s,1), size(Xk10_eS,1));
+    DeltaHX10e_R2(1:2:end,4:6) = [repmat([-cos(Xk10_eS(6,3)),-sin(Xk10_eS(6,3))],size(DeltaHX10e_R2,1)/2,1), -sin(Xk10_eS(6,3))*(Xfk10eR2s(1:2:end,3)-Xk10_eS(4,3))+cos(Xk10_eS(6,3))*(Xfk10eR2s(2:2:end,3)-Xk10_eS(5,3))];
+    DeltaHX10e_R2(2:2:end,4:6) = [repmat([sin(Xk10_eS(6,3)),-cos(Xk10_eS(6,3))],size(DeltaHX10e_R2,1)/2,1), -cos(Xk10_eS(6,3))*(Xfk10eR2s(1:2:end,3)-Xk10_eS(4,3))-sin(Xk10_eS(6,3))*(Xfk10eR2s(2:2:end,3)-Xk10_eS(5,3))];
+   
+    for fkr2 = 1:size(ZkR2s,1)/2
+        DeltaHX10e_R2((fkr2-1)*2+(1:2), Xfk10eR2s_index((fkr2-1)*2+(1:2))) = [cos(Xk10_eS(6,3)), sin(Xk10_eS(6,3));-sin(Xk10_eS(6,3)),cos(Xk10_eS(6,3))];
+        DV_R2 = blkdiag(DV_R2,DVk_R2);
+    end
+
+    % Innovation Covariance S and Kalman Gain K
+    S = DeltaHX10e_R2 * Pk10_s * DeltaHX10e_R2' + DV_R2;
+    K = Pk10_s * DeltaHX10e_R2' /S;
+
+    % Updating process using observation model
+    Xk11_e = Xk10_eS;
+    Xk11_e(:,3) = Xk10_eS(:,3) + K*(ZkR2s(:,2)-HX10e_R2);
+    Pk11 = Pk10_s - K*S*K';
+    else
+        Xk11_e = Xk10_eS;
+        Pk11 = Pk10_s;
+    end
+    
+    Xk11_e([3,6],3) = wrap(Xk11_e([3,6],3));
+
+    XrR1_full = [XrR1_full;Xk11_e(1:3,2:3)];
+    XrR2_full = [XrR2_full;Xk11_e(4:6,2:3)];
+
+    Xk00_e = Xk11_e;
+    Pk00 = Pk11;
+
+end
+
+figure
+
+hold on 
+
+plot(XrR1_full(1:3:end,2),XrR1_full(2:3:end,2),'-ro');
+plot(XrR2_full(1:3:end,2),XrR2_full(2:3:end,2),'--mo');
+
+plot(Xk11_e(7:2:end,3),Xk11_e(8:2:end,3),'^','Color', [0.6, 0.4, 0.2])
+text(Xk11_e(7:2:end,3),Xk11_e(8:2:end,3), num2str(Xk11_e(7:2:end,2)), 'VerticalAlignment', 'bottom', 'HorizontalAlignment', 'right', 'Color', [0.6, 0.4, 0.2])
+
+xlim([fea_xlb-Dfr_threshold, fea_xub+Dfr_threshold])
+ylim([fea_ylb-Dfr_threshold, fea_yub+Dfr_threshold])
+
+XftrueS_logvec = ismember(Xf_true(:,1),Xk11_e(7:2:end,2));
+XftrueS_idx = find(XftrueS_logvec);
+Xftrue_S = Xf_true(XftrueS_idx,:);
+
+plot(Xp_true_R1(:,2),Xp_true_R1(:,3),'-bo')
+plot(Xp_true_R2(:,2),Xp_true_R2(:,3),'--co')
+
+% plot(Xf_true(:,2),Xf_true(:,3),'k^')
+plot(Xftrue_S(:,2),Xftrue_S(:,3),'k^')
+text(Xftrue_S(:,2),Xftrue_S(:,3), num2str(Xftrue_S(:,1)), 'VerticalAlignment', 'bottom', 'HorizontalAlignment', 'right', 'Color', 'k')
+
+legend('Estimated robot postures of R1','Estimated robot postures of R2','Estimated feature positions' , 'True robot postures of R1', 'True robot postures of R2', 'True feature positions')
+xlabel('x')
+ylabel('y')
+title('True X vs Multi-robots EKF')
+
+axis equal
+ax = gca;
+
+% 设置坐标轴属性，使其穿过原点
+ax.XAxisLocation = 'origin'; % x 轴穿过原点
+ax.YAxisLocation = 'origin'; % y 轴穿过原点
+hold off
