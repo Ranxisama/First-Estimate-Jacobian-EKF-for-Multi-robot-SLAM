@@ -1,0 +1,5 @@
+function Xr0 = pose0Generation(XrTrue,addR1Pose0Noise,R10)
+Xr0 = XrTrue(XrTrue(:,1)==0,2);
+if addR1Pose0Noise == 1
+    Xr0 = Xr0 + R1*randn(size(Xr0,1),1);
+end
