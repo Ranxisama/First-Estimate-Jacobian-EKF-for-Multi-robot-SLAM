@@ -1,4 +1,4 @@
-clc
+
 close all
 
 load('TrueState\RobotsWaypoints.mat')
