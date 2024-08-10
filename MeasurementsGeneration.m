@@ -9,23 +9,25 @@ R2XrTrue = dataModify(wp2);
 XfTrueAll = dataModify(lm);
 XfTrueAll(:,1)=XfTrueAll(:,1)+1;
 
-Config;
-
-%% Initial position Generation
-R1Xp0 = pose0Generation(R1XrTrue,R1addPose0Noise,R1O);
-
-%% Robot Orientation Generation
-R1XphiT = bearingGeneration(R1XrTrue(:,2),R1Xphi0True,R1bearingRange);
-R2XphiT = bearingGeneration(R2XrTrue(:,2),R2Xphi0True,R2bearingRange);
+% plot(R1XrTrue(1:2:end-1,2),R1XrTrue(2:2:end,2),'-bo')
 
 R1PosNum = size(R1XrTrue,1)/2;
 R2PosNum = size(R2XrTrue,1)/2;
 
+Config;
 
+
+
+%% Robot Orientation Generation
+R1XphiT = bearingGeneration(R1XrTrue,R1bearingRange);
+R2XphiT = bearingGeneration(R2XrTrue,R2bearingRange);
+
+%% Initial position Generation
+R1Xp0 = pose0Generation(R1XrTrue,R1XphiT,R1addPose0Noise,R1O);
 
 %% Odometry measurements Generation
-R1Odo = odometryGeneration(R1XrTrue,R1XphiT,R1Xphi0True,R1PosNum,R1addOdoNoise,R1Q);
-R2Odo = odometryGeneration(R2XrTrue,R2XphiT,R2Xphi0True,R2PosNum,R2addOdoNoise,R2Q);
+R1Odo = odometryGeneration(R1XrTrue,R1XphiT,R1PosNum,R1addOdoNoise,R1Q);
+R2Odo = odometryGeneration(R2XrTrue,R2XphiT,R2PosNum,R2addOdoNoise,R2Q);
 
 %% Observation measurements Generation
 R1Obs = observationGeneration(R1XrTrue,R1XphiT,R1PosNum,XfTrueAll,R1addObsNoise,R1R,R1sensorRange);

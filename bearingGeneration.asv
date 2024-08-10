@@ -1,20 +1,17 @@
-function Xphi = bearingGeneration(XrTrue,Xphi0True,bearingRange)
+function Xphi = bearingGeneration(XrTrue,bearingRange)
 Deltay = XrTrue(4:2:end)-XrTrue(2:2:end-2);
 Deltax = XrTrue(3:2:end-1)-XrTrue(1:2:end-3);
-OdoPhi = atan2(Deltay,Deltax)-Xphi0True;
-Xphi = zeros(size(OdoPhi,1)+1,1);
-for i = 1:size(OdoPhi,1)+1
-    if i == 1
-        Xphik = Xphi0True;
-    else
-        if OdoPhi(i-1,1) > 0
-            Xphik = Xphik + OdoPhi(i-1,1) - bearingRange*rand;
-        elseif OdoPhi(i-1,1) < 0
-            Xphik = Xphik + OdoPhi(i-1,1) + bearingRange*rand;
-        else
-            Xphik = Xphik + OdoPhi(i-1,1) + 0.5*bearingRange*(2*rand-1);
-        end
-    end
+Deltaphi = atan2(Deltay,Deltax);
+Xphi = zeros(size(Deltaphi,1)+1,1);
+for i = 1:size(Deltaphi,1)+1
+        
+            Xphik = Xphik + Deltaphi(i-1,1) - bearingRange*rand;
+        
+            Xphik = Xphik + Deltaphi(i-1,1) + bearingRange*rand;
+       
+            Xphik = Xphik + Deltaphi(i-1,1) + *bearingRange*(2*rand-1);
+        
+    
     Xphi(i,1) = Xphik;
 end
 

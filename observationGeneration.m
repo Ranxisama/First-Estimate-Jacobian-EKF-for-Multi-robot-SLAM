@@ -1,6 +1,7 @@
-function obs = observationGeneration(XrTrue,odo_phiT,PosNum,XfTrueAll,addObsNoise,R,sensorRange)
+function obs = observationGeneration(XrTrue,XphiTrue,PosNum,XfTrueAll,addObsNoise,R,sensorRange)
 if addObsNoise == 0
-    R = 0;
+    R(1,1) = 0;
+    R(2,2) = 0;
 end
 
 obs = [];
@@ -11,7 +12,7 @@ for k = 0:PosNum-1
         % FeaRobDis: distance from the feature to the robot
         FeaRobDist = sqrt(sum(DeltaDist.^2));
         if FeaRobDist <= sensorRange
-            Rot = rotationMatrix(odo_phiT(k+1));
+            Rot = rotationMatrix(XphiTrue(k+1));
             obs(end+1:end+2,1:3) = [[k;k],XfTrueAll((j-1)*2+(1:2),1),Rot'*DeltaDist+R*randn(2,1)]; 
         end
     end

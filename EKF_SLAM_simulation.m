@@ -1,81 +1,66 @@
 clc
 close all
 
-load('Measurements.mat','R1Xr0','R1Odo','R1Obs','R2Odo','R2Obs')
+load('Measurements.mat','R1Xp0','R1Odo','R1Obs','R2Odo','R2Obs')
 
 Config;
 
-DW0_R1 = blkdiag(sigma_0v_R1^2,sigma_0v_R1^2,sigma_0w_R1^2);
-DW0_R2 = blkdiag(sigma_0v_R2^2,sigma_0v_R2^2,sigma_0w_R2^2);
-Xfk_R1 = [];
-Xfk_R2 = [];
-
-DVk_R1 = blkdiag(sigmaz_R1^2,sigmaz_R1^2);
-DVk_R2 = blkdiag(sigmaz_R2^2,sigmaz_R2^2);
-
-R1R = [sigma_uv_R1^2,0;0,sigma_uw_R1^2];
-R2R = [sigma_uv_R2^2,0;sigma_uw_R2^2];
-DWk = blkdiag(R1R, R1Q);
 
 
-
-
-
-for k = 0:num_of_steps
+for k = 0:size(R1Odo,1)/3
 
     % k
 
     R1Obs_k = R1Obs(R1Obs(:,1)==k,2:3);
     R2Obs_k = R2Obs(R2Obs(:,1)==k,2:3);
 
-    DV_R1 = [];
-    DV_R2 = [];
-
-    GV_R1 = [];
-    GV_R2 = [];
-
     if k == 0 
         % R1Xrk: 
         % first column: data
         % second column: step number
         % third column: robot id
-        R1Xr0(3) = wrap(R1Xr0(3));
-        R1Xrk = [ones(3,1), zeros(3,1), R1Xr0];
+        R1Xrk = [ones(3,1), zeros(3,1), R1Xp0];
 
         % estimate the feature's state vector and at step 0 using the
         % observation model of R1
-        Xfk_R1 = R1Obs_k;
-        Xfk_R1(1:2:end,2) = R1Xr0(1) + cos(R1Xr0(3))*(R1Obs_k(1:2:end,2)) - sin(R1Xr0(3))*(R1Obs_k(2:2:end,2));
-        Xfk_R1(2:2:end,2) = R1Xr0(2) + sin(R1Xr0(3))*(R1Obs_k(1:2:end,2)) + cos(R1Xr0(3))*(R1Obs_k(2:2:end,2));
+        R1Xfk = R1Obs_k;
+        R1Xfk(1:2:end,2) = R1Xp0(1,1) + cos(R1Xp0(3,1))*(R1Obs_k(1:2:end,2)) - sin(R1Xp0(3,1))*(R1Obs_k(2:2:end,2));
+        R1Xfk(2:2:end,2) = R1Xp0(2,1) + sin(R1Xp0(3,1))*(R1Obs_k(1:2:end,2)) + cos(R1Xp0(3,1))*(R1Obs_k(2:2:end,2));
 
+
+
+        R1deltaFX0 = sparse(3+size(R1Xfk,1),3+size(R1Xfk,1));
+        R1deltaFX0(1:3,1:3) = eye(3);
+        R1deltaFX0(4:2:end,1:3) = [repmat([1,0],size(R1Xfk,1)/2,1), -sin(R1Xp0(3))*R1Obs_k(1:2:end,2) - cos(R1Xp0(3))*R1Obs_k(2:2:end,2)];
+        R1deltaFX0(5:2:end,1:3) = [repmat([0,1],size(R1Xfk,1)/2,1), cos(R1Xp0(3))*R1Obs_k(1:2:end,2) - sin(R1Xp0(3))*R1Obs_k(2:2:end,2)];
         
-        
-        DeltaFX0_R1 = sparse(3+size(Xfk_R1,1),3+size(Xfk_R1,1));
-        DeltaFX0_R1(1:3,1:3) = eye(3);
-        DeltaFX0_R1(4:2:end,1:3) = [repmat([1,0],size(Xfk_R1,1)/2,1), -sin(R1Xr0(3))*R1Obs_k(1:2:end,2) - cos(R1Xr0(3))*R1Obs_k(2:2:end,2)];
-        DeltaFX0_R1(5:2:end,1:3) = [repmat([0,1],size(Xfk_R1,1)/2,1), cos(R1Xr0(3))*R1Obs_k(1:2:end,2) - sin(R1Xr0(3))*R1Obs_k(2:2:end,2)];
-        
-        DV0_R1 = [];
-        for kr1 = 1:size(Xfk_R1)/2
-            DV0_R1 = blkdiag(DV0_R1, DVk_R1);
-            DeltaFX0_R1(3+(kr1-1)*2+(1:2),3+(kr1-1)*2+(1:2)) = [cos(R1Xr0(3)), -sin(R1Xr0(3));
-                sin(R1Xr0(3)), cos(R1Xr0(3))];
+        % covariance matrix of observed features at step 0
+        R1Rn = [];
+        for kr1 = 1:size(R1Xfk)/2
+            R1Rn = blkdiag(R1Rn, R1R);
+            R1deltaFX0(3+(kr1-1)*2+(1:2),3+(kr1-1)*2+(1:2)) = [cos(R1Xp0(3,1)), -sin(R1Xp0(3,1));
+                sin(R1Xp0(3,1)), cos(R1Xp0(3,1))];
         end
-        
-        Pk0_R1 = blkdiag(DW0_R1,DV0_R1);
 
-        Xk00e_R1 = [R1Xrk; 2*ones(size(Xfk_R1,1),1), Xfk_R1];
-        Pk00_R1 = DeltaFX0_R1 * Pk0_R1 * DeltaFX0_R1';
-       
+        Pk0_R1 = blkdiag(R1O,R1Rn);
+
+        Xk00e_R1 = [R1Xrk;
+            2*ones(size(R1Xfk,1),1),R1Xfk];
+        Pk00_R1 = R1deltaFX0 * Pk0_R1 * R1deltaFX0';
+
         % find the shared observed feature IDs in 2nd robot
-        % ZkR2s_logvec: logical vector of shared feature observation of
+        % R2Zks_lv: logical vector of shared feature observation of
         % 2nd robot
-        ZkR2s_logvec = ismember(R2Obs_k(:,1), Xfk_R1(:,1));
-        % ZkR2s: shared feature observation of 2nd robot
-        ZkR2s = R2Obs_k(find(ZkR2s_logvec),:);
+        R2Zks_lv = ismember(R2Obs_k(:,1), R1Xfk(:,1));
+        % R2Zks_idx: index of shared feature observation of
+        % 2nd robot in R2Obs_k
+        R2Zks_idx = find(R2Zks_lv);
+        % R2Zks: shared feature observation of 2nd robot
+        R2Zks = R2Obs_k(R2Zks_idx,:);
 
-        XfkR1s_logvec = ismember(Xfk_R1(:,1), R2Obs_k(:,1));
-        XfkR1s = Xfk_R1(find(XfkR1s_logvec),:);
+        R1Xfks_lv = ismember(R1Xfk(:,1), R2Obs_k(:,1));
+        R1Xfks_idx = find(R1Xfks_lv);
+        XfkR1s = R1Xfk(R1Xfks_idx,:);
 
         %% use Gauss-Newton iteration to optimize the 2nd robot pose at step 0
         % use the true value Xr0_true_R2 as the initial value of Xr0_R2 in the GN iteration
@@ -85,7 +70,7 @@ for k = 0:num_of_steps
         JFX = sparse(size(XfkR1s,1),3);
 
         % PZ = [];
-        % for kr2s = 1:size(ZkR2s,1)/2
+        % for kr2s = 1:size(R2Zks,1)/2
         %     PZ = blkdiag(PZ,DVk_R2);
         % end
         for gni_num = 1:100
@@ -97,8 +82,8 @@ for k = 0:num_of_steps
 
             X_old = X;
 
-            X_b = JFX'*(ZkR2s(:,2) - FX + JFX*X);
-            % X_b = JFX'/PZ*(ZkR2s(:,2) - FX + JFX*X);
+            X_b = JFX'*(R2Zks(:,2) - FX + JFX*X);
+            % X_b = JFX'/PZ*(R2Zks(:,2) - FX + JFX*X);
 
             X = (JFX'*JFX)\X_b;
 
@@ -185,8 +170,8 @@ for k = 0:num_of_steps
     ZkR1n = R1Obs_k(find(ZkR1n_logvec),:);
     
     % find the feature observations in R2 from shared features of Xk10_e
-    ZkR2s_logvec = ismember(R2Obs_k(:,1),Xk10_e(7:end,2));
-    ZkR2s = R2Obs_k(find(ZkR2s_logvec),:);
+    R2Zks_lv = ismember(R2Obs_k(:,1),Xk10_e(7:end,2));
+    R2Zks = R2Obs_k(find(R2Zks_lv),:);
     Xfk10eR2s_logvec = ismember(Xk10_e(7:end,2), R2Obs_k(:,1));
     Xfk10eR2s_index = find(Xfk10eR2s_logvec)+6;
     Xfk10eR2s = Xk10_e(Xfk10eR2s_index,:);
@@ -220,16 +205,16 @@ for k = 0:num_of_steps
 
     %% Update using feature observations from R2
     % Xk10_e = [Xr_R1;Xr_R2;Xf_R1];
-    if ~isempty(ZkR2s)
-    HX10e_R2 = sparse(size(ZkR2s,1), 1);
+    if ~isempty(R2Zks)
+    HX10e_R2 = sparse(size(R2Zks,1), 1);
     HX10e_R2(1:2:end,1) = cos(Xk10_eS(6,3))*(Xfk10eR2s(1:2:end,3)-Xk10_eS(4,3))+sin(Xk10_eS(6,3))*(Xfk10eR2s(2:2:end,3)-Xk10_eS(5,3));
     HX10e_R2(2:2:end,1) = -sin(Xk10_eS(6,3))*(Xfk10eR2s(1:2:end,3)-Xk10_eS(4,3))+cos(Xk10_eS(6,3))*(Xfk10eR2s(2:2:end,3)-Xk10_eS(5,3));
 
-    DeltaHX10e_R2 = sparse(size(ZkR2s,1), size(Xk10_eS,1));
+    DeltaHX10e_R2 = sparse(size(R2Zks,1), size(Xk10_eS,1));
     DeltaHX10e_R2(1:2:end,4:6) = [repmat([-cos(Xk10_eS(6,3)),-sin(Xk10_eS(6,3))],size(DeltaHX10e_R2,1)/2,1), -sin(Xk10_eS(6,3))*(Xfk10eR2s(1:2:end,3)-Xk10_eS(4,3))+cos(Xk10_eS(6,3))*(Xfk10eR2s(2:2:end,3)-Xk10_eS(5,3))];
     DeltaHX10e_R2(2:2:end,4:6) = [repmat([sin(Xk10_eS(6,3)),-cos(Xk10_eS(6,3))],size(DeltaHX10e_R2,1)/2,1), -cos(Xk10_eS(6,3))*(Xfk10eR2s(1:2:end,3)-Xk10_eS(4,3))-sin(Xk10_eS(6,3))*(Xfk10eR2s(2:2:end,3)-Xk10_eS(5,3))];
    
-    for fkr2 = 1:size(ZkR2s,1)/2
+    for fkr2 = 1:size(R2Zks,1)/2
         DeltaHX10e_R2((fkr2-1)*2+(1:2), Xfk10eR2s_index((fkr2-1)*2+(1:2))) = [cos(Xk10_eS(6,3)), sin(Xk10_eS(6,3));-sin(Xk10_eS(6,3)),cos(Xk10_eS(6,3))];
         DV_R2 = blkdiag(DV_R2,DVk_R2);
     end
@@ -240,7 +225,7 @@ for k = 0:num_of_steps
 
     % Updating process using observation model
     Xk11_e = Xk10_eS;
-    Xk11_e(:,3) = Xk10_eS(:,3) + K*(ZkR2s(:,2)-HX10e_R2);
+    Xk11_e(:,3) = Xk10_eS(:,3) + K*(R2Zks(:,2)-HX10e_R2);
     Pk11 = Pk10_s - K*S*K';
     else
         Xk11_e = Xk10_eS;
