@@ -11,8 +11,8 @@ R2bearingRange = pi/60; % pi/60: 3°
 
 %% Gaussian noise level settings
 % standard deviation of 1th robot position at time 0 (equals to 0 as the origin of the 1D coordinate system)
-R1sigma_0r = 0.01; % 0.01: 0.01 m/time_step
-R1sigma_0phi = 0.01; % 0.01: 0.01 m/time_step
+R1sigma_0r = 0.01; % 0.01: 0.01 m
+R1sigma_0phi = pi/180; % pi/180: 1°
 R1O = [R1sigma_0r^2,0,0;
     0,R1sigma_0r^2,0;
     0,0,R1sigma_0phi^2];
@@ -32,7 +32,11 @@ R1R = [R1sigma_zv^2,0;
 
 
 % standard deviation of robot position at time 0 (equals to 0 as the origin of the 1D coordinate system)
-R2sigma_0 = 0.005; % 0.005: 0.005 m/time_step
+R2sigma_0r = 0.01; % 0.01: 0.01 m
+R2sigma_0phi = pi/36; % pi/36: 5°
+R2O = [R2sigma_0r^2,0,0;
+    0,R2sigma_0r^2,0;
+    0,0,R2sigma_0phi^2];
 
 % standard deviation of the zero mean Gaussian process noise w(k) of 2nd robot
 R2sigma_uv = 0.025; % 0.025 m/time_step
@@ -47,13 +51,14 @@ R2R = [R2sigma_zv^2,0;
     0,R2sigma_zv^2];
 
 %% Switch to change
-R1addOdoNoise = 1; % if 0, R1 odometry is perfect
+R1addOdoNoise = 0; % if 0, R1 odometry is perfect
 R2addOdoNoise = 1; % if 0, R2 odometry is perfect
 
-R1addObsNoise = 1; % if 0, R1 observation is perfect
+R1addObsNoise = 0; % if 0, R1 observation is perfect
 R2addObsNoise = 1; % if 0, R2 observation is perfect
 
 R1addPose0Noise = 0; % if 0, R1 initial position is accurate
+R2addPose0Noise = 1; % if 0, R2 initial position is accurate
 
 R1sensorRange = 5; % m/s, R1's observation range for the features
 R2sensorRange = 5; % m/s, R2's observation range for the features

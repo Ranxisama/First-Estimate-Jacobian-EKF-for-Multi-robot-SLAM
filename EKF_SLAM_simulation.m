@@ -1,11 +1,10 @@
 clc
 close all
 
-load('Measurements.mat','R1Xp0','R1Odo','R1Obs','R2Odo','R2Obs')
+load('Parameters.mat','R1XrTrue','R1XphiT','R2XrTrue','R2XphiT','XfTrueAll')
+load('Measurements.mat','R1Xp0','R1Odo','R1Obs','R2Xp0','R2Odo','R2Obs')
 
 Config;
-
-
 
 for k = 0:size(R1Odo,1)/3
 
@@ -14,25 +13,20 @@ for k = 0:size(R1Odo,1)/3
     R1Obs_k = R1Obs(R1Obs(:,1)==k,2:3);
     R2Obs_k = R2Obs(R2Obs(:,1)==k,2:3);
 
-    if k == 0 
-        % R1Xrk: 
-        % first column: data
-        % second column: step number
-        % third column: robot id
-        R1Xrk = [ones(3,1), zeros(3,1), R1Xp0];
-
+    if k == 0
         % estimate the feature's state vector and at step 0 using the
         % observation model of R1
         R1Xfk = R1Obs_k;
-        R1Xfk(1:2:end,2) = R1Xp0(1,1) + cos(R1Xp0(3,1))*(R1Obs_k(1:2:end,2)) - sin(R1Xp0(3,1))*(R1Obs_k(2:2:end,2));
-        R1Xfk(2:2:end,2) = R1Xp0(2,1) + sin(R1Xp0(3,1))*(R1Obs_k(1:2:end,2)) + cos(R1Xp0(3,1))*(R1Obs_k(2:2:end,2));
-
-
+        R1Xfk(1:2:(end-1),2) = R1Xp0(1,1) + cos(R1Xp0(3,1))*(R1Obs_k(1:2:(end-1),2)) - sin(R1Xp0(3,1))*(R1Obs_k(2:2:end,2));
+        R1Xfk(2:2:end,2) = R1Xp0(2,1) + sin(R1Xp0(3,1))*(R1Obs_k(1:2:(end-1),2)) + cos(R1Xp0(3,1))*(R1Obs_k(2:2:end,2));
+        
+        R1Xfk
+        XfTrueAll
 
         R1deltaFX0 = sparse(3+size(R1Xfk,1),3+size(R1Xfk,1));
         R1deltaFX0(1:3,1:3) = eye(3);
-        R1deltaFX0(4:2:end,1:3) = [repmat([1,0],size(R1Xfk,1)/2,1), -sin(R1Xp0(3))*R1Obs_k(1:2:end,2) - cos(R1Xp0(3))*R1Obs_k(2:2:end,2)];
-        R1deltaFX0(5:2:end,1:3) = [repmat([0,1],size(R1Xfk,1)/2,1), cos(R1Xp0(3))*R1Obs_k(1:2:end,2) - sin(R1Xp0(3))*R1Obs_k(2:2:end,2)];
+        R1deltaFX0(4:2:(end-1),1:3) = [repmat([1,0],size(R1Xfk,1)/2,1), -sin(R1Xp0(3))*R1Obs_k(1:2:(end-1),2) - cos(R1Xp0(3))*R1Obs_k(2:2:end,2)];
+        R1deltaFX0(5:2:end,1:3) = [repmat([0,1],size(R1Xfk,1)/2,1), cos(R1Xp0(3))*R1Obs_k(1:2:(end-1),2) - sin(R1Xp0(3))*R1Obs_k(2:2:end,2)];
         
         % covariance matrix of observed features at step 0
         R1Rn = [];
@@ -44,13 +38,13 @@ for k = 0:size(R1Odo,1)/3
 
         Pk0_R1 = blkdiag(R1O,R1Rn);
 
-        Xk00e_R1 = [R1Xrk;
+        Xk00e_R1 = [ones(3,1),zeros(3,1),R1Xp0;
             2*ones(size(R1Xfk,1),1),R1Xfk];
         Pk00_R1 = R1deltaFX0 * Pk0_R1 * R1deltaFX0';
 
         % find the shared observed feature IDs in 2nd robot
         % R2Zks_lv: logical vector of shared feature observation of
-        % 2nd robot
+        % 2nd robot at step k
         R2Zks_lv = ismember(R2Obs_k(:,1), R1Xfk(:,1));
         % R2Zks_idx: index of shared feature observation of
         % 2nd robot in R2Obs_k
@@ -60,34 +54,41 @@ for k = 0:size(R1Odo,1)/3
 
         R1Xfks_lv = ismember(R1Xfk(:,1), R2Obs_k(:,1));
         R1Xfks_idx = find(R1Xfks_lv);
-        XfkR1s = R1Xfk(R1Xfks_idx,:);
+        R1Xfks = R1Xfk(R1Xfks_idx,:);
 
         %% use Gauss-Newton iteration to optimize the 2nd robot pose at step 0
         % use the true value Xr0_true_R2 as the initial value of Xr0_R2 in the GN iteration
-        Xp0_true_R2(3) = wrap(Xp0_true_R2(3));
-        X = Xp0_true_R2';
-        FX = sparse(size(XfkR1s,1),1);
-        JFX = sparse(size(XfkR1s,1),3);
+        R2Xp0Gni = R2Xp0;
+        FX = sparse(size(R1Xfks,1),1);
+        JFX = sparse(size(R1Xfks,1),3);
 
         % PZ = [];
         % for kr2s = 1:size(R2Zks,1)/2
         %     PZ = blkdiag(PZ,DVk_R2);
         % end
         for gni_num = 1:100
-            FX(1:2:end, 1) = (XfkR1s(1:2:end,2) - X(1)) * cos(X(3)) + (XfkR1s(2:2:end,2) - X(2)) * sin(X(3));
-            FX(2:2:end, 1) = (XfkR1s(1:2:end,2) - X(1)) * -sin(X(3)) + (XfkR1s(2:2:end,2) - X(2)) * cos(X(3));
+            FX(1:2:(end-1),1) = (R1Xfks(1:2:(end-1),2) - R2Xp0Gni(1,1))*cos(R2Xp0Gni(3,1)) + (R1Xfks(2:2:end,2) - R2Xp0Gni(2,1))*sin(R2Xp0Gni(3,1));
 
-            JFX(1:2:end, :) = [repmat([-cos(X(3)), -sin(X(3))], size(XfkR1s,1)/2, 1), -sin(X(3)) * (XfkR1s(1:2:end,2)-X(1)) + cos(X(3)) * (XfkR1s(2:2:end,2)-X(2))];
-            JFX(2:2:end, :) = [repmat([sin(X(3)), -cos(X(3))], size(XfkR1s,1)/2, 1), -cos(X(3)) * (XfkR1s(1:2:end,2)-X(1)) - sin(X(3)) * (XfkR1s(2:2:end,2)-X(2))];
+            FX(2:2:end,1) = (R1Xfks(1:2:(end-1),2) - R2Xp0Gni(1,1))*-sin(R2Xp0Gni(3,1)) + (R1Xfks(2:2:end,2) - R2Xp0Gni(2,1))*cos(R2Xp0Gni(3,1));
 
-            X_old = X;
 
-            X_b = JFX'*(R2Zks(:,2) - FX + JFX*X);
-            % X_b = JFX'/PZ*(R2Zks(:,2) - FX + JFX*X);
 
-            X = (JFX'*JFX)\X_b;
+            JFX(1:2:(end-1),:) = [repmat([-cos(R2Xp0Gni(3,1)),-sin(R2Xp0Gni(3,1))],size(R1Xfks,1)/2, 1), ...
+                -sin(R2Xp0Gni(3,1))*(R1Xfks(1:2:(end-1),2)-R2Xp0Gni(1,1)) + cos(R2Xp0Gni(3,1))*(R1Xfks(2:2:end,2)-R2Xp0Gni(2,1))];
 
-            D = X - X_old;
+            JFX(2:2:end,:) = [repmat([sin(R2Xp0Gni(3,1)),-cos(R2Xp0Gni(3,1))],size(R1Xfks,1)/2, 1), ...
+                -cos(R2Xp0Gni(3,1))*(R1Xfks(1:2:(end-1),2)-R2Xp0Gni(1,1)) - sin(R2Xp0Gni(3,1))*(R1Xfks(2:2:end,2)-R2Xp0Gni(2,1))];
+            
+            full(JFX)
+
+            R2Xp0GniOld = R2Xp0Gni;
+
+            X_b = JFX'*(R2Zks(:,2) - FX + JFX*R2Xp0Gni);
+            % X_b = JFX'/PZ*(R2Zks(:,2) - FX + JFX*R2Xp0Gni);
+
+            R2Xp0Gni = (JFX'*JFX)\X_b;
+
+            D = R2Xp0Gni - R2Xp0GniOld;
             DD = D'*D;
 
             if DD < CC
@@ -95,7 +96,10 @@ for k = 0:size(R1Odo,1)/3
             end
         end
         
-        X(3) = wrap(X(3));
+        DeltaR2Xp0 = R2Xp0Gni-[R2XrTrue(1:2,2);R2XphiT(1,1)]
+        
+
+        R2Xp0Gni(3) = wrap(R2Xp0Gni(3));
        
         
         
@@ -108,7 +112,7 @@ for k = 0:size(R1Odo,1)/3
         %% combined Xk00e_R1 and Xk00e_R2n as the feature positions observed by all robots of the state
         % vector
         Xk00_e =  [Xk00e_R1(1:3,:);
-            ones(3,1) zeros(3,1) X;
+            ones(3,1) zeros(3,1) R2Xp0Gni;
             Xk00e_R1(4:end,:)];
 
         % Xk00_e:
