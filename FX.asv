@@ -1,0 +1,4 @@
+function Fx = FX(Xfk,Xp0Gni)
+Fx = sparse(size(Xfk,1),1);
+Fx(1:2:(end-1),1) = (Xfk(1:2:(end-1),2) - Xp0Gni(1,1))*cos(Xp0Gni(3,1)) + (Xfk(2:2:end,2) - Xp0Gni(2,1))*sin(Xp0Gni(3,1));
+Fx(2:2:end,1) = (Xfk(1:2:(end-1),2) - Xp0Gni(1,1))*-sin(Xp0Gni(3,1)) + (Xfk(2:2:end,2) - Xp0Gni(2,1))*cos(Xp0Gni(3,1));

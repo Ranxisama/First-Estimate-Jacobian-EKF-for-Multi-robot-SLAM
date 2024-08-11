@@ -52,7 +52,7 @@ R2R = [R2sigma_zv^2,0;
 
 %% Switch to change
 R1addOdoNoise = 1; % if 0, R1 odometry is perfect
-R2addOdoNoise = 1; % if 0, R2 odometry is perfect
+R2addOdoNoise = 0; % if 0, R2 odometry is perfect
 
 R1addObsNoise = 1; % if 0, R1 observation is perfect
 R2addObsNoise = 1; % if 0, R2 observation is perfect
