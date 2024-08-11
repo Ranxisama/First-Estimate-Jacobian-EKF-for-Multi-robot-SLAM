@@ -20,6 +20,8 @@ for gni_num = 1:100
 
     % X_b = JFx'*(R2Zks(:,2)-Fx+JFx*X);
     % X = (JFx'*JFx)\X_b;
+    % X_b = JFx'/R1Pfks*(R2Zks(:,2)-Fx+JFx*X);
+    % X = (JFx'/R1Pfks*JFx)\X_b;
     X_b = JFx'/R1Pfks*(R2Zks(:,2)-Fx+JFx*X);
     X = (JFx'/R1Pfks*JFx)\X_b;
 

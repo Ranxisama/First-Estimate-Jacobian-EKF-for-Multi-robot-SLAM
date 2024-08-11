@@ -58,7 +58,7 @@ R1addObsNoise = 1; % if 0, R1 observation is perfect
 R2addObsNoise = 1; % if 0, R2 observation is perfect
 
 R1addPose0Noise = 0; % if 0, R1 initial position is accurate
-R2addPose0Noise = 1; % if 0, R2 initial position is accurate
+R2addPose0Noise = 0; % if 0, R2 initial position is accurate
 
 R1sensorRange = 8; % m/s, R1's observation range for the features
 R2sensorRange = 8; % m/s, R2's observation range for the features

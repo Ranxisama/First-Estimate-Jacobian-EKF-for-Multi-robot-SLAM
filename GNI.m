@@ -14,7 +14,8 @@ for gni_num = 1:100
 
     JFx = JacobiFX(R2Xp0Gni,XfksGni);
 
-    % full(JFX)
+    % R2Zks(:,2)-Fx
+    % JFx*X
 
     Xold = X;
 
