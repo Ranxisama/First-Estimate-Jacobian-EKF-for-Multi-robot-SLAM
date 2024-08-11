@@ -9,12 +9,14 @@ R2XrTrue = dataModify(wp2);
 XfTrueAll = dataModify(lm);
 XfTrueAll(:,1)=XfTrueAll(:,1)+1;
 
-hold on
-plot(R1XrTrue(1:2:end-1,2),R1XrTrue(2:2:end,2),'-bo')
-plot(R2XrTrue(1:2:end-1,2),R2XrTrue(2:2:end,2),'-ro')
-xlim([-50,50])
-ylim([-50,50])
-hold off
+% hold on
+% plot(R1XrTrue(1:2:(end-1),2),R1XrTrue(2:2:end,2),'-bo')
+% plot(R2XrTrue(1:2:(end-1),2),R2XrTrue(2:2:end,2),'-ro')
+% plot(XfTrueAll(1:2:(end-1),2),XfTrueAll(2:2:end,2),'g*')
+% text(XfTrueAll(1:2:(end-1),2),XfTrueAll(2:2:end,2),num2str(XfTrueAll(2:2:end,1)))
+% xlim([-50,50])
+% ylim([-50,50])
+% hold off
 
 R1PosNum = size(R1XrTrue,1)/2;
 R2PosNum = size(R2XrTrue,1)/2;

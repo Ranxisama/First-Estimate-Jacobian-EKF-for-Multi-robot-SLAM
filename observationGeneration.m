@@ -6,14 +6,17 @@ end
 
 obs = [];
 for k = 0:PosNum-1
+    XrkT = XrTrue(XrTrue(:,1)==k,2);
+    XphikT = XphiTrue(XphiTrue(:,1)==k,2);
     for j = 1:size(XfTrueAll,1)/2
+        XfjT = XfTrueAll((j-1)*2+(1:2),2);
         % Euclidean distance from the feature to the robot
-        DeltaDist = XfTrueAll((j-1)*2+(1:2),2)-XrTrue(XrTrue(:,1)==k);
+        DeltaDist = XfjT - XrkT;
         % FeaRobDis: distance from the feature to the robot
         FeaRobDist = sqrt(sum(DeltaDist.^2));
         if FeaRobDist <= sensorRange
-            Rot = rotationMatrix(XphiTrue(XphiTrue(:,1)==k,2));
-            obs(end+1:end+2,1:3) = [[k;k],XfTrueAll((j-1)*2+(1:2),1), ...
+            Rot = rotationMatrix(XphikT);
+            obs((end+1):(end+2),1:3) = [[k;k],XfTrueAll((j-1)*2+(1:2),1), ...
                 Rot'*DeltaDist+R*randn(2,1)]; 
         end
     end
