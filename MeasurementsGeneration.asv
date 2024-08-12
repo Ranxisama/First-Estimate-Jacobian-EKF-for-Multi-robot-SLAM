@@ -43,36 +43,37 @@ save('Parameters.mat','R1XrTrue','R1XphiT','R2XrTrue','R2XphiT','XfTrueAll')
 save('Measurements.mat','R1Xp0','R1Odo','R1Obs','R2Xp0','R2Odo','R2Obs')
 
 %% Measurements Check
-% hold on
-% plot(R1XrTrue(1:2:(end-1),2),R1XrTrue(2:2:end,2),'-bo')
-% plot(R2XrTrue(1:2:(end-1),2),R2XrTrue(2:2:end,2),'-co')
-% plot(XfTrueAll(1:2:(end-1),2),XfTrueAll(2:2:end,2),'g*')
-% text(XfTrueAll(1:2:(end-1),2),XfTrueAll(2:2:end,2),num2str(XfTrueAll(2:2:end,1)))
-% 
-% 
-% 
-% R1Xf = [];
-% for R1k = 0:(R1PosNum-1)
-%     if R1k == 0
-%         R1Xpk = R1Xp0;
-%         R1Xp = R1Xpk;
-%     else
-%         R1Odok = R1Odo(R1Odo(:,2)==R1k,3);
-%         R1Xpk(1:2,1) = R1Xpk(1:2,1) + rotationMatrix(R1Xpk(3,1))*R1Odok(1:2,1);
-%         R1Xpk(3,1) = R1Xpk(3,1) + R1Odok(3,1);
-%         R1Xp = [R1Xp;R1Xpk];
-%     end
-% 
-%     R1Zk = R1Obs(R1Obs(:,1)==R1k,2:3);
-%     for R1j = 1:(size(R1Zk,1)/2)
-%         R1Xfk = R1Xp(R1k*3+(1:2),1) + rotationMatrix(R1Xp(R1k*3+3,1)) * R1Zk((R1j-1)*2+(1:2),2);
-%         R1Xf = [R1Xf;R1Zk((R1j-1)*2+(1:2),1),R1Xfk];
-%     end
-% 
-% end
-% plot(R1Xp(1:3:(end-2),1),R1Xp(2:3:(end-1),1),'--ro')
-% plot(R1Xf(1:2:(end-1),2),R1Xf(2:2:end,2),'k^')
-% text(R1Xf(1:2:(end-1),2),R1Xf(2:2:end,2),num2str(R1Xf(2:2:end,1)),"Color",'k')
-% xlim([fea_xlb,fea_xub])
-% ylim([fea_ylb,fea_yub])
-% hold off
+hold on
+plot(R1XrTrue(1:2:(end-1),2),R1XrTrue(2:2:end,2),'-bo')
+plot(R2XrTrue(1:2:(end-1),2),R2XrTrue(2:2:end,2),'-co')
+plot(XfTrueAll(1:2:(end-1),2),XfTrueAll(2:2:end,2),'g*')
+text(XfTrueAll(1:2:(end-1),2),XfTrueAll(2:2:end,2),num2str(XfTrueAll(2:2:end,1)))
+
+
+
+R1Xf = [];
+for R1k = 0:(R1PosNum-1)
+    if R1k == 0
+        R1Xpk = R1Xp0;
+        R1Xp = R1Xpk;
+    else
+        R1Odok = R1Odo(R1Odo(:,2)==R1k,3);
+        R1Xpk(1:2,1) = R1Xpk(1:2,1) + rotationMatrix(R1Xpk(3,1))*R1Odok(1:2,1);
+        R1Xpk(3,1) = R1Xpk(3,1) + R1Odok(3,1);
+        R1Xp = [R1Xp;R1Xpk];
+    end
+    if R1k ~= 0
+        R1Zk = R1Obs(R1Obs(:,1)==R1k,2);
+        for R1j = 1:(size(R1Zk,1)/2)
+            R1Xfk = R1Xpk(1:2,1) + rotationMatrix(R1Xpk(3,1)) * R1Zk((R1j-1)*2+(1:2),1);
+            R1Xf = [R1Xf;R1Xfk];
+        end
+
+    end
+end
+plot(R1Xp(1:3:(end-2),1),R1Xp(2:3:(end-1),1),'--ro')
+plot(R1Xf(1:2:(end-1),1),R1Xf(2:2:end,1),'k^')
+
+xlim([fea_xlb,fea_xub])
+ylim([fea_ylb,fea_yub])
+hold off

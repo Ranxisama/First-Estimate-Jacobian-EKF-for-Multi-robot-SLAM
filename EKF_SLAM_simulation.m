@@ -15,47 +15,14 @@ for k = 0:size(R1Odo,1)/3
     R2Obs_k = R2Obs(R2Obs(:,1)==k,2:3);
 
     if k == 0
-        %% estimate observed feature's state of R1 at step 0 using the observation model
-        % R1Xfk = R1Obs_k;
-        % R1Xfk(1:2:(end-1),2) = R1Xp0(1,1) + cos(R1Xp0(3,1))*(R1Obs_k(1:2:(end-1),2)) - sin(R1Xp0(3,1))*(R1Obs_k(2:2:end,2));
-        % R1Xfk(2:2:end,2) = R1Xp0(2,1) + sin(R1Xp0(3,1))*(R1Obs_k(1:2:(end-1),2)) + cos(R1Xp0(3,1))*(R1Obs_k(2:2:end,2));
-        % 
-        % % XfTrueAll
-        % 
-        % R1deltaFX0 = sparse(3+size(R1Xfk,1),3+size(R1Xfk,1));
-        % 
-        % R1deltaFX0(1:3,1:3) = eye(3);
-        % 
-        % R1deltaFX0(4:2:(end-1),1:3) = [repmat([1,0],size(R1Xfk,1)/2,1), ...
-        %     -sin(R1Xp0(3))*R1Obs_k(1:2:(end-1),2) - cos(R1Xp0(3))*R1Obs_k(2:2:end,2)];
-        % 
-        % R1deltaFX0(5:2:end,1:3) = [repmat([0,1],size(R1Xfk,1)/2,1), ...
-        %     cos(R1Xp0(3))*R1Obs_k(1:2:(end-1),2) - sin(R1Xp0(3))*R1Obs_k(2:2:end,2)];
-        % 
-        % % covariance matrix of observed features at step 0
-        % R1Rn = [];
-        % for R1j = 1:size(R1Xfk)/2
-        %     R1Rn = blkdiag(R1Rn, R1R);
-        %     R1deltaFX0(3+(R1j-1)*2+(1:2),3+(R1j-1)*2+(1:2)) = [cos(R1Xp0(3,1)), -sin(R1Xp0(3,1));
-        %         sin(R1Xp0(3,1)), cos(R1Xp0(3,1))];
-        % end
-        % 
-        % R1Pk0 = blkdiag(R1O,R1Rn);
-        % 
-        % R1Xk00e = [ones(3,1),zeros(3,1),R1Xp0;
-        %     2*ones(size(R1Xfk,1),1),R1Xfk];
-        % R1Pk00 = R1deltaFX0 * R1Pk0 * R1deltaFX0';
-
-       
-        
-        % find the shared observed feature IDs in 2nd robot
-        % R2Zks_lv: logical vector of shared feature observation of
-        % 2nd robot at step k
+        % find the shared observed feature IDs in 1st robot
+        % R1Zks_lv: logical vector of shared feature observation of
+        % 1st robot at step k
         R1Zks_lv = ismember(R1Obs_k(:,1), R2Obs_k(:,1));
-        % R2Zks_idx: index of shared feature observation of
-        % 2nd robot in R2Obs_k
+        % R1Zks_idx: index of shared feature observation of
+        % 1st robot in R2Obs_k
         R1Zks_idx = find(R1Zks_lv);
-        % R2Zks: shared feature observation of 2nd robot
+        % R1Zks: shared feature observation of 1st robot
         R1Zks = R1Obs_k(R1Zks_idx,:);
         R1Xfks = R1Zks;
         R1Xfks(1:2:(end-1),2) = R1Xp0(1,1) + cos(R1Xp0(3,1))*(R1Zks(1:2:(end-1),2)) - sin(R1Xp0(3,1))*(R1Zks(2:2:end,2));
@@ -161,8 +128,8 @@ for k = 0:size(R1Odo,1)/3
 
         
         
-        XrR1_full = Xk00e(1:3,2:3); % save all robot postures of R1
-        XrR2_full = Xk00e(4:6,2:3); % save all robot postures of R2
+        R1XrFull = Xk00e(1:3,2:3); % save all robot postures of R1
+        R2XrFull = Xk00e(4:6,2:3); % save all robot postures of R2
         continue
     end
 
@@ -344,8 +311,8 @@ for k = 0:size(R1Odo,1)/3
         Pk11 = Pk10S;
     end
     
-    XrR1_full = [XrR1_full;Xk11e(1:3,2:3)];
-    XrR2_full = [XrR2_full;Xk11e(4:6,2:3)];
+    R1XrFull = [R1XrFull;Xk11e(1:3,2:3)];
+    R2XrFull = [R2XrFull;Xk11e(4:6,2:3)];
 
     Xk00e = Xk11e;
     Pk00 = Pk11;
@@ -356,23 +323,23 @@ figure
 
 hold on 
 
-plot(XrR1_full(1:3:(end-2),2),XrR1_full(2:3:(end-1),2),'--ro');
-plot(XrR2_full(1:3:(end-2),2),XrR2_full(2:3:(end-1),2),'--mo');
-
-plot(Xk11e(7:2:(end-1),3),Xk11e(8:2:end,3),'^','Color', [0.6, 0.4, 0.2])
-text(Xk11e(7:2:(end-1),3),Xk11e(8:2:end,3), num2str(Xk11e(7:2:(end-1),2)), 'VerticalAlignment', 'bottom', 'HorizontalAlignment', 'right', 'Color', [0.6, 0.4, 0.2])
-
-xlim([fea_xlb, fea_xub])
-ylim([fea_ylb, fea_yub])
+plot(R1XrFull(1:3:(end-2),2),R1XrFull(2:3:(end-1),2),'--ro');
+plot(R2XrFull(1:3:(end-2),2),R2XrFull(2:3:(end-1),2),'--mo');
 
 plot(R1XrTrue(1:2:(end-1),2),R1XrTrue(2:2:end,2),'-bo')
 plot(R2XrTrue(1:2:(end-1),2),R2XrTrue(2:2:end,2),'-co')
 
-% plot(Xf_true(:,2),Xf_true(:,3),'k^')
-plot(XfTrueAll(1:2:(end-1),2),XfTrueAll(2:2:end,2),'k^')
-text(XfTrueAll(1:2:(end-1),2),XfTrueAll(2:2:end,2), num2str(XfTrueAll(1:2:(end-1),1)), 'VerticalAlignment', 'bottom', 'HorizontalAlignment', 'right', 'Color', 'k')
+% plot(Xk11e(7:2:(end-1),3),Xk11e(8:2:end,3),'^','k^')
+% text(Xk11e(7:2:(end-1),3),Xk11e(8:2:end,3), num2str(Xk11e(7:2:(end-1),2)), 'VerticalAlignment', 'bottom', 'HorizontalAlignment', 'right', 'Color', 'k')
 
-legend('Estimated robot postures of R1','Estimated robot postures of R2','Estimated feature positions' , 'True robot postures of R1', 'True robot postures of R2', 'True feature positions')
+% plot(XfTrueAll(1:2:(end-1),2),XfTrueAll(2:2:end,2),'g^')
+% text(XfTrueAll(1:2:(end-1),2),XfTrueAll(2:2:end,2), num2str(XfTrueAll(1:2:(end-1),1)), 'VerticalAlignment', 'bottom', 'HorizontalAlignment', 'right', 'Color', 'g')
+
+legend('Estimated robot postures of R1','Estimated robot postures of R2', 'True robot postures of R1', 'True robot postures of R2')
+% legend('Estimated robot postures of R1','Estimated robot postures of R2', 'True robot postures of R1', 'True robot postures of R2', 'Estimated feature positions', 'True feature positions')
+
+xlim([fea_xlb, fea_xub])
+ylim([fea_ylb, fea_yub])
 xlabel('x')
 ylabel('y')
 title('True X vs Multi-robots EKF')
