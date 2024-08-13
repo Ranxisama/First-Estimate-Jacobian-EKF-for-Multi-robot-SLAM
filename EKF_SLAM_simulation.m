@@ -315,42 +315,42 @@ for k = 0:size(R1Odo,1)/3
         R1DV = [];
         R2DV = [];
         if ~isempty(R1Zks)
-            HX10e(1:2:(size(R1Zks,1)-1),1) = cos(Xk10e(3,3))*(R1Xfks(1:2:(end-1),2)-Xk10e(1,3)) + ...
-                sin(Xk10e(3,3))*(R1Xfks(2:2:end,2)-Xk10e(2,3));
-            HX10e(2:2:size(R1Zks,1),1) = -sin(Xk10e(3,3))*(R1Xfks(1:2:(end-1),2)-Xk10e(1,3)) + ...
-                cos(Xk10e(3,3))*(R1Xfks(2:2:end,2)-Xk10e(2,3));
+            HX10e(1:2:(size(R1Zks,1)-1),1) = cos(Xk10eFI(3,3))*(R1Xfks(1:2:(end-1),2)-Xk10eFI(1,3)) + ...
+                sin(Xk10eFI(3,3))*(R1Xfks(2:2:end,2)-Xk10eFI(2,3));
+            HX10e(2:2:size(R1Zks,1),1) = -sin(Xk10eFI(3,3))*(R1Xfks(1:2:(end-1),2)-Xk10eFI(1,3)) + ...
+                cos(Xk10eFI(3,3))*(R1Xfks(2:2:end,2)-Xk10eFI(2,3));
 
-            JHX10e(1:2:(size(R1Zks,1)-1),1:3) = [repmat([-cos(Xk10e(3,3)),-sin(Xk10e(3,3))],size(R1Zks,1)/2,1), ...
-                -sin(Xk10e(3,3))*(R1Xfks(1:2:(end-1),2)-Xk10e(1,3))+cos(Xk10e(3,3))*(R1Xfks(2:2:end,2)-Xk10e(2,3))];
+            JHX10e(1:2:(size(R1Zks,1)-1),1:3) = [repmat([-cos(Xk10eFI(3,3)),-sin(Xk10eFI(3,3))],size(R1Zks,1)/2,1), ...
+                -sin(Xk10eFI(3,3))*(R1Xfks(1:2:(end-1),2)-Xk10eFI(1,3))+cos(Xk10eFI(3,3))*(R1Xfks(2:2:end,2)-Xk10eFI(2,3))];
 
-            JHX10e(2:2:size(R1Zks,1),1:3) = [repmat([sin(Xk10e(3,3)),-cos(Xk10e(3,3))],size(R1Zks,1)/2,1), ...
-                -cos(Xk10e(3,3))*(R1Xfks(1:2:(end-1),2)-Xk10e(1,3))-sin(Xk10e(3,3))*(R1Xfks(2:2:end,2)-Xk10e(2,3))];
+            JHX10e(2:2:size(R1Zks,1),1:3) = [repmat([sin(Xk10eFI(3,3)),-cos(Xk10eFI(3,3))],size(R1Zks,1)/2,1), ...
+                -cos(Xk10eFI(3,3))*(R1Xfks(1:2:(end-1),2)-Xk10eFI(1,3))-sin(Xk10eFI(3,3))*(R1Xfks(2:2:end,2)-Xk10eFI(2,3))];
 
             for R1kj = 1:size(R1Zks,1)/2
                 R1DV = blkdiag(R1DV,R1R);
-                JHX10e((R1kj-1)*2+(1:2), R1Xfks_idx((R1kj-1)*2+(1:2),1)') = rotationMatrix(Xk10e(3,3))';
+                JHX10e((R1kj-1)*2+(1:2), R1Xfks_idx((R1kj-1)*2+(1:2),1)') = rotationMatrix(Xk10eFI(3,3))';
             end
         end
 
         if ~isempty(R2Zks)
-            HX10e(size(R1Zks,1)+(1:2:(size(R2Zks,1)-1)),1) = cos(Xk10e(6,3))*(R2Xfks(1:2:(end-1),2)-Xk10e(4,3)) + ...
-                sin(Xk10e(6,3))*(R2Xfks(2:2:end,2)-Xk10e(5,3));
-            HX10e(size(R1Zks,1)+(2:2:size(R2Zks,1)),1) = -sin(Xk10e(6,3))*(R2Xfks(1:2:(end-1),2)-Xk10e(4,3)) + ...
-                cos(Xk10e(6,3))*(R2Xfks(2:2:end,2)-Xk10e(5,3));
+            HX10e(size(R1Zks,1)+(1:2:(size(R2Zks,1)-1)),1) = cos(Xk10eFI(6,3))*(R2Xfks(1:2:(end-1),2)-Xk10eFI(4,3)) + ...
+                sin(Xk10eFI(6,3))*(R2Xfks(2:2:end,2)-Xk10eFI(5,3));
+            HX10e(size(R1Zks,1)+(2:2:size(R2Zks,1)),1) = -sin(Xk10eFI(6,3))*(R2Xfks(1:2:(end-1),2)-Xk10eFI(4,3)) + ...
+                cos(Xk10eFI(6,3))*(R2Xfks(2:2:end,2)-Xk10eFI(5,3));
 
-            JHX10e(size(R1Zks,1)+(1:2:size(R2Zks,1)-1),4:6) = [repmat([-cos(Xk10e(6,3)),-sin(Xk10e(6,3))],size(R2Zks,1)/2,1), ...
-                -sin(Xk10e(6,3))*(R2Xfks(1:2:(end-1),2)-Xk10e(4,3))+cos(Xk10e(6,3))*(R2Xfks(2:2:end,2)-Xk10e(5,3))];
+            JHX10e(size(R1Zks,1)+(1:2:size(R2Zks,1)-1),4:6) = [repmat([-cos(Xk10eFI(6,3)),-sin(Xk10eFI(6,3))],size(R2Zks,1)/2,1), ...
+                -sin(Xk10eFI(6,3))*(R2Xfks(1:2:(end-1),2)-Xk10eFI(4,3))+cos(Xk10eFI(6,3))*(R2Xfks(2:2:end,2)-Xk10eFI(5,3))];
 
-            JHX10e(size(R1Zks,1)+(2:2:size(R2Zks,1)),4:6) = [repmat([sin(Xk10e(6,3)),-cos(Xk10e(6,3))],size(R2Zks,1)/2,1), ...
-                -cos(Xk10e(6,3))*(R2Xfks(1:2:(end-1),2)-Xk10e(4,3))-sin(Xk10e(6,3))*(R2Xfks(2:2:end,2)-Xk10e(5,3))];
+            JHX10e(size(R1Zks,1)+(2:2:size(R2Zks,1)),4:6) = [repmat([sin(Xk10eFI(6,3)),-cos(Xk10eFI(6,3))],size(R2Zks,1)/2,1), ...
+                -cos(Xk10eFI(6,3))*(R2Xfks(1:2:(end-1),2)-Xk10eFI(4,3))-sin(Xk10eFI(6,3))*(R2Xfks(2:2:end,2)-Xk10eFI(5,3))];
 
             for R2kj = 1:size(R2Zks,1)/2
                 R2DV = blkdiag(R2DV,R2R);
-                JHX10e(size(R1Zks,1)+(R2kj-1)*2+(1:2), R2Xfks_idx((R2kj-1)*2+(1:2),1)') = rotationMatrix(Xk10e(6,3))';
+                JHX10e(size(R1Zks,1)+(R2kj-1)*2+(1:2), R2Xfks_idx((R2kj-1)*2+(1:2),1)') = rotationMatrix(Xk10eFI(6,3))';
             end
         end
 
-        % JHX10_e = full(JHX10e);
+        JHX10_e = full(JHX10e);
         DV = blkdiag(R1DV,R2DV);
 
         % Innovation Covariance S and Kalman Gain K
