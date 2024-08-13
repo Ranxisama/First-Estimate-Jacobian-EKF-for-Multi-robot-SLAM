@@ -4,6 +4,8 @@ XsGni = Xs;
 
 for gni_num = 1:100
 
+    XsGni([3,6],1) = wrap(XsGni([3,6],1));
+
     Fx = F(XsGni,Zks);
 
     JFx = JacobiF(XsGni,Zks);
@@ -24,5 +26,5 @@ for gni_num = 1:100
     end
 end
 
-
+XsGni([3,6],1) = wrap(XsGni([3,6],1));
 PsGni = inv(JFx'/Ps*JFx); % R2Pp0Gni: Cov of R2 posture

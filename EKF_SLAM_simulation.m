@@ -358,11 +358,14 @@ for k = 0:size(R1Odo,1)/3
         Ks = Pk10FI * JHX10e' /Ss;
 
         % Updating process using observation model
-        Xk11e(:,3) = Xk10eFI(:,3) + Ks*(Zks(:,3)-HX10e);
+        % Xk11e(:,3) = Xk10eFI(:,3) + Ks*(Zks(:,3)-HX10e);
+        Xk11e(:,3) = Xk10eFI(:,3) + wrap(Ks*(Zks(:,3)-HX10e));
+        Xk11e([3,6],3) = wrap(Xk11e([3,6],3));
+
         Pk11 = Pk10FI - Ks*Ss*Ks';
     end
-    
-     % Updatiing process check
+
+    % Updatiing process check
     if realTimeCheck == 1
         hold on
         plot(Xk11e(1,3),Xk11e(2,3),'ro')
