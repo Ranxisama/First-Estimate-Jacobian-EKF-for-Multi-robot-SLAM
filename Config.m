@@ -64,3 +64,5 @@ R1sensorRange = 8; % m/s, R1's observation range for the features
 R2sensorRange = 8; % m/s, R2's observation range for the features
 
 reqSharedObsNum = 8; % Required number of shared feature observations
+
+realTimeCheck = 1;

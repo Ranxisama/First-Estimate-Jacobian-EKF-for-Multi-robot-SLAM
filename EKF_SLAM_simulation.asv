@@ -365,13 +365,13 @@ for k = 0:size(R1Odo,1)/3
      % Updatiing process check
     if realTimeCheck == 1
         hold on
-        plot(Xk11e(1,3),Xk11e(2,3),'ro')
-        plot(Xk11e(4,3),Xk11e(5,3),'mo')
+        plot(Xk10eFI(1,3),Xk10eFI(2,3),'ro')
+        plot(Xk10eFI(4,3),Xk10eFI(5,3),'mo')
         hold off
-        if ~isempty(Zks)
+        if ~isempty(Xfn)
             hold on
-            plot(Xk11e(7:2:(end-1),3),Xk11e(8:2:end,3),'y*')
-            text(Xk11e(7:2:(end-1),3),Xk11e(8:2:end,3),num2str(Xk11e(7:2:(end-1),2)),'Color','y')
+            plot(Xfn(1:2:(end-1),2),Xfn(2:2:end,2),'*','Color',[0.6, 0.3, 0])
+            text(Xfn(1:2:(end-1),2),Xfn(2:2:end,2),num2str(Xfn(1:2:(end-1),1)),'Color',[0.6, 0.3, 0])
             hold off
         end
     end
