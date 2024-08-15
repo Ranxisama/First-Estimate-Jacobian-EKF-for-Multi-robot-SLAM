@@ -9,7 +9,6 @@ Config;
 for k = 0:size(R1Odo,1)/3
 
     % k
-    
 
     R1Obs_k = R1Obs(R1Obs(:,1)==k,2:3);
     R2Obs_k = R2Obs(R2Obs(:,1)==k,2:3);
@@ -55,12 +54,12 @@ for k = 0:size(R1Odo,1)/3
         Ps = blkdiag(R1O,R2O,R1sRn,R2sRn);
 
         Zks = [Xs(1:6,3);R1Zks(:,2);R2Zks(:,2)];
-        
+
         XsGni = Xs;
         [XsGni(:,3),PsGni] = GNI(Xs(:,3),Ps,Zks,CC);
-      
-        
-        
+        XsGni([3,6],1) = wrap(XsGni([3,6],1));
+
+
         %% estimate new observed feature's state at step 0 using the observation model
         % find the new observed feature IDs in 1st robot
         % R1Zkn_lv: logical vector of new feature observation of
@@ -133,21 +132,23 @@ for k = 0:size(R1Odo,1)/3
 
         % Initial state estimates check
         if realTimeCheck == 1
-        figure(1)
-        hold on
-        plot(R1XrTrue(1:2:(end-1),2),R1XrTrue(2:2:end,2),'-bo')
-        plot(R2XrTrue(1:2:(end-1),2),R2XrTrue(2:2:end,2),'-co')
-        plot(XfTrueAll(1:2:(end-1),2),XfTrueAll(2:2:end,2),'g*')
-        text(XfTrueAll(1:2:(end-1),2),XfTrueAll(2:2:end,2),num2str(XfTrueAll(2:2:end,1)),"Color",'g')
+            figure(1)
+            hold on
+            if k == 0
+                plot(R1XrTrue(1:2:(end-1),2),R1XrTrue(2:2:end,2),'-bo')
+                plot(R2XrTrue(1:2:(end-1),2),R2XrTrue(2:2:end,2),'-co')
+                plot(XfTrueAll(1:2:(end-1),2),XfTrueAll(2:2:end,2),'g*')
+                text(XfTrueAll(1:2:(end-1),2),XfTrueAll(2:2:end,2),num2str(XfTrueAll(2:2:end,1)),"Color",'g')
+            end
 
-        plot(Xk00e(1,3),Xk00e(2,3),'ro')
-        plot(Xk00e(4,3),Xk00e(5,3),'mo')
-        plot(Xk00e(7:2:(end-1),3),Xk00e(8:2:end,3),'k*')
-        text(Xk00e(7:2:(end-1),3),Xk00e(8:2:end,3),num2str(Xk00e(8:2:end,2)),"Color",'k')
-        xlim([fea_xlb,fea_xub])
-        ylim([fea_ylb,fea_yub])
-        title('Initial state estimates check')
-        hold off
+            plot(Xk00e(1,3),Xk00e(2,3),'-ro')
+            plot(Xk00e(4,3),Xk00e(5,3),'-mo')
+            plot(Xk00e(7:2:(end-1),3),Xk00e(8:2:end,3),'k*')
+            text(Xk00e(7:2:(end-1),3),Xk00e(8:2:end,3),num2str(Xk00e(8:2:end,2)),"Color",'k')
+            xlim([fea_xlb,fea_xub])
+            ylim([fea_ylb,fea_yub])
+            title('Initial state estimates check')
+            hold off
         end
 
         continue
@@ -169,10 +170,14 @@ for k = 0:size(R1Odo,1)/3
         R2Odo_k(3,1)];
 
     Xk10e([3,6],3) = wrap(Xk10e([3,6],3));
-    
+
     % % Prediction check
     if realTimeCheck == 1
-    Xp = [R1XrTrue(R1XrTrue(:,1)==k,:);R1XphiT(R1XphiT(:,1)==k,:);R2XrTrue(R2XrTrue(:,1)==k,:);R2XphiT(R2XphiT(:,1)==k,:)]
+        hold on
+        plot(Xk10e(1,3),Xk10e(2,3),'-ro')
+        plot(Xk10e(4,3),Xk10e(5,3),'-mo')
+        hold off
+        Xpk = [R1XrTrue(R1XrTrue(:,1)==k,:);R1XphiT(R1XphiT(:,1)==k,:);R2XrTrue(R2XrTrue(:,1)==k,:);R2XphiT(R2XphiT(:,1)==k,:)]
     end
 
     DeltaFX = sparse(size(Xk10e,1),size(Xk10e,1));
@@ -272,10 +277,6 @@ for k = 0:size(R1Odo,1)/3
 
     % Feature initialization check
     if realTimeCheck == 1
-        hold on
-        plot(Xk10eFI(1,3),Xk10eFI(2,3),'ro')
-        plot(Xk10eFI(4,3),Xk10eFI(5,3),'mo')
-        hold off
         if ~isempty(Xfn)
             hold on
             plot(Xfn(1:2:(end-1),2),Xfn(2:2:end,2),'*','Color',[0.6, 0.3, 0])
@@ -350,7 +351,7 @@ for k = 0:size(R1Odo,1)/3
             end
         end
 
-        JHX10_e = full(JHX10e);
+        % JHX10_e = full(JHX10e)
         DV = blkdiag(R1DV,R2DV);
 
         % Innovation Covariance S and Kalman Gain K
@@ -358,14 +359,14 @@ for k = 0:size(R1Odo,1)/3
         Ks = Pk10FI * JHX10e' /Ss;
 
         % Updating process using observation model
+        % Xk11e(:,3) = Xk10eFI(:,3) + Ks*(Zks(:,3)-HX10e);
         Xk11e(:,3) = Xk10eFI(:,3) + Ks*(Zks(:,3)-HX10e);
-        % Xk11e(:,3) = Xk10eFI(:,3) + wrap(Ks*(Zks(:,3)-HX10e));
         Xk11e([3,6],3) = wrap(Xk11e([3,6],3));
 
         Pk11 = Pk10FI - Ks*Ss*Ks';
     end
 
-    % Updatiing process check
+    % Updating process check
     if realTimeCheck == 1
         hold on
         plot(Xk11e(1,3),Xk11e(2,3),'ro')
@@ -373,8 +374,8 @@ for k = 0:size(R1Odo,1)/3
         hold off
         if ~isempty(Zks)
             hold on
-            plot(Xk11e(7:2:(end-1),3),Xk11e(8:2:end,3),'y*')
-            text(Xk11e(7:2:(end-1),3),Xk11e(8:2:end,3),num2str(Xk11e(7:2:(end-1),2)),'Color','y')
+            plot(Xk11e(7:2:(end-1),3),Xk11e(8:2:end,3),'*','Color',[1, 0.5, 0]) % yellow
+            text(Xk11e(7:2:(end-1),3),Xk11e(8:2:end,3),num2str(Xk11e(7:2:(end-1),2)),'Color',[1, 0.5, 0]) % yellow
             hold off
         end
     end

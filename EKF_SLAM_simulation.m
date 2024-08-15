@@ -9,7 +9,6 @@ Config;
 for k = 0:size(R1Odo,1)/3
 
     % k
-    
 
     R1Obs_k = R1Obs(R1Obs(:,1)==k,2:3);
     R2Obs_k = R2Obs(R2Obs(:,1)==k,2:3);
@@ -55,12 +54,12 @@ for k = 0:size(R1Odo,1)/3
         Ps = blkdiag(R1O,R2O,R1sRn,R2sRn);
 
         Zks = [Xs(1:6,3);R1Zks(:,2);R2Zks(:,2)];
-        
+
         XsGni = Xs;
         [XsGni(:,3),PsGni] = GNI(Xs(:,3),Ps,Zks,CC);
-      
-        
-        
+        XsGni([3,6],1) = wrap(XsGni([3,6],1));
+
+
         %% estimate new observed feature's state at step 0 using the observation model
         % find the new observed feature IDs in 1st robot
         % R1Zkn_lv: logical vector of new feature observation of
@@ -133,21 +132,23 @@ for k = 0:size(R1Odo,1)/3
 
         % Initial state estimates check
         if realTimeCheck == 1
-        figure(1)
-        hold on
-        plot(R1XrTrue(1:2:(end-1),2),R1XrTrue(2:2:end,2),'-bo')
-        plot(R2XrTrue(1:2:(end-1),2),R2XrTrue(2:2:end,2),'-co')
-        plot(XfTrueAll(1:2:(end-1),2),XfTrueAll(2:2:end,2),'g*')
-        text(XfTrueAll(1:2:(end-1),2),XfTrueAll(2:2:end,2),num2str(XfTrueAll(2:2:end,1)),"Color",'g')
+            figure(1)
+            hold on
+            if k == 0
+                plot(R1XrTrue(1:2:(end-1),2),R1XrTrue(2:2:end,2),'-bo')
+                plot(R2XrTrue(1:2:(end-1),2),R2XrTrue(2:2:end,2),'-co')
+                plot(XfTrueAll(1:2:(end-1),2),XfTrueAll(2:2:end,2),'g*')
+                text(XfTrueAll(1:2:(end-1),2),XfTrueAll(2:2:end,2),num2str(XfTrueAll(2:2:end,1)),"Color",'g')
+            end
 
-        plot(Xk00e(1,3),Xk00e(2,3),'ro')
-        plot(Xk00e(4,3),Xk00e(5,3),'mo')
-        plot(Xk00e(7:2:(end-1),3),Xk00e(8:2:end,3),'k*')
-        text(Xk00e(7:2:(end-1),3),Xk00e(8:2:end,3),num2str(Xk00e(8:2:end,2)),"Color",'k')
-        xlim([fea_xlb,fea_xub])
-        ylim([fea_ylb,fea_yub])
-        title('Initial state estimates check')
-        hold off
+            plot(Xk00e(1,3),Xk00e(2,3),'-ro')
+            plot(Xk00e(4,3),Xk00e(5,3),'-mo')
+            plot(Xk00e(7:2:(end-1),3),Xk00e(8:2:end,3),'k*')
+            text(Xk00e(7:2:(end-1),3),Xk00e(8:2:end,3),num2str(Xk00e(8:2:end,2)),"Color",'k')
+            xlim([fea_xlb,fea_xub])
+            ylim([fea_ylb,fea_yub])
+            title('Initial state estimates check')
+            hold off
         end
 
         continue
@@ -169,10 +170,14 @@ for k = 0:size(R1Odo,1)/3
         R2Odo_k(3,1)];
 
     Xk10e([3,6],3) = wrap(Xk10e([3,6],3));
-    
+
     % % Prediction check
     if realTimeCheck == 1
-    Xp = [R1XrTrue(R1XrTrue(:,1)==k,:);R1XphiT(R1XphiT(:,1)==k,:);R2XrTrue(R2XrTrue(:,1)==k,:);R2XphiT(R2XphiT(:,1)==k,:)]
+        hold on
+        plot(Xk10e(1,3),Xk10e(2,3),'-ro')
+        plot(Xk10e(4,3),Xk10e(5,3),'-mo')
+        hold off
+        Xpk = [R1XrTrue(R1XrTrue(:,1)==k,:);R1XphiT(R1XphiT(:,1)==k,:);R2XrTrue(R2XrTrue(:,1)==k,:);R2XphiT(R2XphiT(:,1)==k,:)]
     end
 
     DeltaFX = sparse(size(Xk10e,1),size(Xk10e,1));
@@ -217,19 +222,19 @@ for k = 0:size(R1Odo,1)/3
 
     Zkn = [R1Zkn;R2Zkn];
 
-    Xk10eFI = Xk10e;
+    Xk10efi = Xk10e;
     Pk10FI = Pk10;
 
     if ~isempty(Zkn)
         R1Xfn = R1Zkn;
         R2Xfn = R2Zkn;
         
-        DeltaGX = sparse(size(Xk10eFI,1),size(Xk10e,1));
+        DeltaGX = sparse(size(Xk10efi,1),size(Xk10e,1));
         DeltaGX(1:size(Xk10e,1),1:size(Xk10e,1)) = eye(size(Xk10e,1));
 
         R1nRn = [];
         R2nRn = [];
-        DeltaGV = sparse(size(Xk10eFI,1),size(Zkn,1));
+        DeltaGV = sparse(size(Xk10efi,1),size(Zkn,1));
 
         if ~isempty(R1Xfn)
             R1Xfn(1:2:(end-1),2) = Xk10e(1,3) + cos(Xk10e(3,3))*R1Zkn(1:2:(end-1),2) - sin(Xk10e(3,3))*R1Zkn(2:2:end,2);
@@ -262,7 +267,7 @@ for k = 0:size(R1Odo,1)/3
         end
 
         Xfn = [R1Xfn;R2Xfn];
-        Xk10eFI = [Xk10e;
+        Xk10efi = [Xk10e;
             [ones(size(R1Xfn,1),1);2*ones(size(R2Xfn,1),1)],Xfn];
 
         nRn = blkdiag(R1nRn,R2nRn);
@@ -272,10 +277,6 @@ for k = 0:size(R1Odo,1)/3
 
     % Feature initialization check
     if realTimeCheck == 1
-        hold on
-        plot(Xk10eFI(1,3),Xk10eFI(2,3),'ro')
-        plot(Xk10eFI(4,3),Xk10eFI(5,3),'mo')
-        hold off
         if ~isempty(Xfn)
             hold on
             plot(Xfn(1:2:(end-1),2),Xfn(2:2:end,2),'*','Color',[0.6, 0.3, 0])
@@ -306,51 +307,51 @@ for k = 0:size(R1Odo,1)/3
     Zks = [ones(size(R1Zks,1),1),R1Zks;2*ones(size(R2Zks,1),1),R2Zks];
     % Xfks_idx = [R1Xfks_idx;R2Xfks_idx];
 
-    Xk11e = Xk10eFI;
+    Xk11e = Xk10efi;
     Pk11 = Pk10FI;
     if ~isempty(Zks)
         HX10e = sparse(size(Zks,1), 1);
-        JHX10e = sparse(size(Zks,1), size(Xk10eFI,1));
+        JHX10e = sparse(size(Zks,1), size(Xk10efi,1));
 
         R1DV = [];
         R2DV = [];
         if ~isempty(R1Zks)
-            HX10e(1:2:(size(R1Zks,1)-1),1) = cos(Xk10eFI(3,3))*(R1Xfks(1:2:(end-1),2)-Xk10eFI(1,3)) + ...
-                sin(Xk10eFI(3,3))*(R1Xfks(2:2:end,2)-Xk10eFI(2,3));
-            HX10e(2:2:size(R1Zks,1),1) = -sin(Xk10eFI(3,3))*(R1Xfks(1:2:(end-1),2)-Xk10eFI(1,3)) + ...
-                cos(Xk10eFI(3,3))*(R1Xfks(2:2:end,2)-Xk10eFI(2,3));
+            HX10e(1:2:(size(R1Zks,1)-1),1) = cos(Xk10efi(3,3))*(R1Xfks(1:2:(end-1),2)-Xk10efi(1,3)) + ...
+                sin(Xk10efi(3,3))*(R1Xfks(2:2:end,2)-Xk10efi(2,3));
+            HX10e(2:2:size(R1Zks,1),1) = -sin(Xk10efi(3,3))*(R1Xfks(1:2:(end-1),2)-Xk10efi(1,3)) + ...
+                cos(Xk10efi(3,3))*(R1Xfks(2:2:end,2)-Xk10efi(2,3));
 
-            JHX10e(1:2:(size(R1Zks,1)-1),1:3) = [repmat([-cos(Xk10eFI(3,3)),-sin(Xk10eFI(3,3))],size(R1Zks,1)/2,1), ...
-                -sin(Xk10eFI(3,3))*(R1Xfks(1:2:(end-1),2)-Xk10eFI(1,3))+cos(Xk10eFI(3,3))*(R1Xfks(2:2:end,2)-Xk10eFI(2,3))];
+            JHX10e(1:2:(size(R1Zks,1)-1),1:3) = [repmat([-cos(Xk10efi(3,3)),-sin(Xk10efi(3,3))],size(R1Zks,1)/2,1), ...
+                -sin(Xk10efi(3,3))*(R1Xfks(1:2:(end-1),2)-Xk10efi(1,3))+cos(Xk10efi(3,3))*(R1Xfks(2:2:end,2)-Xk10efi(2,3))];
 
-            JHX10e(2:2:size(R1Zks,1),1:3) = [repmat([sin(Xk10eFI(3,3)),-cos(Xk10eFI(3,3))],size(R1Zks,1)/2,1), ...
-                -cos(Xk10eFI(3,3))*(R1Xfks(1:2:(end-1),2)-Xk10eFI(1,3))-sin(Xk10eFI(3,3))*(R1Xfks(2:2:end,2)-Xk10eFI(2,3))];
+            JHX10e(2:2:size(R1Zks,1),1:3) = [repmat([sin(Xk10efi(3,3)),-cos(Xk10efi(3,3))],size(R1Zks,1)/2,1), ...
+                -cos(Xk10efi(3,3))*(R1Xfks(1:2:(end-1),2)-Xk10efi(1,3))-sin(Xk10efi(3,3))*(R1Xfks(2:2:end,2)-Xk10efi(2,3))];
 
             for R1kj = 1:size(R1Zks,1)/2
                 R1DV = blkdiag(R1DV,R1R);
-                JHX10e((R1kj-1)*2+(1:2), R1Xfks_idx((R1kj-1)*2+(1:2),1)') = rotationMatrix(Xk10eFI(3,3))';
+                JHX10e((R1kj-1)*2+(1:2), R1Xfks_idx((R1kj-1)*2+(1:2),1)') = rotationMatrix(Xk10efi(3,3))';
             end
         end
 
         if ~isempty(R2Zks)
-            HX10e(size(R1Zks,1)+(1:2:(size(R2Zks,1)-1)),1) = cos(Xk10eFI(6,3))*(R2Xfks(1:2:(end-1),2)-Xk10eFI(4,3)) + ...
-                sin(Xk10eFI(6,3))*(R2Xfks(2:2:end,2)-Xk10eFI(5,3));
-            HX10e(size(R1Zks,1)+(2:2:size(R2Zks,1)),1) = -sin(Xk10eFI(6,3))*(R2Xfks(1:2:(end-1),2)-Xk10eFI(4,3)) + ...
-                cos(Xk10eFI(6,3))*(R2Xfks(2:2:end,2)-Xk10eFI(5,3));
+            HX10e(size(R1Zks,1)+(1:2:(size(R2Zks,1)-1)),1) = cos(Xk10efi(6,3))*(R2Xfks(1:2:(end-1),2)-Xk10efi(4,3)) + ...
+                sin(Xk10efi(6,3))*(R2Xfks(2:2:end,2)-Xk10efi(5,3));
+            HX10e(size(R1Zks,1)+(2:2:size(R2Zks,1)),1) = -sin(Xk10efi(6,3))*(R2Xfks(1:2:(end-1),2)-Xk10efi(4,3)) + ...
+                cos(Xk10efi(6,3))*(R2Xfks(2:2:end,2)-Xk10efi(5,3));
 
-            JHX10e(size(R1Zks,1)+(1:2:size(R2Zks,1)-1),4:6) = [repmat([-cos(Xk10eFI(6,3)),-sin(Xk10eFI(6,3))],size(R2Zks,1)/2,1), ...
-                -sin(Xk10eFI(6,3))*(R2Xfks(1:2:(end-1),2)-Xk10eFI(4,3))+cos(Xk10eFI(6,3))*(R2Xfks(2:2:end,2)-Xk10eFI(5,3))];
+            JHX10e(size(R1Zks,1)+(1:2:size(R2Zks,1)-1),4:6) = [repmat([-cos(Xk10efi(6,3)),-sin(Xk10efi(6,3))],size(R2Zks,1)/2,1), ...
+                -sin(Xk10efi(6,3))*(R2Xfks(1:2:(end-1),2)-Xk10efi(4,3))+cos(Xk10efi(6,3))*(R2Xfks(2:2:end,2)-Xk10efi(5,3))];
 
-            JHX10e(size(R1Zks,1)+(2:2:size(R2Zks,1)),4:6) = [repmat([sin(Xk10eFI(6,3)),-cos(Xk10eFI(6,3))],size(R2Zks,1)/2,1), ...
-                -cos(Xk10eFI(6,3))*(R2Xfks(1:2:(end-1),2)-Xk10eFI(4,3))-sin(Xk10eFI(6,3))*(R2Xfks(2:2:end,2)-Xk10eFI(5,3))];
+            JHX10e(size(R1Zks,1)+(2:2:size(R2Zks,1)),4:6) = [repmat([sin(Xk10efi(6,3)),-cos(Xk10efi(6,3))],size(R2Zks,1)/2,1), ...
+                -cos(Xk10efi(6,3))*(R2Xfks(1:2:(end-1),2)-Xk10efi(4,3))-sin(Xk10efi(6,3))*(R2Xfks(2:2:end,2)-Xk10efi(5,3))];
 
             for R2kj = 1:size(R2Zks,1)/2
                 R2DV = blkdiag(R2DV,R2R);
-                JHX10e(size(R1Zks,1)+(R2kj-1)*2+(1:2), R2Xfks_idx((R2kj-1)*2+(1:2),1)') = rotationMatrix(Xk10eFI(6,3))';
+                JHX10e(size(R1Zks,1)+(R2kj-1)*2+(1:2), R2Xfks_idx((R2kj-1)*2+(1:2),1)') = rotationMatrix(Xk10efi(6,3))';
             end
         end
 
-        JHX10_e = full(JHX10e);
+        % JHX10_e = full(JHX10e)
         DV = blkdiag(R1DV,R2DV);
 
         % Innovation Covariance S and Kalman Gain K
@@ -358,14 +359,14 @@ for k = 0:size(R1Odo,1)/3
         Ks = Pk10FI * JHX10e' /Ss;
 
         % Updating process using observation model
-        % Xk11e(:,3) = Xk10eFI(:,3) + Ks*(Zks(:,3)-HX10e);
-        Xk11e(:,3) = Xk10eFI(:,3) + wrap(Ks*(Zks(:,3)-HX10e));
+        % Xk11e(:,3) = Xk10efi(:,3) + Ks*(Zks(:,3)-HX10e);
+        Xk11e(:,3) = Xk10efi(:,3) + Ks*(Zks(:,3)-HX10e);
         Xk11e([3,6],3) = wrap(Xk11e([3,6],3));
 
         Pk11 = Pk10FI - Ks*Ss*Ks';
     end
 
-    % Updatiing process check
+    % Updating process check
     if realTimeCheck == 1
         hold on
         plot(Xk11e(1,3),Xk11e(2,3),'ro')
@@ -373,8 +374,8 @@ for k = 0:size(R1Odo,1)/3
         hold off
         if ~isempty(Zks)
             hold on
-            plot(Xk11e(7:2:(end-1),3),Xk11e(8:2:end,3),'y*')
-            text(Xk11e(7:2:(end-1),3),Xk11e(8:2:end,3),num2str(Xk11e(7:2:(end-1),2)),'Color','y')
+            plot(Xk11e(7:2:(end-1),3),Xk11e(8:2:end,3),'*','Color',[1, 0.5, 0]) % yellow
+            text(Xk11e(7:2:(end-1),3),Xk11e(8:2:end,3),num2str(Xk11e(7:2:(end-1),2)),'Color',[1, 0.5, 0]) % yellow
             hold off
         end
     end
