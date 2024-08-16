@@ -15,56 +15,81 @@ for k = 0:size(R1Odo,1)/3
 
     if k == 0
         % find the shared observed feature IDs in 1st robot
-        % R1Zks_lv: logical vector of shared feature observation of
-        % 1st robot at step k
-        R1Zks_lv = ismember(R1Obs_k(:,1), R2Obs_k(:,1));
-        % R1Zks_idx: index of shared feature observation of
+        % R1Z0s_lv: logical vector of shared feature observation of
+        % 1st robot at step 0
+        R1Z0s_lv = ismember(R1Obs_k(:,1), R2Obs_k(:,1));
+        % R1Z0s_idx: index of shared feature observation of
         % 1st robot in R2Obs_k
-        R1Zks_idx = find(R1Zks_lv);
-        % R1Zks: shared feature observation of 1st robot
-        R1Zks = R1Obs_k(R1Zks_idx,:);
-        R1Xfks = R1Zks;
-        R1Xfks(1:2:(end-1),2) = R1Xp0(1,1) + cos(R1Xp0(3,1))*(R1Zks(1:2:(end-1),2)) - sin(R1Xp0(3,1))*(R1Zks(2:2:end,2));
-        R1Xfks(2:2:end,2) = R1Xp0(2,1) + sin(R1Xp0(3,1))*(R1Zks(1:2:(end-1),2)) + cos(R1Xp0(3,1))*(R1Zks(2:2:end,2));
+        R1Z0s_idx = find(R1Z0s_lv);
+        % R1Z0s: shared feature observation of 1st robot
+        R1Z0s = R1Obs_k(R1Z0s_idx,:);
+        R1Xf0s = R1Z0s;
+        R1Xf0s(1:2:(end-1),2) = R1Xp0(1,1) + cos(R1Xp0(3,1))*(R1Z0s(1:2:(end-1),2)) - sin(R1Xp0(3,1))*(R1Z0s(2:2:end,2));
+        R1Xf0s(2:2:end,2) = R1Xp0(2,1) + sin(R1Xp0(3,1))*(R1Z0s(1:2:(end-1),2)) + cos(R1Xp0(3,1))*(R1Z0s(2:2:end,2));
 
         % find the shared observed feature IDs in 2nd robot
-        % R2Zks_lv: logical vector of shared feature observation of
+        % R2Z0s_lv: logical vector of shared feature observation of
         % 2nd robot at step k
-        R2Zks_lv = ismember(R2Obs_k(:,1), R1Obs_k(:,1));
-        % R2Zks_idx: index of shared feature observation of
+        R2Z0s_lv = ismember(R2Obs_k(:,1), R1Obs_k(:,1));
+        % R2Z0s_idx: index of shared feature observation of
         % 2nd robot in R2Obs_k
-        R2Zks_idx = find(R2Zks_lv);
-        % R2Zks: shared feature observation of 2nd robot
-        R2Zks = R2Obs_k(R2Zks_idx,:);
+        R2Z0s_idx = find(R2Z0s_lv);
+        % R2Z0s: shared feature observation of 2nd robot
+        R2Z0s = R2Obs_k(R2Z0s_idx,:);
 
         
 
         %% use Gauss-Newton iteration to optimize the shared state at step 0
         % use R2Xp0 as the initial value of R2's pose in the GN iteration
-        Xs = [ones(3,1),zeros(3,1),R1Xp0;
-            2*ones(3,1),zeros(3,1),R2Xp0;
-            zeros(size(R1Xfks,1),1),R1Xfks];
+        Xs = [2*ones(3,1),zeros(3,1),R2Xp0;
+            zeros(size(R1Xf0s,1),1),R1Xf0s];
         
         R1sRn = [];
         R2sRn = [];
-        for kj = 1:(size(R1Xfks,1)/2)
+        for kj = 1:(size(R1Xf0s,1)/2)
             R1sRn = blkdiag(R1sRn,R1R);
             R2sRn = blkdiag(R2sRn,R2R);
         end
-        Ps = blkdiag(R1O,R2O,R1sRn,R2sRn);
+        Pz = blkdiag(R1sRn,R2sRn);
 
-        Zks = [Xs(1:6,3);R1Zks(:,2);R2Zks(:,2)];
+        Z0s = [R1Z0s(:,2);R2Z0s(:,2)];
 
         XsGni = Xs;
-        [XsGni(:,3),PsGni] = GNI(Xs(:,3),Ps,Zks,CC);
-        XsGni([3,6],1) = wrap(XsGni([3,6],1));
+        [XsGni(:,3),PzGni] = GNI(R1Xp0,Xs(:,3),Pz,Z0s,CC);
+        XsGni(3,1) = wrap(XsGni(3,1));
+
+        if realTimeCheck == 1 && errorEllipseCheck == 1
+            figure(1)
+            hold on
+            plot(XfTrueAll(1:2:(end-1),2),XfTrueAll(2:2:end,2),'g*')
+
+            for j = 1:((size(XsGni,1)-3)/2)
+                plot(XsGni(3+(j-1)*2+1,3),XsGni(3+(j-1)*2+2,3),'*','Color',[0, 0.5, 0]);
+
+                eeR2Xf = errorEllipse(PzGni(3+(j-1)*2+(1:2),3+(j-1)*2+(1:2)), XsGni(3+(j-1)*2+(1:2),3), CI);
+                plot(eeR2Xf(:,1),eeR2Xf(:,2),'Color',[0, 0.5, 0])
+            end
+            % Plot the ellipse
+            plot(R2XrTrue(1,2),R2XrTrue(2,2),'co');
+
+            plot(XsGni(1,3),XsGni(2,3),'mo');
+
+            eeR2Xp0 = errorEllipse(PzGni(1:2,1:2), XsGni(1:2,3), CI);
+            plot(eeR2Xp0(:,1), eeR2Xp0(:,2),'Color','m');
+            
+            title('error ellipse of confidence interval of R2 and features at step 0 after GNI')
+            % legend('True feature position','estimated feature position','error confidence interval of estimated feature','True R2 position','estimated position of R2','error confidence interval of R2')
+            hold off
+        end
 
 
         %% estimate new observed feature's state at step 0 using the observation model
+        X0 = [ones(3,1),zeros(3,1),R1Xp0;XsGni];
+        P0 = blkdiag(R1O,PzGni);
         % find the new observed feature IDs in 1st robot
         % R1Zkn_lv: logical vector of new feature observation of
         % 2nd robot at step k
-        R1Zkn_lv = ~R1Zks_lv;
+        R1Zkn_lv = ~R1Z0s_lv;
         % R1Zkn_idx: index of new feature observation of
         % 1st robot in R1Obs_k
         R1Zkn_idx = find(R1Zkn_lv);
@@ -72,13 +97,13 @@ for k = 0:size(R1Odo,1)/3
         R1Zkn = R1Obs_k(R1Zkn_idx,:);
 
         R1Xfkn = R1Zkn;
-        R1Xfkn(1:2:(end-1),2) = XsGni(1,3) + cos(XsGni(3,3))*(R1Zkn(1:2:(end-1),2)) - sin(XsGni(3,3))*(R1Zkn(2:2:end,2));
-        R1Xfkn(2:2:end,2) = XsGni(2,3) + sin(XsGni(3,3))*(R1Zkn(1:2:(end-1),2)) + cos(XsGni(3,3))*(R1Zkn(2:2:end,2));
+        R1Xfkn(1:2:(end-1),2) = X0(1,3) + cos(X0(3,3))*(R1Zkn(1:2:(end-1),2)) - sin(X0(3,3))*(R1Zkn(2:2:end,2));
+        R1Xfkn(2:2:end,2) = X0(2,3) + sin(X0(3,3))*(R1Zkn(1:2:(end-1),2)) + cos(X0(3,3))*(R1Zkn(2:2:end,2));
 
         % find the new observed feature IDs in 2nd robot
         % R2Zkn_lv: logical vector of new feature observation of
         % 2nd robot at step k
-        R2Zkn_lv = ~R2Zks_lv;
+        R2Zkn_lv = ~R2Z0s_lv;
         % R2Zkn_idx: index of new feature observation of
         % 2nd robot in R2Obs_k
         R2Zkn_idx = find(R2Zkn_lv);
@@ -88,26 +113,26 @@ for k = 0:size(R1Odo,1)/3
         % Zkns = intersect(R1Zkn(:,1),R2Zkn(:,1));
         
         R2Xfkn = R2Zkn;
-        R2Xfkn(1:2:(end-1),2) = XsGni(4,3) + cos(XsGni(6,3))*(R2Zkn(1:2:(end-1),2)) - sin(XsGni(6,3))*(R2Zkn(2:2:end,2));
-        R2Xfkn(2:2:end,2) = XsGni(5,3) + sin(XsGni(6,3))*(R2Zkn(1:2:(end-1),2)) + cos(XsGni(6,3))*(R2Zkn(2:2:end,2));
+        R2Xfkn(1:2:(end-1),2) = X0(4,3) + cos(X0(6,3))*(R2Zkn(1:2:(end-1),2)) - sin(X0(6,3))*(R2Zkn(2:2:end,2));
+        R2Xfkn(2:2:end,2) = X0(5,3) + sin(X0(6,3))*(R2Zkn(1:2:(end-1),2)) + cos(X0(6,3))*(R2Zkn(2:2:end,2));
 
         %% Xk00e: state estimate
         % first column: 1 -> robot posture; 2 -> feature position
         % second column: posture id or position id
         % third column: data
-        Xk00e = [XsGni;
+        Xk00e = [X0;
             ones(size(R1Xfkn,1),1),R1Xfkn;
             2*ones(size(R2Xfkn,1),1),R2Xfkn];
 
         %% Jacobian of Xk
 
-        JFXk = sparse(size(Xk00e,1),size(XsGni,1));
-        JFXk(1:size(XsGni,1),1:size(XsGni,1)) = eye(size(XsGni,1));
-        JFXk(size(XsGni,1)+(1:2:(size(R1Xfkn,1)-1)),1:3) = [repmat([1,0],size(R1Xfkn,1)/2,1), -sin(XsGni(3,3))*R1Zkn(1:2:(end-1),2) - cos(XsGni(3,3))*R1Zkn(2:2:end,2)];
-        JFXk(size(XsGni,1)+(2:2:size(R1Xfkn,1)),1:3) = [repmat([0,1],size(R1Xfkn,1)/2,1), cos(XsGni(3,3))*R1Zkn(1:2:(end-1),2) - sin(XsGni(3,3))*R1Zkn(2:2:end,2)];
+        JFXk = sparse(size(Xk00e,1),size(X0,1));
+        JFXk(1:size(X0,1),1:size(X0,1)) = eye(size(X0,1));
+        JFXk(size(X0,1)+(1:2:(size(R1Xfkn,1)-1)),1:3) = [repmat([1,0],size(R1Xfkn,1)/2,1), -sin(X0(3,3))*R1Zkn(1:2:(end-1),2) - cos(X0(3,3))*R1Zkn(2:2:end,2)];
+        JFXk(size(X0,1)+(2:2:size(R1Xfkn,1)),1:3) = [repmat([0,1],size(R1Xfkn,1)/2,1), cos(X0(3,3))*R1Zkn(1:2:(end-1),2) - sin(X0(3,3))*R1Zkn(2:2:end,2)];
 
-        JFXk(size(XsGni,1)+size(R1Xfkn,1)+(1:2:(size(R2Xfkn,1)-1)),4:6) = [repmat([1,0],size(R2Xfkn,1)/2,1), -sin(XsGni(6,3))*R2Zkn(1:2:(end-1),2) - cos(XsGni(6,3))*R2Zkn(2:2:end,2)];
-        JFXk(size(XsGni,1)+size(R1Xfkn,1)+(2:2:size(R2Xfkn,1)),4:6) = [repmat([0,1],size(R2Xfkn,1)/2,1), cos(XsGni(6,3))*R2Zkn(1:2:(end-1),2) - sin(XsGni(6,3))*R2Zkn(2:2:end,2)];
+        JFXk(size(X0,1)+size(R1Xfkn,1)+(1:2:(size(R2Xfkn,1)-1)),4:6) = [repmat([1,0],size(R2Xfkn,1)/2,1), -sin(X0(6,3))*R2Zkn(1:2:(end-1),2) - cos(X0(6,3))*R2Zkn(2:2:end,2)];
+        JFXk(size(X0,1)+size(R1Xfkn,1)+(2:2:size(R2Xfkn,1)),4:6) = [repmat([0,1],size(R2Xfkn,1)/2,1), cos(X0(6,3))*R2Zkn(1:2:(end-1),2) - sin(X0(6,3))*R2Zkn(2:2:end,2)];
         
         
         R1nRn = [];
@@ -115,15 +140,15 @@ for k = 0:size(R1Odo,1)/3
         JFWk = sparse(size(Xk00e,1),size(R1Zkn,1)+size(R2Zkn,1));
         for R1jn = 1:(size(R1Zkn,1)/2)
             R1nRn = blkdiag(R1nRn, R1R);
-            JFWk(size(XsGni,1)+(R1jn-1)*2+(1:2),(R1jn-1)*2+(1:2)) = rotationMatrix(XsGni(3,3));
+            JFWk(size(X0,1)+(R1jn-1)*2+(1:2),(R1jn-1)*2+(1:2)) = rotationMatrix(X0(3,3));
         end
         for R2jn = 1:(size(R2Zkn,1)/2)
             R2nRn = blkdiag(R2nRn, R2R);
-            JFWk(size(XsGni,1)+size(R1Zkn,1)+(R2jn-1)*2+(1:2),size(R1Zkn,1)+(R2jn-1)*2+(1:2)) = rotationMatrix(XsGni(6,3));
+            JFWk(size(X0,1)+size(R1Zkn,1)+(R2jn-1)*2+(1:2),size(R1Zkn,1)+(R2jn-1)*2+(1:2)) = rotationMatrix(X0(6,3));
         end
         
         nRn = blkdiag(R1nRn,R2nRn);
-        Pk00 = JFXk*PsGni*JFXk'+JFWk*nRn*JFWk';
+        Pk00 = JFXk*P0*JFXk'+JFWk*nRn*JFWk';
 
         
 
@@ -132,7 +157,7 @@ for k = 0:size(R1Odo,1)/3
 
         % Initial state estimates check
         if realTimeCheck == 1
-            figure(1)
+            figure(2)
             hold on
             if k == 0
                 plot(R1XrTrue(1:2:(end-1),2),R1XrTrue(2:2:end,2),'-bo')
@@ -388,7 +413,7 @@ for k = 0:size(R1Odo,1)/3
 
 end
 
-figure(1)
+figure(3)
 
 hold on
 

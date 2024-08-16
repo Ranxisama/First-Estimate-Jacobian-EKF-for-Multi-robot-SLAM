@@ -9,8 +9,8 @@ R2XrTrueAll = dataModify(wp2);
 XfTrueAll = dataModify(lm);
 XfTrueAll(:,1)=XfTrueAll(:,1)+1;
 
-R1PosNum = size(R1XrTrue,1)/2;
-R2PosNum = size(R2XrTrue,1)/2;
+R1PosNum = size(R1XrTrueAll,1)/2;
+R2PosNum = size(R2XrTrueAll,1)/2;
 
 PosNum = min(R1PosNum,R2PosNum);
 
@@ -30,12 +30,12 @@ R1Xp0 = pose0Generation(R1XrTrue,R1XphiT,R1addPose0Noise,R1O);
 R2Xp0 = pose0Generation(R2XrTrue,R2XphiT,R2addPose0Noise,R2O);
 
 %% Odometry measurements Generation
-R1Odo = odometryGeneration(R1XrTrue,R1XphiT,R1PosNum,R1addOdoNoise,R1Q);
-R2Odo = odometryGeneration(R2XrTrue,R2XphiT,R2PosNum,R2addOdoNoise,R2Q);
+R1Odo = odometryGeneration(R1XrTrue,R1XphiT,PosNum,R1addOdoNoise,R1Q);
+R2Odo = odometryGeneration(R2XrTrue,R2XphiT,PosNum,R2addOdoNoise,R2Q);
 
 %% Observation measurements Generation
-R1Obs = observationGeneration(R1XrTrue,R1XphiT,R1PosNum,XfTrueAll,R1addObsNoise,R1R,R1sensorRange);
-R2Obs = observationGeneration(R2XrTrue,R2XphiT,R2PosNum,XfTrueAll,R2addObsNoise,R2R,R2sensorRange);
+R1Obs = observationGeneration(R1XrTrue,R1XphiT,PosNum,XfTrueAll,R1addObsNoise,R1R,R1sensorRange);
+R2Obs = observationGeneration(R2XrTrue,R2XphiT,PosNum,XfTrueAll,R2addObsNoise,R2R,R2sensorRange);
 
 %% Shared feature Observation at step 0
 sharedObs0Num = numel(intersect(R1Obs(R1Obs(:,1)==0,2),R2Obs(R2Obs(:,1)==0,2)));

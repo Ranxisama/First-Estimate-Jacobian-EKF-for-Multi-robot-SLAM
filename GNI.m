@@ -1,22 +1,21 @@
-function [XsGni,PsGni] = GNI(Xs,Ps,Zks,ConvergenceCondition)
+function [XsGni,PsGni] = GNI(R1Xp0,Xs,Ps,Zks,ConvergenceCondition)
 
 XsGni = Xs;
 
 for gni_num = 1:100
 
-    XsGni([3,6],1) = wrap(XsGni([3,6],1));
+    XsGni(3,1) = wrap(XsGni(3,1));
 
-    Fx = F(XsGni,Zks);
+    Fx = F(R1Xp0,XsGni,Zks);
 
-    JFx = JacobiF(XsGni,Zks);
+    JFx = JacobiF(R1Xp0,XsGni,Zks);
 
     % R2Zks(:,2)-Fx
     % JFx*X
 
     Xold = XsGni;
     
-    X_b = JFx'/Ps*(Zks-Fx+JFx*XsGni);
-    XsGni = (JFx'/Ps*JFx)\X_b;
+    XsGni = Xold + (JFx'/Ps*JFx)\JFx'/Ps*(Zks-Fx);
 
     D = XsGni - Xold;
     DD = D'*D;

@@ -5,6 +5,29 @@ fea_yub = 50; % upper boundary of features in x axis
 
 CC = 1e-9; % CC: converge coefficient of Gauss-Newton iteration
 
+CI = 0.9973; 
+% CI: confidence interval; 
+% 0.9973: Confidence level of 99.73% corresponding to 3-sigma bound
+
+%% Switch to change
+R1addPose0Noise = 0; % if 0, R1 initial position is accurate
+R2addPose0Noise = 1; % if 0, R2 initial position is accurate
+
+R1addOdoNoise = 1; % if 0, R1 odometry is perfect
+R2addOdoNoise = 1; % if 0, R2 odometry is perfect
+
+R1addObsNoise = 1; % if 0, R1 observation is perfect
+R2addObsNoise = 1; % if 0, R2 observation is perfect
+
+measurementsCheck = 1; % if 1, check the measurements by running MeasurementsGeneration.m
+realTimeCheck = 1; % if 1, check the real-time state at each step after by running EKF_SLAM_simulation.m
+errorEllipseCheck = 0; % if 1, check the confidence interval ellipse at each step
+
+R1sensorRange = 8; % m/s, R1's observation range for the features
+R2sensorRange = 8; % m/s, R2's observation range for the features
+
+reqSharedObsNum = 8; % Required number of shared feature observations
+
 %% Robot bearing ranges
 R1bearingRange = pi/60; % pi/60: 3°
 R2bearingRange = pi/60; % pi/60: 3°
@@ -25,8 +48,8 @@ R1sigma_zv = 0.05; % 0.05 m/time_step
 
 
 % standard deviation of robot position at time 0 (equals to 0 as the origin of the 1D coordinate system)
-R2sigma_0r = 0.01; % 0.01: 0.01 m
-R2sigma_0phi = pi/36; % pi/36: 5°
+R2sigma_0r = 0.04; % 0.01: 0.01 m
+R2sigma_0phi = pi/9; % pi/9: 20°
 
 
 % standard deviation of the zero mean Gaussian process noise w(k) of 2nd robot
@@ -36,26 +59,6 @@ R2sigma_uw = pi/180; % 1°/time_step
 
 % standard deviation of the zero mean Gaussian observation noise v(k) of 2nd robot
 R2sigma_zv = 0.05;
-
-
-%% Switch to change
-R1addPose0Noise = 0; % if 0, R1 initial position is accurate
-R2addPose0Noise = 1; % if 0, R2 initial position is accurate
-
-R1addOdoNoise = 1; % if 0, R1 odometry is perfect
-R2addOdoNoise = 1; % if 0, R2 odometry is perfect
-
-R1addObsNoise = 1; % if 0, R1 observation is perfect
-R2addObsNoise = 1; % if 0, R2 observation is perfect
-
-measurementsCheck = 1; % if 1, check the measurements by running MeasurementsGeneration.m
-realTimeCheck = 0; % if 0, check the real-time state at each step after by running EKF_SLAM_simulation.m
-
-R1sensorRange = 8; % m/s, R1's observation range for the features
-R2sensorRange = 8; % m/s, R2's observation range for the features
-
-reqSharedObsNum = 8; % Required number of shared feature observations
-
 
 
 
