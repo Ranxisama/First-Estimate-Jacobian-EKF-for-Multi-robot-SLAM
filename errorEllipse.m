@@ -14,9 +14,6 @@ function ee = errorEllipse(C, mu, conf)
     % Chi-square value for the given confidence interval
     s = -2 * log(1 - conf);
     
-    % Set the elements of C that are less than 1e-12 to zero. This can be useful for dealing with numerical errors or avoiding unnecessary imaginary parts in calculations.
-    C(abs(C) < 1e-12) = 0;
-
     [V, D] = eig(C * s);
     
     V = abs(V);
