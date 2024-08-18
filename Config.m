@@ -9,7 +9,12 @@ CI = 0.9973;
 % CI: confidence interval; 
 % 0.9973: Confidence level of 99.73% corresponding to 3-sigma bound
 
-%% Switch to change
+%% Check Switch
+measurementsCheck = 0; % if 1, check the measurements by running MeasurementsGeneration.m
+realTimeCheck = 1; % if 1, check the real-time state at each step after by running EKF_SLAM_simulation.m
+CovCheck = 1; % if 1, check the confidence interval ellipse at each step
+
+%% Noise Switch
 R1addPose0Noise = 0; % if 0, R1 initial position is accurate
 R2addPose0Noise = 1; % if 0, R2 initial position is accurate
 
@@ -19,13 +24,12 @@ R2addOdoNoise = 1; % if 0, R2 odometry is perfect
 R1addObsNoise = 1; % if 0, R1 observation is perfect
 R2addObsNoise = 1; % if 0, R2 observation is perfect
 
-measurementsCheck = 1; % if 1, check the measurements by running MeasurementsGeneration.m
-realTimeCheck = 1; % if 1, check the real-time state at each step after by running EKF_SLAM_simulation.m
-errorEllipseCheck = 0; % if 1, check the confidence interval ellipse at each step
 
+%% Sensor Range
 R1sensorRange = 8; % m/s, R1's observation range for the features
 R2sensorRange = 8; % m/s, R2's observation range for the features
 
+%% Required number of shared feature observations at step 0 
 reqSharedObsNum = 8; % Required number of shared feature observations
 
 %% Robot bearing ranges
