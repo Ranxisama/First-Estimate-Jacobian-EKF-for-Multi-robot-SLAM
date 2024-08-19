@@ -1,11 +1,9 @@
 %% Check Switch
 measurementsCheck = 1; % if 1, check the measurements by running MeasurementsGeneration.m
-
 step0Check = 1; % if 1, check the real-time state of Gni and feature initialization at step 0
-updateCheck = 1; % if 1, check the real-time state of update at each step after step 0
-
 predictCheck = 1; % if 1, check the real-time state of prediction at each step
 fiCheck = 1; % if 1, check the real-time state of feature initilization at each step after step 0
+updateCheck = 1; % if 1, check the real-time state of update at each step
 
 %% Noise Switch
 R1addPose0Noise = 0; % if 0, R1 initial position is accurate

@@ -37,13 +37,13 @@ for k = 0:size(R1Odo,1)/3
         % R2Z0s: shared feature observation of 2nd robot
         R2Z0s = R2Obs_k(R2Z0s_idx,:);
 
-        
+
 
         %% use Gauss-Newton iteration to optimize the shared state at step 0
         % use R2Xp0 as the initial value of R2's pose in the GN iteration
         Xs = [2*ones(3,1),zeros(3,1),R2Xp0;
             zeros(size(R1Xf0s,1),1),R1Xf0s];
-        
+
         R1sRn = [];
         R2sRn = [];
         for kj = 1:(size(R1Xf0s,1)/2)
@@ -57,64 +57,61 @@ for k = 0:size(R1Odo,1)/3
         XsGni = Xs;
         [XsGni(:,3),PzGni] = GNI(R1Xp0,Xs(:,3),Pz,Z0s,CC);
         XsGni(3,1) = wrap(XsGni(3,1));
-        
+
         % Set the elements that are less than CovT to zero. This can be useful for dealing with numerical errors or avoiding unnecessary imaginary parts in calculations.
         PzGni(abs(PzGni)<CovT) = 0;
 
         %% Add the information of R1 into XsGni and PsGni
         X0 = [ones(3,1),zeros(3,1),R1Xp0;XsGni];
         P0 = blkdiag(R1O,PzGni);
-        
-        
-        if realTimeCheck == 1
+
+
+        if step0Check == 1
             figure(1)
             hold on
             % true state
-            plot(R1XrTrue(1:2:(end-1),2),R1XrTrue(2:2:end,2),'-bo');
-            plot(R2XrTrue(1:2:(end-1),2),R2XrTrue(2:2:end,2),'-co');
-            plot(XfTrueAll(1:2:(end-1),2),XfTrueAll(2:2:end,2),'*','Color',oliveGreen)
+            R1trueP = plot(R1XrTrue(1:2:(end-1),2),R1XrTrue(2:2:end,2),'-bo','DisplayName','R1 True pose');
+            R2trueP = plot(R2XrTrue(1:2:(end-1),2),R2XrTrue(2:2:end,2),'-co','DisplayName','R2 True pose');
+            FeaTrueP = plot(XfTrueAll(1:2:(end-1),2),XfTrueAll(2:2:end,2),'*','Color',oliveGreen,'DisplayName','True features');
             % estimated state
-            plot(X0(1,3),X0(2,3),'ro');
-            plot(X0(4,3),X0(5,3),'mo');
-            plot(X0(7:2:(end-1),3),X0(8:2:end,3),'*','Color',lightGreen);
+            R1Xr0P = plot(X0(1,3),X0(2,3),'ro','DisplayName','R1 estimated pose');
+            R2Xr0P = plot(X0(4,3),X0(5,3),'mo','DisplayName','R2 estimated pose');
+            Xf0P = plot(X0(7:2:(end-1),3),X0(8:2:end,3),'*','Color',lightGreen,'DisplayName','Estimated features of GNI');
             text(X0(7:2:(end-1),3),X0(8:2:end,3),num2str(X0(7:2:(end-1),2)),'Color',lightGreen);
 
-            if CovCheck == 1
-                % Plot the ellipse of robot pose
-                % R1
-                eeR1Xr10e = errorEllipse(P0(1:2,1:2), X0(1:2,3), CI);
-                plot(eeR1Xr10e(:,1), eeR1Xr10e(:,2),'Color','r');
-                % R2
-                eeR2Xr10e = errorEllipse(P0(4:5,4:5), X0(4:5,3), CI);
-                plot(eeR2Xr10e(:,1), eeR2Xr10e(:,2),'Color','m');
-                for j = 1:((size(X0,1)-6)/2)
-                    eeXfk0 = errorEllipse(P0(6+(j-1)*2+(1:2),6+(j-1)*2+(1:2)), X0(6+(j-1)*2+(1:2),3), CI);
-                    plot(eeXfk0(:,1),eeXfk0(:,2),'Color',lightGreen)
-                end
+            axis equal
+            ax = gca;
 
-                legendEntries1 = legend('true R1 pose','true R2 pose','true feature', ...
-                    'estimated R1 pose','estimated R2 pose','estimated features', ...
-                    'Cov ellipse of estimated R1 pose','Cov ellipse of estimated R2 pose', 'Cov ellipse of estimated features');
-                legendStrings = legendEntries1.String;
+            % 设置坐标轴属性，使其穿过原点
+            ax.XAxisLocation = 'origin'; % x 轴穿过原点
+            ax.YAxisLocation = 'origin'; % y 轴穿过原点
 
-            else
-                legendEntries2 = legend('true R1 pose','true R2 pose','true feature', ...
-                    'estimated R1 pose','estimated R2 pose','estimated features');
-                legendStrings = legendEntries2.String;
 
+            % Plot the ellipse of robot pose
+            % R1
+            % eeR1Xr0e = errorEllipse(P0(1:2,1:2), X0(1:2,3), CI);
+            % eeR1Xr0eP = plot(eeR1Xr0e(:,1), eeR1Xr0e(:,2),'Color','r','DisplayName','Estimated R1 pose Cov ellipse');
+            % R2
+            eeR2Xr0e = errorEllipse(P0(4:5,4:5), X0(4:5,3), CI);
+            eeR2Xr0eP = plot(eeR2Xr0e(:,1), eeR2Xr0e(:,2),'Color','m','DisplayName','Estimated R2 pose Cov ellipse');
+
+            eeXf0PHandles = gobjects(1, (size(X0,1)-6)/2);
+            for j = 1:((size(X0,1)-6)/2)
+                eeXf0 = errorEllipse(P0(6+(j-1)*2+(1:2),6+(j-1)*2+(1:2)), X0(6+(j-1)*2+(1:2),3), CI);
+                eeXf0PHandles(j) = plot(eeXf0(:,1),eeXf0(:,2),'Color',lightGreen);
             end
-            legend(legendStrings)
-            title(sprintf('step %d with %d features after GNI',k,size(X0,1)-6))
+            eeXf0PHandles(1).DisplayName = 'Estimated features Cov ellipse of GNI';
 
             hold off
+
         end
-        
+
 
         %% estimate new observed feature's state at step 0 using the observation model
         % find the new observed feature IDs in 1st robot
         % R1Zkn_lv: logical vector of new feature observation of
         % 2nd robot at step k
-        R1Zkn_lv = ~R1Z0s_lv;
+        R1Zkn_lv = ~ismember(R1Obs_k(:,1),X0(7:end,2));
         % R1Zkn_idx: index of new feature observation of
         % 1st robot in R1Obs_k
         R1Zkn_idx = find(R1Zkn_lv);
@@ -128,7 +125,7 @@ for k = 0:size(R1Odo,1)/3
         % find the new observed feature IDs in 2nd robot
         % R2Zkn_lv: logical vector of new feature observation of
         % 2nd robot at step k
-        R2Zkn_lv = ~R2Z0s_lv;
+        R2Zkn_lv = ~ismember(R2Obs_k(:,1),X0(7:end,2));
         % R2Zkn_idx: index of new feature observation of
         % 2nd robot in R2Obs_k
         R2Zkn_idx = find(R2Zkn_lv);
@@ -136,12 +133,12 @@ for k = 0:size(R1Odo,1)/3
         R2Zkn = R2Obs_k(R2Zkn_idx,:);
 
         % Zkns = intersect(R1Zkn(:,1),R2Zkn(:,1));
-        
+
         R2Xfkn = R2Zkn;
         R2Xfkn(1:2:(end-1),2) = X0(4,3) + cos(X0(6,3))*(R2Zkn(1:2:(end-1),2)) - sin(X0(6,3))*(R2Zkn(2:2:end,2));
         R2Xfkn(2:2:end,2) = X0(5,3) + sin(X0(6,3))*(R2Zkn(1:2:(end-1),2)) + cos(X0(6,3))*(R2Zkn(2:2:end,2));
 
-        %% Xk00e: state estimate
+        % Xk00e: state estimate
         % first column: 1 -> robot posture; 2 -> feature position
         % second column: posture id or position id
         % third column: data
@@ -149,7 +146,7 @@ for k = 0:size(R1Odo,1)/3
             ones(size(R1Xfkn,1),1),R1Xfkn;
             2*ones(size(R2Xfkn,1),1),R2Xfkn];
 
-        %% Jacobian of Xk
+        % Jacobian of Xk
         JFXk = sparse(size(Xk00e,1),size(X0,1));
         JFXk(1:size(X0,1),1:size(X0,1)) = eye(size(X0,1));
         JFXk(size(X0,1)+(1:2:(size(R1Xfkn,1)-1)),1:3) = [repmat([1,0],size(R1Xfkn,1)/2,1), -sin(X0(3,3))*R1Zkn(1:2:(end-1),2) - cos(X0(3,3))*R1Zkn(2:2:end,2)];
@@ -157,8 +154,8 @@ for k = 0:size(R1Odo,1)/3
 
         JFXk(size(X0,1)+size(R1Xfkn,1)+(1:2:(size(R2Xfkn,1)-1)),4:6) = [repmat([1,0],size(R2Xfkn,1)/2,1), -sin(X0(6,3))*R2Zkn(1:2:(end-1),2) - cos(X0(6,3))*R2Zkn(2:2:end,2)];
         JFXk(size(X0,1)+size(R1Xfkn,1)+(2:2:size(R2Xfkn,1)),4:6) = [repmat([0,1],size(R2Xfkn,1)/2,1), cos(X0(6,3))*R2Zkn(1:2:(end-1),2) - sin(X0(6,3))*R2Zkn(2:2:end,2)];
-        
-        
+
+
         R1nRn = [];
         R2nRn = [];
         JFWk = sparse(size(Xk00e,1),size(R1Zkn,1)+size(R2Zkn,1));
@@ -170,7 +167,7 @@ for k = 0:size(R1Odo,1)/3
             R2nRn = blkdiag(R2nRn, R2R);
             JFWk(size(X0,1)+size(R1Zkn,1)+(R2jn-1)*2+(1:2),size(R1Zkn,1)+(R2jn-1)*2+(1:2)) = rotationMatrix(X0(6,3));
         end
-        
+
         nRn = blkdiag(R1nRn,R2nRn);
         Pk00 = JFXk*P0*JFXk'+JFWk*nRn*JFWk';
 
@@ -178,28 +175,33 @@ for k = 0:size(R1Odo,1)/3
 
         R1XpFull = Xk00e(1:3,2:3); % save all robot postures of R1
         R2XpFull = Xk00e(4:6,2:3); % save all robot postures of R2
-        
-        
+
+
         % Initial state estimates check
-        if realTimeCheck == 1
+        if step0Check == 1
             figure(1)
             hold on
             % estimated state
-            plot(Xk00e((size(X0,1)+1):2:(end-1),3),Xk00e((size(X0,1)+2):2:end,3),'*','Color',lightGreen);
-            text(Xk00e((size(X0,1)+1):2:(end-1),3),Xk00e((size(X0,1)+2):2:end,3),num2str(Xk00e((size(X0,1)+1):2:(end-1),2)),'Color',lightGreen);
+            Xf00eP = plot(Xk00e((size(X0,1)+1):2:(end-1),3),Xk00e((size(X0,1)+2):2:end,3),'*','Color',cyanGreen,'DisplayName','Estimated features of FI');
+            text(Xk00e((size(X0,1)+1):2:(end-1),3),Xk00e((size(X0,1)+2):2:end,3),num2str(Xk00e((size(X0,1)+1):2:(end-1),2)),'Color',cyanGreen);
 
-            if CovCheck == 1
-                % Plot the ellipse of initialized features
-                for j = 1:((size(Xk00e,1)-size(X0,1))/2)
-                    eeXfk00e = errorEllipse(Pk00(size(X0,1)+(j-1)*2+(1:2),size(X0,1)+(j-1)*2+(1:2)), Xk00e(size(X0,1)+(j-1)*2+(1:2),3), CI);
-                    plot(eeXfk00e(:,1),eeXfk00e(:,2),'Color',lightGreen)
-                end
+
+            % Plot the ellipse of initialized features
+            eeXf00ePHandles = gobjects(1,(size(Xk00e,1)-size(X0,1))/2);
+            for j = 1:((size(Xk00e,1)-size(X0,1))/2)
+                eeXfk00e = errorEllipse(Pk00(size(X0,1)+(j-1)*2+(1:2),size(X0,1)+(j-1)*2+(1:2)), Xk00e(size(X0,1)+(j-1)*2+(1:2),3), CI);
+                eeXf00ePHandles(j) = plot(eeXfk00e(:,1),eeXfk00e(:,2),'Color',cyanGreen);
             end
-            legend(legendStrings)
+            eeXf00ePHandles(1).DisplayName = 'Estimated features Cov ellipse of FI';
+             legend([R1trueP, R2trueP, FeaTrueP, ...
+                 R1Xr0P, R2Xr0P, Xf0P, ...
+                 eeR2Xr0eP, eeXf0PHandles(1), ...
+                 Xf00eP, eeXf00ePHandles(1)]);
+
             title(sprintf('step %d with %d features after feature initialization',k,size(Xk00e,1)-6))
             hold off
         end
-    
+
         continue
     end
 
@@ -243,31 +245,36 @@ for k = 0:size(R1Odo,1)/3
     % Set the elements that are less than CovT to zero. This can be useful for dealing with numerical errors or avoiding unnecessary imaginary parts in calculations.
     Pk10(abs(Pk10)<CovT) = 0;
 
-    
+
     % % Prediction check
-    if realTimeCheck == 1
-        figure(1)
+    if predictCheck == 1
+        figure(2)
         hold on
-        plot(Xk10e(1,3),Xk10e(2,3),'-ro')
-        plot(Xk10e(4,3),Xk10e(5,3),'-mo')
+        % true state
+        R1trueP = plot(R1XrTrue(1:2:(end-1),2),R1XrTrue(2:2:end,2),'-bo','DisplayName','R1 True pose');
+        R2trueP = plot(R2XrTrue(1:2:(end-1),2),R2XrTrue(2:2:end,2),'-co','DisplayName','R2 True pose');
+        FeaTrueP = plot(XfTrueAll(1:2:(end-1),2),XfTrueAll(2:2:end,2),'*','Color',oliveGreen,'DisplayName','True features');
+        % estimated state
+        R1Xk10eP = plot(Xk10e(1,3),Xk10e(2,3),'-ro','DisplayName','R1 estimated pose after prediction');
+        R2Xk10eP = plot(Xk10e(4,3),Xk10e(5,3),'-mo','DisplayName','R2 estimated pose after prediction');
         % Xpk = [R1XrTrue(R1XrTrue(:,1)==k,:);R1XphiT(R1XphiT(:,1)==k,:);R2XrTrue(R2XrTrue(:,1)==k,:);R2XphiT(R2XphiT(:,1)==k,:)]
 
-        if CovCheck == 1
-            % R1
-            eeXr10e = errorEllipse(Pk10(1:2,1:2), Xk10e(1:2,3), CI);
-            plot(eeXr10e(:,1), eeXr10e(:,2),'Color','r');
-            % R2
-            eeR2Xr10e = errorEllipse(Pk10(4:5,4:5), Xk10e(4:5,3), CI);
-            plot(eeR2Xr10e(:,1), eeR2Xr10e(:,2),'Color','m');
-        end
+        % R1
+        eeR1Xr10e = errorEllipse(Pk10(1:2,1:2), Xk10e(1:2,3), CI);
+        eeR1Xr10eP = plot(eeXr10e(:,1), eeR1Xr10e(:,2),'Color','r','DisplayName','R1 estimated pose Cov ellipse after prediction');
+        % R2
+        eeR2Xr10e = errorEllipse(Pk10(4:5,4:5), Xk10e(4:5,3), CI);
+        eeR2Xr10eP = plot(eeR2Xr10e(:,1), eeR2Xr10e(:,2),'Color','m','DisplayName','R2 estimated pose Cov ellipse after prediction');
 
-        legend(legendStrings)
+        legend([R1trueP,R2trueP,FeaTrueP, ...
+            R1Xk10eP,R2Xk10eP, ...
+            eeR1Xr10eP,eeR2Xr10eP])
         title(sprintf('step %d with %d features after prediction',k,size(Xk10e,1)-6))
 
         hold off
-    
+
     end
-    
+
 
     %% Feature initialization using new feature observations from R1 and R2
     % find the feature observations in R1 from new features of Xk10e
@@ -279,8 +286,8 @@ for k = 0:size(R1Odo,1)/3
     R2Zkn_lv = ~ismember(R2Obs_k(:,1),Xk10e(7:end,2));
     R2Zkn_idx = find(R2Zkn_lv);
     R2Zkn = R2Obs_k(R2Zkn_idx,:);
-    
-    % % R1和R2都看到同一个新feature怎么办~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    % % R1和R2都看到同一个新feature怎么办
     Zkns = intersect(R1Zkn(:,1),R2Zkn(:,1));
     % 用R1的来initialization,R2的从R2Zkn中去掉，后面用来做update
     if ~isempty(Zkns)
@@ -297,7 +304,7 @@ for k = 0:size(R1Odo,1)/3
     if ~isempty(Zkn)
         R1Xfn = R1Zkn;
         R2Xfn = R2Zkn;
-        
+
         DeltaGX = sparse(size(Xk10efi,1),size(Xk10e,1));
         DeltaGX(1:size(Xk10e,1),1:size(Xk10e,1)) = eye(size(Xk10e,1));
 
@@ -345,20 +352,20 @@ for k = 0:size(R1Odo,1)/3
         Pk10fi(abs(Pk10fi)<CovT) = 0;
 
     end
-    
-    
+
+
     % Feature initialization check
-    if realTimeCheck == 1 && ~isempty(Xfn)
-        figure(1)
+    if fiCheck == 1 && ~isempty(Xfn)
+        figure(2)
         hold on
-        plot(Xfn(1:2:(end-1),2),Xfn(2:2:end,2),'*','Color',cyanGreen)
+        XfnP = plot(Xfn(1:2:(end-1),2),Xfn(2:2:end,2),'*','Color',cyanGreen);
         % text(Xfn(1:2:(end-1),2),Xfn(2:2:end,2),num2str(Xfn(1:2:(end-1),1)),'Color',mediumLightGreen)
 
         if CovCheck == 1
             % new features
             for j = 1:(size(Xfn,1)/2)
-            eeXf10e = errorEllipse(Pk10fi(size(Pk10,1)+(j-1)*2+(1:2),size(Pk10,1)+(j-1)*2+(1:2)), Xfn((j-1)*2+(1:2),2), CI);
-            plot(eeXf10e(:,1), eeXf10e(:,2),'Color',cyanGreen);
+                eeXf10e = errorEllipse(Pk10fi(size(Pk10,1)+(j-1)*2+(1:2),size(Pk10,1)+(j-1)*2+(1:2)), Xfn((j-1)*2+(1:2),2), CI);
+                plot(eeXf10e(:,1), eeXf10e(:,2),'Color',cyanGreen);
             end
         end
 
@@ -369,28 +376,42 @@ for k = 0:size(R1Odo,1)/3
 
     end
 
-    
+
 
     %% Update using shared feature observations from R1 and R2
     % find the shared feature observations in R1 and R2 of Xk10e
     R1Zks_lv = ismember(R1Obs_k(:,1),Xk10efi(7:end,2));
     R1Zks_idx = find(R1Zks_lv);
-    R1Zks = R1Obs_k(R1Zks_idx,:);
+    R1Zks1 = R1Obs_k(R1Zks_idx,:);
 
+    % find the shared features in Xk10efi
     R1Xfks_lv = ismember(Xk10efi(7:end,2),R1Obs_k(:,1));
-    R1Xfks_idx = find(R1Xfks_lv)+6;
+    R1Xfks_idx = find(R1Xfks_lv)+6; 
+    % R1Xfks_idx: index of R1's shared features with Xk10efi at step k
     R1Xfks = Xk10efi(R1Xfks_idx,2:3);
+    
+    % re-order the shared features R1Zks to make it consistent with R1Xfks
+    [~,R1ZkS_idx] = ismember(R1Xfks(:,1),R1Zks1(:,1));
+    R1ZkS_idx(2:2:end,1)=R1ZkS_idx(2:2:end,1)+1;
+    % R1ZkS_idx: index of R1's shared features with R1Zks at step k
+    R1Zks2 = R1Zks1(R1ZkS_idx,:);
+
 
 
     R2Zks_lv = ismember(R2Obs_k(:,1),Xk10efi(7:end,2));
     R2Zks_idx = find(R2Zks_lv);
-    R2Zks = R2Obs_k(R2Zks_idx,:);
+    R2Zks1 = R2Obs_k(R2Zks_idx,:);
 
     R2Xfks_lv = ismember(Xk10efi(7:end,2),R2Obs_k(:,1));
     R2Xfks_idx = find(R2Xfks_lv)+6;
     R2Xfks = Xk10efi(R2Xfks_idx,2:3);
 
-    Zks = [ones(size(R1Zks,1),1),R1Zks;2*ones(size(R2Zks,1),1),R2Zks];
+    [~,R2ZkS_idx] = ismember(R2Xfks(:,1),R2Zks1(:,1));
+    R2ZkS_idx(2:2:end,1)=R2ZkS_idx(2:2:end,1)+1;
+    % R1ZkS_idx: index of R1's shared features with R1Zks at step k
+    R2Zks2 = R2Zks1(R2ZkS_idx,:);
+
+    Zks = [ones(size(R1Zks2,1),1),R1Zks2;2*ones(size(R2Zks2,1),1),R2Zks2];
     % Xfks_idx = [R1Xfks_idx;R2Xfks_idx];
 
     Xk11e = Xk10efi;
@@ -401,39 +422,39 @@ for k = 0:size(R1Odo,1)/3
 
         R1DV = [];
         R2DV = [];
-        if ~isempty(R1Zks)
-            HX10e(1:2:(size(R1Zks,1)-1),1) = cos(Xk10efi(3,3))*(R1Xfks(1:2:(end-1),2)-Xk10efi(1,3)) + ...
+        if ~isempty(R1Zks2)
+            HX10e(1:2:(size(R1Zks2,1)-1),1) = cos(Xk10efi(3,3))*(R1Xfks(1:2:(end-1),2)-Xk10efi(1,3)) + ...
                 sin(Xk10efi(3,3))*(R1Xfks(2:2:end,2)-Xk10efi(2,3));
-            HX10e(2:2:size(R1Zks,1),1) = -sin(Xk10efi(3,3))*(R1Xfks(1:2:(end-1),2)-Xk10efi(1,3)) + ...
+            HX10e(2:2:size(R1Zks2,1),1) = -sin(Xk10efi(3,3))*(R1Xfks(1:2:(end-1),2)-Xk10efi(1,3)) + ...
                 cos(Xk10efi(3,3))*(R1Xfks(2:2:end,2)-Xk10efi(2,3));
 
-            JHX10e(1:2:(size(R1Zks,1)-1),1:3) = [repmat([-cos(Xk10efi(3,3)),-sin(Xk10efi(3,3))],size(R1Zks,1)/2,1), ...
+            JHX10e(1:2:(size(R1Zks2,1)-1),1:3) = [repmat([-cos(Xk10efi(3,3)),-sin(Xk10efi(3,3))],size(R1Zks2,1)/2,1), ...
                 -sin(Xk10efi(3,3))*(R1Xfks(1:2:(end-1),2)-Xk10efi(1,3))+cos(Xk10efi(3,3))*(R1Xfks(2:2:end,2)-Xk10efi(2,3))];
 
-            JHX10e(2:2:size(R1Zks,1),1:3) = [repmat([sin(Xk10efi(3,3)),-cos(Xk10efi(3,3))],size(R1Zks,1)/2,1), ...
+            JHX10e(2:2:size(R1Zks2,1),1:3) = [repmat([sin(Xk10efi(3,3)),-cos(Xk10efi(3,3))],size(R1Zks2,1)/2,1), ...
                 -cos(Xk10efi(3,3))*(R1Xfks(1:2:(end-1),2)-Xk10efi(1,3))-sin(Xk10efi(3,3))*(R1Xfks(2:2:end,2)-Xk10efi(2,3))];
 
-            for R1kj = 1:size(R1Zks,1)/2
+            for R1kj = 1:size(R1Zks2,1)/2
                 R1DV = blkdiag(R1DV,R1R);
                 JHX10e((R1kj-1)*2+(1:2), R1Xfks_idx((R1kj-1)*2+(1:2),1)') = rotationMatrix(Xk10efi(3,3))';
             end
         end
 
-        if ~isempty(R2Zks)
-            HX10e(size(R1Zks,1)+(1:2:(size(R2Zks,1)-1)),1) = cos(Xk10efi(6,3))*(R2Xfks(1:2:(end-1),2)-Xk10efi(4,3)) + ...
+        if ~isempty(R2Zks2)
+            HX10e(size(R1Zks2,1)+(1:2:(size(R2Zks2,1)-1)),1) = cos(Xk10efi(6,3))*(R2Xfks(1:2:(end-1),2)-Xk10efi(4,3)) + ...
                 sin(Xk10efi(6,3))*(R2Xfks(2:2:end,2)-Xk10efi(5,3));
-            HX10e(size(R1Zks,1)+(2:2:size(R2Zks,1)),1) = -sin(Xk10efi(6,3))*(R2Xfks(1:2:(end-1),2)-Xk10efi(4,3)) + ...
+            HX10e(size(R1Zks2,1)+(2:2:size(R2Zks2,1)),1) = -sin(Xk10efi(6,3))*(R2Xfks(1:2:(end-1),2)-Xk10efi(4,3)) + ...
                 cos(Xk10efi(6,3))*(R2Xfks(2:2:end,2)-Xk10efi(5,3));
 
-            JHX10e(size(R1Zks,1)+(1:2:size(R2Zks,1)-1),4:6) = [repmat([-cos(Xk10efi(6,3)),-sin(Xk10efi(6,3))],size(R2Zks,1)/2,1), ...
+            JHX10e(size(R1Zks2,1)+(1:2:size(R2Zks2,1)-1),4:6) = [repmat([-cos(Xk10efi(6,3)),-sin(Xk10efi(6,3))],size(R2Zks2,1)/2,1), ...
                 -sin(Xk10efi(6,3))*(R2Xfks(1:2:(end-1),2)-Xk10efi(4,3))+cos(Xk10efi(6,3))*(R2Xfks(2:2:end,2)-Xk10efi(5,3))];
 
-            JHX10e(size(R1Zks,1)+(2:2:size(R2Zks,1)),4:6) = [repmat([sin(Xk10efi(6,3)),-cos(Xk10efi(6,3))],size(R2Zks,1)/2,1), ...
+            JHX10e(size(R1Zks2,1)+(2:2:size(R2Zks2,1)),4:6) = [repmat([sin(Xk10efi(6,3)),-cos(Xk10efi(6,3))],size(R2Zks2,1)/2,1), ...
                 -cos(Xk10efi(6,3))*(R2Xfks(1:2:(end-1),2)-Xk10efi(4,3))-sin(Xk10efi(6,3))*(R2Xfks(2:2:end,2)-Xk10efi(5,3))];
 
-            for R2kj = 1:size(R2Zks,1)/2
+            for R2kj = 1:size(R2Zks2,1)/2
                 R2DV = blkdiag(R2DV,R2R);
-                JHX10e(size(R1Zks,1)+(R2kj-1)*2+(1:2), R2Xfks_idx((R2kj-1)*2+(1:2),1)') = rotationMatrix(Xk10efi(6,3))';
+                JHX10e(size(R1Zks2,1)+(R2kj-1)*2+(1:2), R2Xfks_idx((R2kj-1)*2+(1:2),1)') = rotationMatrix(Xk10efi(6,3))';
             end
         end
 
@@ -462,7 +483,7 @@ for k = 0:size(R1Odo,1)/3
             hold on
             plot(Xk11e(7:2:(end-1),3),Xk11e(8:2:end,3),'*','Color',yellowGreen)
             % text(Xk11e(7:2:(end-1),3),Xk11e(8:2:end,3),num2str(Xk11e(7:2:(end-1),2)),'Color',[1, 0.5, 0]) % yellow
-            
+
             if CovCheck == 1
                 % new features
                 for j = 1:((size(Xk11e,1)-6)/2)

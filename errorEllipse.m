@@ -16,9 +16,6 @@ function ee = errorEllipse(C, mu, conf)
     
     [V, D] = eig(C * s);
     
-    V = abs(V);
-    D = abs(D);
-
     % Create an ellipse with unit radius
     t = linspace(0, 2*pi, 100);
     a = cos(t);
