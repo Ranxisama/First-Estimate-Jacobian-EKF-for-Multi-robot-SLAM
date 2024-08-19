@@ -52,8 +52,8 @@ if measurementsCheck == 1
 hold on
 plot(R1XrTrue(1:2:(end-1),2),R1XrTrue(2:2:end,2),'-bo')
 plot(R2XrTrue(1:2:(end-1),2),R2XrTrue(2:2:end,2),'-co')
-plot(XfTrueAll(1:2:(end-1),2),XfTrueAll(2:2:end,2),'*','Color',darkGreen)
-text(XfTrueAll(1:2:(end-1),2),XfTrueAll(2:2:end,2),num2str(XfTrueAll(2:2:end,1)),'Color',darkGreen)
+plot(XfTrueAll(1:2:(end-1),2),XfTrueAll(2:2:end,2),'*','Color',oliveGreen)
+text(XfTrueAll(1:2:(end-1),2),XfTrueAll(2:2:end,2),num2str(XfTrueAll(2:2:end,1)),'Color',oliveGreen)
 
 
 
