@@ -3,17 +3,13 @@
 measurementsCheck = 1; % if 1, check the measurements by running MeasurementsGeneration.m
 
 %% Simulation check
-% figure (3)
 % pose check
-poseCovCheck = 1; % if 1, check the pose of R1 and R2
-% feature check
-feaCovCheck = 0; % if 1, check the features
+poseCheck = 1; % if 1, check 
 
 % real time check, use more computer performance by running EKF_SLAM_simulation.m
-% figure (1)
 step0Check = 1; % if 1, check the real-time state of Gni and feature initialization at step 0
 updateCheck = 1; % if 1, check the real-time state of update at each step after step 0
-% figure (2)
+
 predictCheck = 0; % if 1, check the real-time state of prediction at each step
 fiCheck = 0; % if 1, check the real-time state of feature initilization at each step after step 0
 
