@@ -3,15 +3,17 @@
 measurementsCheck = 1; % if 1, check the measurements by running MeasurementsGeneration.m
 
 %% Simulation check
-% pose check
-poseCheck = 1; % if 1, check 
-
 % real time check, use more computer performance by running EKF_SLAM_simulation.m
-step0Check = 1; % if 1, check the real-time state of Gni and feature initialization at step 0
+% for figure (1)
+% step0Check = 1; % if 1, check the real-time state of Gni and feature initialization at step 0
 updateCheck = 1; % if 1, check the real-time state of update at each step after step 0
-
+% for figure (2)
 predictCheck = 0; % if 1, check the real-time state of prediction at each step
 fiCheck = 0; % if 1, check the real-time state of feature initilization at each step after step 0
+
+% Cov check
+poseCovCheck =  1; % if 1, check the pose Cov of R1 and R2
+feaCovCheck = 1; % if 1, check the features Cov
 
 %% Noise Switch
 R1addPose0Noise = 0; % if 0, R1 initial position is accurate
@@ -133,3 +135,7 @@ if R2addObsNoise == 0
 end
 R2R = [R2sigma_zv^2,0;
     0,R2sigma_zv^2];
+
+if poseCovCheck ==  0 & feaCovCheck == 1
+    error('To check feature Cov, you must switch on poseCovCheck')
+end

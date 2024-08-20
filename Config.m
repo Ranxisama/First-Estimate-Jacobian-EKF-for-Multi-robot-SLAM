@@ -1,21 +1,19 @@
 %% Check Switch
 %% Measurements check
-measurementsCheck = 1; % if 1, check the measurements by running MeasurementsGeneration.m
+measurementsCheck = 0; % if 1, check the measurements by running MeasurementsGeneration.m
 
 %% Simulation check
-% figure (3)
-% pose check
-poseCovCheck = 1; % if 1, check the pose of R1 and R2
-% feature check
-feaCovCheck = 0; % if 1, check the features
-
 % real time check, use more computer performance by running EKF_SLAM_simulation.m
-% figure (1)
-step0Check = 1; % if 1, check the real-time state of Gni and feature initialization at step 0
+% for figure (1)
+% step0Check = 1; % if 1, check the real-time state of Gni and feature initialization at step 0
 updateCheck = 1; % if 1, check the real-time state of update at each step after step 0
-% figure (2)
+% for figure (2)
 predictCheck = 0; % if 1, check the real-time state of prediction at each step
 fiCheck = 0; % if 1, check the real-time state of feature initilization at each step after step 0
+
+% Cov check
+poseCovCheck =  1; % if 1, check the pose Cov of R1 and R2
+feaCovCheck = 0; % if 1, check the features Cov
 
 %% Noise Switch
 R1addPose0Noise = 0; % if 0, R1 initial position is accurate
@@ -56,8 +54,8 @@ R1sigma_zv = 0.05; % 0.05 m/time_step
 
 %% R2
 % standard deviation of robot position at time 0 (equals to 0 as the origin of the 1D coordinate system)
-R2sigma_0r = 0.03; % 0.03: 0.03 m
-R2sigma_0phi = pi/60; % pi/60: 3°
+R2sigma_0r = 3; % 3: 3 m
+R2sigma_0phi = 0.6*pi; % 0.6*pi: 108°
 
 
 % standard deviation of the zero mean Gaussian process noise w(k) of 2nd robot
@@ -87,11 +85,9 @@ CovT = 1e-16; % set the matrix's elements that are less than CovT to zero.
 % This can be useful for dealing with numerical errors or avoiding unnecessary imaginary parts in calculations. 
 
 %% feature color
-lightGreen = [144, 238, 144] / 255; % 浅绿色
-cyanGreen = [0, 255, 127] / 255;   % 青绿色
-yellowGreen = [154, 205, 50] / 255; % 黄绿色
-oliveGreen = [85, 107, 47] / 255;   % 橄榄绿色
-
+brightGreen = [0, 255, 0] / 255;
+paleGreen = [152, 251, 152]/255;
+darkGreen = [0, 100, 0] / 255;
 
 
 if R1addPose0Noise == 0
@@ -137,3 +133,7 @@ if R2addObsNoise == 0
 end
 R2R = [R2sigma_zv^2,0;
     0,R2sigma_zv^2];
+
+if poseCovCheck ==  0 & feaCovCheck == 1
+    error('To check feature Cov, you must switch on poseCovCheck')
+end

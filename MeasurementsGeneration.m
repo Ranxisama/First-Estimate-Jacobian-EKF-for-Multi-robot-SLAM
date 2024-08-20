@@ -52,8 +52,8 @@ if measurementsCheck == 1
 hold on
 plot(R1XrTrue(1:2:(end-1),2),R1XrTrue(2:2:end,2),'-bo')
 plot(R2XrTrue(1:2:(end-1),2),R2XrTrue(2:2:end,2),'-co')
-plot(XfTrueAll(1:2:(end-1),2),XfTrueAll(2:2:end,2),'*','Color',oliveGreen)
-text(XfTrueAll(1:2:(end-1),2),XfTrueAll(2:2:end,2),num2str(XfTrueAll(2:2:end,1)),'Color',oliveGreen)
+plot(XfTrueAll(1:2:(end-1),2),XfTrueAll(2:2:end,2),'*','Color',darkGreen)
+text(XfTrueAll(1:2:(end-1),2),XfTrueAll(2:2:end,2),num2str(XfTrueAll(2:2:end,1)),'Color',darkGreen)
 
 
 
@@ -93,11 +93,11 @@ end
 plot(R1Xp(1:3:(end-2),1),R1Xp(2:3:(end-1),1),'--ro')
 plot(R2Xp(1:3:(end-2),1),R2Xp(2:3:(end-1),1),'--mo')
 
-% plot(R1Xf(1:2:(end-1),2),R1Xf(2:2:end,2),'*','Color',lightGreen)
-% text(R1Xf(1:2:(end-1),2),R1Xf(2:2:end,2),num2str(R1Xf(2:2:end,1)),"Color",lightGreen)
+% plot(R1Xf(1:2:(end-1),2),R1Xf(2:2:end,2),'*','Color',brightGreen)
+% text(R1Xf(1:2:(end-1),2),R1Xf(2:2:end,2),num2str(R1Xf(2:2:end,1)),"Color",brightGreen)
 % 
-% plot(R2Xf(1:2:(end-1),2),R2Xf(2:2:end,2),'*','Color',cyanGreen)
-% text(R2Xf(1:2:(end-1),2),R2Xf(2:2:end,2),num2str(R2Xf(2:2:end,1)),"Color",cyanGreen)
+% plot(R2Xf(1:2:(end-1),2),R2Xf(2:2:end,2),'*','Color',paleGreen)
+% text(R2Xf(1:2:(end-1),2),R2Xf(2:2:end,2),num2str(R2Xf(2:2:end,1)),"Color",paleGreen)
 xlim([fea_xlb,fea_xub])
 ylim([fea_ylb,fea_yub])
 hold off
