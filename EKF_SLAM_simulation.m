@@ -206,7 +206,7 @@ for k = 0:size(R1Odo,1)/3
 
         legend(Labels0)
 
-        title(sprintf('step %d with %d features after update',k,(size(Xk11e,1)-6)/2))
+        title(sprintf('step %d with %d features after update',k,(size(Xk00e,1)-6)/2))
 
         pause
         continue

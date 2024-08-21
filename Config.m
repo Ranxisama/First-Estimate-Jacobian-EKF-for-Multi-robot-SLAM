@@ -50,7 +50,7 @@ R1sigma_uw = pi/360; % 0.5°/time_step
 
 
 % standard deviation of the zero mean Gaussian observation noise v(k) of 1th robot
-R1sigma_zv = 0.05; % 0.05 m/time_step
+R1sigma_zv = 0.1; % 0.05 m/time_step
 
 %% R2
 % standard deviation of robot position at time 0 (equals to 0 as the origin of the 1D coordinate system)
@@ -64,7 +64,7 @@ R2sigma_uw = pi/180; % 1°/time_step
 
 
 % standard deviation of the zero mean Gaussian observation noise v(k) of 2nd robot
-R2sigma_zv = 0.1;
+R2sigma_zv = 0.05;
 
 
 
