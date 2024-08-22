@@ -4,13 +4,6 @@ measurementsCheck = 0; % if 1, check the measurements by running MeasurementsGen
 
 %% Simulation check
 % real time check, use more computer performance by running EKF_SLAM_simulation.m
-% for figure (1)
-% step0Check = 1; % if 1, check the real-time state of Gni and feature initialization at step 0
-updateCheck = 1; % if 1, check the real-time state of update at each step after step 0
-% for figure (2)
-predictCheck = 0; % if 1, check the real-time state of prediction at each step
-fiCheck = 0; % if 1, check the real-time state of feature initilization at each step after step 0
-
 % Cov check
 poseCovCheck =  1; % if 1, check the pose Cov of R1 and R2
 feaCovCheck = 0; % if 1, check the features Cov
@@ -33,6 +26,9 @@ R2sensorRange = 8; % m/s, R2's observation range for the features
 %% Required number of shared feature observations at step 0 
 reqSharedObsNum = 8; % Required number of shared feature observations
 
+%% MarkerSize
+MS = 2;
+
 %% Robot bearing ranges
 R1bearingRange = pi/60; % pi/60: 3°
 R2bearingRange = pi/60; % pi/60: 3°
@@ -50,7 +46,7 @@ R1sigma_uw = pi/360; % 0.5°/time_step
 
 
 % standard deviation of the zero mean Gaussian observation noise v(k) of 1th robot
-R1sigma_zv = 0.1; % 0.05 m/time_step
+R1sigma_zv = 0.05; % m/time_step
 
 %% R2
 % standard deviation of robot position at time 0 (equals to 0 as the origin of the 1D coordinate system)
@@ -59,12 +55,12 @@ R2sigma_0phi = 0.6*pi; % 0.6*pi: 108°
 
 
 % standard deviation of the zero mean Gaussian process noise w(k) of 2nd robot
-R2sigma_uv = 0.05; % 0.025 m/time_step
-R2sigma_uw = pi/180; % 1°/time_step
+R2sigma_uv = 0.025; % m/time_step
+R2sigma_uw = pi/360; % °/time_step
 
 
 % standard deviation of the zero mean Gaussian observation noise v(k) of 2nd robot
-R2sigma_zv = 0.05;
+R2sigma_zv = 0.05; % m/time_step
 
 
 

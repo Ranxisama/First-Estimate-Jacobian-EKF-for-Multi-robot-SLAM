@@ -382,18 +382,18 @@ figure(1)
 
 hold on
 
-R1XrTrueP = plot(R1XrTrue(1:2:(end-1),2),R1XrTrue(2:2:end,2),'-bo','MarkerSize',MS);
+R1XrTrueP = plot(R1XrTrue(1:2:(end-1),2),R1XrTrue(2:2:end,2),'-bo','MarkSize',1);
 R1XrTrueP(1).DisplayName = 'R1 true pose';
-R2XrTrueP = plot(R2XrTrue(1:2:(end-1),2),R2XrTrue(2:2:end,2),'-co','MarkerSize',MS);
+R2XrTrueP = plot(R2XrTrue(1:2:(end-1),2),R2XrTrue(2:2:end,2),'-co','MarkSize',1);
 R2XrTrueP(1).DisplayName = 'R2 true pose';
-XfTrueAllP = plot(XfTrueAll(1:2:(end-1),2),XfTrueAll(2:2:end,2),'*','Color',darkGreen,'MarkerSize',MS);
+XfTrueAllP = plot(XfTrueAll(1:2:(end-1),2),XfTrueAll(2:2:end,2),'*','Color',darkGreen,'MarkSize',1);
 XfTrueAllP(1).DisplayName = 'True features';
 
-R1XreP = plot(R1XpFull(1:3:(end-2),2),R1XpFull(2:3:(end-1),2),'--ro','MarkerSize',MS);
+R1XreP = plot(R1XpFull(1:3:(end-2),2),R1XpFull(2:3:(end-1),2),'--ro','MarkSize',1);
 R1XreP.DisplayName = 'R1 estimated pose';
-R2XreP = plot(R2XpFull(1:3:(end-2),2),R2XpFull(2:3:(end-1),2),'--mo','MarkerSize',MS);
+R2XreP = plot(R2XpFull(1:3:(end-2),2),R2XpFull(2:3:(end-1),2),'--mo','MarkSize',1);
 R2XreP(1).DisplayName = 'R2 estimated pose';
-XfeP = plot(Xk11e(7:2:(end-1),3),Xk11e(8:2:end,3),'*','Color',brightGreen,'MarkerSize',MS);
+XfeP = plot(Xk11e(7:2:(end-1),3),Xk11e(8:2:end,3),'*','Color',brightGreen,'MarkSize',1);
 XfeP(1).DisplayName = 'Estimated features';
 
 if poseCovCheck == 1
