@@ -3,15 +3,8 @@ function [XsGni,PsGni] = GNI(R1Xp0,Xs,Ps,Zks,ConvergenceCondition)
 XsGni = Xs;
 DD = 1;
 
-k = 0;
 while DD >= ConvergenceCondition
     
-    k = k+1;
-
-    % if k == 6
-    %     pause
-    % end
-
     XsGni(3,1) = wrap(XsGni(3,1));
 
     Fx = F(R1Xp0,XsGni,Zks);
