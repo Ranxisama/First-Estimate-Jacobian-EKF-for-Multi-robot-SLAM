@@ -5,7 +5,7 @@ measurementsCheck = 0; % if 1, check the measurements by running MeasurementsGen
 %% Simulation check
 % real time check, use more computer performance by running EKF_SLAM_simulation.m
 % Cov check
-poseCovCheck =  1; % if 1, check the pose Cov of R1 and R2
+poseCovCheck =  0; % if 1, check the pose Cov of R1 and R2
 feaCovCheck = 0; % if 1, check the features Cov
 
 %% Noise Switch

@@ -399,9 +399,10 @@ XfeP(1).DisplayName = 'Estimated features';
 if poseCovCheck == 1
     R1eeP = plot(R1eeFull(:,1:2:(end-1)),R1eeFull(:,2:2:end),'r');
     R2eeP = plot(R2eeFull(:,1:2:(end-1)),R2eeFull(:,2:2:end),'m');
+    R1eeP(1).DisplayName = 'R1 estimated pose Cov';
+    R2eeP(1).DisplayName = 'R1 estimated pose Cov';
 end
-R1eeP(1).DisplayName = 'R1 estimated pose Cov';
-R2eeP(1).DisplayName = 'R1 estimated pose Cov';
+
 
 if feaCovCheck == 1
     Fee = [];
@@ -416,6 +417,8 @@ if feaCovCheck == 1
     legend([R1XrTrueP(1),R2XrTrueP(1),XfTrueAllP(1),R1XreP(1),R2XreP(1),XfeP(1),R1eeP(1),R2eeP(1),FeeP(1)])
 else
     if poseCovCheck == 1
+        legend([R1XrTrueP(1),R2XrTrueP(1),XfTrueAllP(1),R1XreP(1),R2XreP(1),XfeP(1),R1eeP(1),R2eeP(1)])
+    else
         legend([R1XrTrueP(1),R2XrTrueP(1),XfTrueAllP(1),R1XreP(1),R2XreP(1),XfeP(1)])
     end
 

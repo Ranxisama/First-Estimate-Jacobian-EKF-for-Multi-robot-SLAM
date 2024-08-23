@@ -1,8 +1,8 @@
 function [XsGni,PsGni] = GNI(R1Xp0,Xs,Ps,Zks,ConvergenceCondition)
 
 XsGni = Xs;
-
-for gni_num = 1:100
+DD = 1;
+while DD >= ConvergenceCondition
 
     XsGni(3,1) = wrap(XsGni(3,1));
 
@@ -19,10 +19,6 @@ for gni_num = 1:100
 
     D = XsGni - Xold;
     DD = D'*D;
-
-    if DD < ConvergenceCondition
-        break
-    end
 end
 
 PsGni = inv(JFx'/Ps*JFx); % R2Pp0Gni: Cov of R2 posture
