@@ -1,3 +1,6 @@
+%% Number of Monte Carlo experiments
+mcNum = 100;
+
 %% Check Switch
 %% Measurements check
 measurementsCheck = 0; % if 1, check the measurements by running MeasurementsGeneration.m
