@@ -41,15 +41,22 @@ R2Xp0Set = [R2Xp0Set,R2Xp0];
 %% Odometry measurements Generation
 R1Odo = odometryGeneration(R1XrTrue,R1XphiT,PosNum,R1addOdoNoise,R1Q);
 R2Odo = odometryGeneration(R2XrTrue,R2XphiT,PosNum,R2addOdoNoise,R2Q);
-R1OdoSet = [R1OdoSet,R1Odo];
-R2OdoSet = [R2OdoSet,R2Odo];
+R1OdoSet = [R1OdoSet,R1Odo(:,3)];
+R2OdoSet = [R2OdoSet,R2Odo(:,3)];
 
 %% Observation measurements Generation
 R1Obs = observationGeneration(R1XrTrue,R1XphiT,PosNum,XfTrueAll,R1addObsNoise,R1R,R1sensorRange);
 R2Obs = observationGeneration(R2XrTrue,R2XphiT,PosNum,XfTrueAll,R2addObsNoise,R2R,R2sensorRange);
-R1ObsSet = [R1ObsSet,R1Obs];
-R2ObsSet = [R2ObsSet,R2Obs];
+R1ObsSet = [R1ObsSet,R1Obs(:,3)];
+R2ObsSet = [R2ObsSet,R2Obs(:,3)];
 end
+
+R1OdoSet = [R1Odo(:,1:2),R1OdoSet];
+R2OdoSet = [R2Odo(:,1:2),R2OdoSet];
+R1ObsSet = [R1Obs(:,1:2),R1ObsSet];
+R2ObsSet = [R2Obs(:,1:2),R2ObsSet];
+
+
 
 %% Shared feature Observation at step 0
 sharedObs0Num = numel(intersect(R1Obs(R1Obs(:,1)==0,2),R2Obs(R2Obs(:,1)==0,2)));
@@ -58,5 +65,5 @@ if sharedObs0Num < reqSharedObsNum
     disp('Shared feature observations at step 0 not enough, need to adjust sensor range and rerun')
 end
 
-save('Parameters.mat','R1XrTrue','R1XphiT','R2XrTrue','R2XphiT','XfTrueAll')
-save('Measurements.mat','R1Xp0Set','R1OdoSet','R1ObsSet','R2Xp0Set','R2OdoSet','R2ObsSet')
+save('MT_Parameters.mat','R1XrTrue','R1XphiT','R2XrTrue','R2XphiT','XfTrueAll')
+save('MT_Measurements.mat','R1Xp0Set','R1OdoSet','R1ObsSet','R2Xp0Set','R2OdoSet','R2ObsSet')

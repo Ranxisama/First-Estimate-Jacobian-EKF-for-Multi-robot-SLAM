@@ -54,7 +54,7 @@ R1sigma_zv = 0.05; % m/time_step
 %% R2
 % standard deviation of robot position at time 0 (equals to 0 as the origin of the 1D coordinate system)
 R2sigma_0r = 0.5; % m
-R2sigma_0phi = 0.01*pi; % 0.01*pi: 1.8°
+R2sigma_0phi = 0.01*pi; % 0.6*pi: 108°
 
 
 % standard deviation of the zero mean Gaussian process noise w(k) of 2nd robot
