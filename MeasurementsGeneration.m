@@ -51,7 +51,11 @@ save('Measurements.mat','R1Xp0','R1Odo','R1Obs','R2Xp0','R2Odo','R2Obs')
 if measurementsCheck == 1
 hold on
 plot(R1XrTrue(1:2:(end-1),2),R1XrTrue(2:2:end,2),'-bo')
+text(R1XrTrue(1:2:(end-1),2),R1XrTrue(2:2:end,2),num2str(R1XrTrue(1:2:(end-1),1)),'Color','b')
+
 plot(R2XrTrue(1:2:(end-1),2),R2XrTrue(2:2:end,2),'-co')
+text(R2XrTrue(1:2:(end-1),2),R2XrTrue(2:2:end,2),num2str(R2XrTrue(1:2:(end-1),1)),'Color','c')
+
 plot(XfTrueAll(1:2:(end-1),2),XfTrueAll(2:2:end,2),'*','Color',darkGreen)
 text(XfTrueAll(1:2:(end-1),2),XfTrueAll(2:2:end,2),num2str(XfTrueAll(2:2:end,1)),'Color',darkGreen)
 

@@ -8,9 +8,13 @@ Config;
 
 poseNum = size(R1OdoSet,1)/3;
 
+
 R1XpFullSet = [];
+R1PFullSet = [];
 R2XpFullSet = [];
-FFullSet = [];
+R2PFullSet = [];
+XfFullSet = [];
+PfFullSet = [];
 
 for mc = 1:mcNum
 
@@ -24,7 +28,10 @@ for mc = 1:mcNum
     R2Obs = R2ObsSet(:,[1,2,2+mc]);
 
     R1XpFull = [];
+    R1PFull = [];
     R2XpFull = [];
+    R2PFull = [];
+    PfFull = [];
 
     Xs = [];
     X0 = [];
@@ -80,10 +87,10 @@ for mc = 1:mcNum
             Pz = blkdiag(R1sRn,R2sRn);
 
             Z0s = [R1Z0s(:,2);R2Z0s(:,2)];
-            
+
             Xs(3,1) = wrap(Xs(3,1));
             XsGni = Xs;
-            
+
             %% 显示GNI的结果是奇异矩阵是因为加噪声随机生成的R2Xp0落在feature的真值上了
 
             [XsGni(:,3),PzGni] = GNI(R1Xp0,Xs(:,3),Pz,Z0s,CC);
@@ -166,6 +173,9 @@ for mc = 1:mcNum
 
             R1XpFull = Xk00e(1:3,2:3); % save all robot postures of R1
             R2XpFull = Xk00e(4:6,2:3); % save all robot postures of R2
+
+            R1PFull = Pk00(1:3,1:3);
+            R2PFull = Pk00(4:6,4:6);
 
             continue
         end
@@ -387,19 +397,169 @@ for mc = 1:mcNum
         end
 
         R1XpFull = [R1XpFull;Xk11e(1:3,2:3)];
+        R1PFull = [R1PFull;Pk11(1:3,1:3)];
+
         R2XpFull = [R2XpFull;Xk11e(4:6,2:3)];
+        R2PFull = [R2PFull;Pk11(4:6,4:6)];
 
         Xk00e = Xk11e;
         Pk00 = Pk11;
 
     end
-    
+
     R1XpFullSet = [R1XpFullSet,R1XpFull(:,2)];
+    R1PFullSet = [R1PFullSet,R1PFull];
+
     R2XpFullSet = [R2XpFullSet,R2XpFull(:,2)];
-    FFullSet = [FFullSet,Xk11e(7:end,3)];
+    R2PFullSet = [R2PFullSet,R2PFull];
+
+    XfFullSet = [XfFullSet,Xk11e(7:end,3)];
+    PfFullSet = [PfFullSet,Pk11(7:end,7:end)];
 
 end
 
+feaNum = size(Xk11e(7:end,1),1)/2;
+
 R1XpFullSet = [R1XpFull(:,1),R1XpFullSet];
 R2XpFullSet = [R2XpFull(:,1),R2XpFullSet];
-FFullSet = [Xk11e(7:end,1:2),FFullSet];
+XfFullSet = [Xk11e(7:end,2),XfFullSet];
+
+R1XrFullSet = [];
+R2XrFullSet = [];
+R1XphiFullSet = [];
+R2XphiFullSet = [];
+
+DeltaR1XpFullSet = [];
+DeltaR2XpFullSet = [];
+
+DeltaR1XrFullSet = [];
+DeltaR2XrFullSet = [];
+
+DeltaR1XphiFullSet = [];
+DeltaR2XphiFullSet = [];
+
+for pn = 0:poseNum
+
+    DeltaR1XpFullSet((end+1):(end+3),:) = R1XpFullSet(pn*3+(1:3),2:end) - [R1XrTrue(pn*2+(1:2),2);R1XphiT(pn+1,2)];
+    DeltaR2XpFullSet((end+1):(end+3),:) = R2XpFullSet(pn*3+(1:3),2:end) - [R2XrTrue(pn*2+(1:2),2);R2XphiT(pn+1,2)];
+
+    % wrap the delta angle
+    DeltaR1XpFullSet(end,:) = wrap(DeltaR1XpFullSet(end,:));
+    DeltaR2XpFullSet(end,:) = wrap(DeltaR2XpFullSet(end,:));
+
+    DeltaR1XrFullSet((end+1):(end+2),:) = DeltaR1XpFullSet((end-2):(end-1),:);
+    DeltaR2XrFullSet((end+1):(end+2),:) = DeltaR2XpFullSet((end-2):(end-1),:);
+
+    DeltaR1XphiFullSet(end+1,:) = DeltaR1XpFullSet(end,:);
+    DeltaR2XphiFullSet(end+1,:) = DeltaR2XpFullSet(end,:);
+
+end
+
+%% re-order the true features XfTrueAll's IDs to make it consistent with FFullSet
+[~,XfTrue_idx] = ismember(XfFullSet(:,1),XfTrueAll(:,1));
+XfTrue_idx(2:2:end,1) = XfTrue_idx(2:2:end,1)+1;
+XfTrue = XfTrueAll(XfTrue_idx,:);
+DeltaFFullSet = XfFullSet(:,2:end)-XfTrue(:,2);
+
+%% Root Mean Square Error (RMSE)
+R1XrRMSE = [(0:poseNum)',zeros(poseNum+1,1)];
+R1XphiRMSE = [(0:poseNum)',zeros(poseNum+1,1)];
+
+R2XrRMSE = [(0:poseNum)',zeros(poseNum+1,1)];
+R2XphiRMSE = [(0:poseNum)',zeros(poseNum+1,1)];
+
+FRMSE = [XfFullSet(1:2:(end-1),1),zeros(feaNum,1)];
+
+R1XrRMSE(:,2) =  sqrt((sum(DeltaR1XrFullSet(1:2:(end-1),:).^2,2)+sum(DeltaR1XrFullSet(2:2:end,:).^2,2))/mcNum);
+R1XrRMSE_mean = mean(R1XrRMSE(:,2));
+fprintf('Std R1 Position Err.RMS (m): %.2f \n',R1XrRMSE_mean);
+
+R1XphiRMSE(:,2) = sqrt(sum(DeltaR1XphiFullSet(1:end,:).^2,2));
+R1XphiRMSE_mean = mean(R1XphiRMSE(:,2));
+fprintf('Std R1 Heading Err.RMS (rad): %.2f \n',R1XphiRMSE_mean);
+
+R2XrRMSE(:,2) =  sqrt((sum(DeltaR2XrFullSet(1:2:(end-1),:).^2,2)+sum(DeltaR2XrFullSet(2:2:end,:).^2,2))/mcNum);
+R2XrRMSE_mean = mean(R2XrRMSE(:,2));
+fprintf('Std R2 Position Err.RMS (m): %.2f \n',R2XrRMSE_mean);
+
+R2XphiRMSE(:,2) = sqrt(sum(DeltaR2XphiFullSet(1:end,:).^2,2));
+R2XphiRMSE_mean = mean(R2XphiRMSE(:,2));
+fprintf('Std R2 Heading Err.RMS (rad): %.2f \n',R2XphiRMSE_mean);
+
+FRMSE(:,2) = sqrt((sum(DeltaFFullSet(1:2:(end-1),:).^2,2)+sum(DeltaFFullSet(2:2:end,:).^2,2))/mcNum);
+FRMSE_mean = mean(FRMSE(:,2));
+fprintf('Std Landmark Position Err.RMS (m): %.2f \n',FRMSE_mean);
+
+figure(1)
+subplot(1,2,1)
+hold on
+R1XrRMSEP = plot(R1XrRMSE(:,1)',R1XrRMSE(:,2)','-bo','DisplayName','R1 std EKF');
+R2XrRMSEP = plot(R2XrRMSE(:,1)',R2XrRMSE(:,2)','-ro','DisplayName','R2 std EKF');
+
+xlabel('Steps')
+ylabel('Position RMSE (m)')
+axis([0,poseNum,0,3])
+legend([R1XrRMSEP,R2XrRMSEP])
+
+hold off
+
+subplot(1,2,2)
+hold on
+R1XphiRMSEP = plot(R1XphiRMSE(:,1)',R1XphiRMSE(:,2)','-bo','DisplayName','R1 std EKF');
+R2XphiRMSEP = plot(R2XphiRMSE(:,1)',R2XphiRMSE(:,2)','-ro','DisplayName','R2 std EKF');
+xlabel('Steps')
+ylabel('Heading RMSE (m)')
+xlim([0,poseNum])
+legend([R1XphiRMSEP,R2XphiRMSEP])
+
+hold off
+
+%% Average Normalized (state) Estimation Error Squared (ANEES)
+
+R1XpSum = [(1:poseNum)',zeros(poseNum,mcNum)];
+R2XpSum = [(0:poseNum)',zeros(poseNum+1,mcNum)];
+for k = 0:poseNum
+
+    for mn = 1:mcNum
+        R2xri_e = DeltaR2XpFullSet(k*3+(1:3),mn);
+        R2C_xrie = R2PFullSet(k*3+(1:3),(mn-1)*3+(1:3));
+        R2NEES_k(k+1,mn) = R2xri_e'/R2C_xrie*R2xri_e;
+
+        if k == 0
+            continue
+        else
+            R1xri_e = DeltaR1XpFullSet(k*3+(1:3),mn);
+            R1C_xrie = R1PFullSet(k*3+(1:3),(mn-1)*3+(1:3));
+            R1NEES_k(k,mn) = R1xri_e'/R1C_xrie*R1xri_e;
+        end
+    end
+end
+
+R1XpNEES = [R1NEES_k(:,1),mean(R1NEES_k(:,2:end),2)];
+R2XpNEES = [R2NEES_k(:,1),mean(R2NEES_k(:,2:end),2)];
+
+R1XpNEES_mean = mean(R1XpNEES(:,2));
+fprintf('Std EKF R1 Pose NEES: %.2f \n',R1XpNEES_mean);
+
+R2XpNEES_mean = mean(R2XpNEES(:,2));
+fprintf('Std EKF R2 Pose NEES: %.2f \n',R2XpNEES_mean);
+
+XfNEES = 0;
+for mn = 1:mcNum
+    xfi_e = DeltaFFullSet(:,mn);
+    C_xfie = PfFullSet(:,(mn-1)*feaNum*2+(1:(2*feaNum)));
+    XfNEES = XfNEES+xfi_e'/C_xfie*xfi_e;
+end
+
+XfNEES_mean = XfNEES/mcNum;
+fprintf('Std EKF landmark position NEES: %.2f \n',XfNEES_mean);
+
+figure(2)
+hold on
+R1XpNEESP = plot(R1XpNEES(:,1)',R1XpNEES(:,2)','-bo','DisplayName','R1 std EKF');
+R2XpNEESP = plot(R2XpNEES(:,1)',R2XpNEES(:,2)','-ro','DisplayName','R2 std EKF');
+xlabel('Steps')
+ylabel('Pose NEES')
+xlim([0,poseNum])
+legend([R1XpNEESP,R2XpNEESP])
+hold off

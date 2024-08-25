@@ -56,8 +56,6 @@ R2OdoSet = [R2Odo(:,1:2),R2OdoSet];
 R1ObsSet = [R1Obs(:,1:2),R1ObsSet];
 R2ObsSet = [R2Obs(:,1:2),R2ObsSet];
 
-
-
 %% Shared feature Observation at step 0
 sharedObs0Num = numel(intersect(R1Obs(R1Obs(:,1)==0,2),R2Obs(R2Obs(:,1)==0,2)));
 disp(['Number of shared feature observations at step 0: ',num2str(sharedObs0Num)])
