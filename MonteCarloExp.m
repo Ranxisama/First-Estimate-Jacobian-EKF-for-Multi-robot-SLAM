@@ -455,7 +455,7 @@ for pn = 0:poseNum
 
 end
 
-%% re-order the true features XfTrueAll's IDs to make it consistent with FFullSet
+%% re-order the true features XfTrueAll's IDs to make it consistent with FFullSet 每一步的
 [~,XfTrue_idx] = ismember(XfFullSet(:,1),XfTrueAll(:,1));
 XfTrue_idx(2:2:end,1) = XfTrue_idx(2:2:end,1)+1;
 XfTrue = XfTrueAll(XfTrue_idx,:);
@@ -514,7 +514,12 @@ legend([R1XphiRMSEP,R2XphiRMSEP])
 
 hold off
 
+<<<<<<< Updated upstream
 %% Average Normalized (state) Estimation Error Squared (ANEES)
+=======
+%% Average Normalized (state) Estimation Error Squared (ANEES) 最后一步的
+
+>>>>>>> Stashed changes
 R1NEES_k = [(1:poseNum)',zeros(poseNum,mcNum)];
 R2NEES_k = [(0:poseNum)',zeros(poseNum+1,mcNum)];
 for k = 0:poseNum
