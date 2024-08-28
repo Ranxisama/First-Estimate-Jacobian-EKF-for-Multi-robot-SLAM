@@ -543,9 +543,10 @@ R1XpNEES = [R1NEES_k(:,1),mean(R1NEES_k(:,2:end),2)];
 R2XpNEES = [R2NEES_k(:,1),mean(R2NEES_k(:,2:end),2)];
 
 R1XpNEES_mean = mean(R1XpNEES(:,2));
+fprintf('Std EKF R1 Pose ANEES: %.2f \n',R1XpNEES_mean);
 
 R2XpNEES_mean = mean(R2XpNEES(:,2));
-
+fprintf('Std EKF R2 Pose ANEES: %.2f \n',R2XpNEES_mean);
 
 XfNEES_k = [XfFullSet(1:2:(end-1),1),zeros(feaNum,mcNum)];
 for j = 1:feaNum
@@ -558,9 +559,6 @@ end
 
 XfNEES = [XfNEES_k(:,1),mean(XfNEES_k(:,2:end),2)];
 XfNEES_mean = mean(XfNEES(:,2));
-
-fprintf('Std EKF R1 Pose ANEES: %.2f \n',R1XpNEES_mean);
-fprintf('Std EKF R2 Pose ANEES: %.2f \n',R2XpNEES_mean);
 fprintf('Std EKF landmark position ANEES: %.2f \n',XfNEES_mean);
 
 figure(2)
