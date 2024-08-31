@@ -682,12 +682,7 @@ legend([R1XphiRMSEP,R2XphiRMSEP])
 
 hold off
 
-<<<<<<< Updated upstream
-%% Average Normalized (state) Estimation Error Squared (ANEES)
-=======
 %% Average Normalized (state) Estimation Error Squared (ANEES) 最后一步的
-
->>>>>>> Stashed changes
 R1NEES_k = [(1:poseNum)',zeros(poseNum,mcNum)];
 R2NEES_k = [(0:poseNum)',zeros(poseNum+1,mcNum)];
 for k = 0:poseNum
