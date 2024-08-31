@@ -47,9 +47,13 @@ for mc = 1:mcNum
     for k = 0:poseNum
 
         % k
-
+        
+        % standard EKF
         R1Obs_k = R1Obs(R1Obs(:,1)==k,2:3);
         R2Obs_k = R2Obs(R2Obs(:,1)==k,2:3);
+
+        R1ObsT_k = R1ObsT(R1ObsT(:,1)==k,2:3);
+        R2ObsT_k = R2ObsT(R2ObsT(:,1)==k,2:3);
 
         if k == 0
             % find the shared observed feature IDs in 1st robot
@@ -287,14 +291,10 @@ for mc = 1:mcNum
         R2Zkn = R2Obs_k(R2Zkn_idx,:);
 
         %% ideal EKF
-        R1Zkn_lv = ~ismember(R1Obs_k(:,1),Xk10e(7:end,2));
-        R1Zkn_idx = find(R1Zkn_lv);
-        R1Zkn_ide = R1Obs_k(R1Zkn_idx,:);
+        R1Zkn_ide = R1ObsT_k(R1Zkn_idx,:);
 
         % find the feature observations in R2 from new features of Xk10e
-        R2Zkn_lv = ~ismember(R2Obs_k(:,1),Xk10e(7:end,2));
-        R2Zkn_idx = find(R2Zkn_lv);
-        R2Zkn = R2Obs_k(R2Zkn_idx,:);
+        R2Zkn = R1ObsT_k(R2Zkn_idx,:);
 
         %% R1和R2都看到同一个新feature怎么办
         Zkns = intersect(R1Zkn(:,1),R2Zkn(:,1));
@@ -334,6 +334,8 @@ for mc = 1:mcNum
             R1nRn = [];
             R2nRn = [];
             DeltaGV = sparse(size(Xk10efi,1),size(Zkn,1));
+            DeltaGV_ide = sparse(size(Xk10efi_ide,1),size(Zkn,1));
+            
 
             if ~isempty(R1Xfn)
                 %% standard EKF
@@ -352,8 +354,8 @@ for mc = 1:mcNum
                 end
 
                  %% ideal EKF
-                R1Xfn_ide(1:2:(end-1),2) = Xk10e_ide(1,3) + cos(Xk10e_ide(3,3))*R1Zkn(1:2:(end-1),2) - sin(Xk10e_ide(3,3))*R1Zkn(2:2:end,2);
-                R1Xfn_ide(2:2:end,2) = Xk10e_ide(2,3) + sin(Xk10e_ide(3,3))*R1Zkn(1:2:(end-1),2) + cos(Xk10e_ide(3,3))*R1Zkn(2:2:end,2);
+                R1Xfn_ide(1:2:(end-1),2) = Xk10e_ide(1,3) + cos(Xk10e_ide(3,3))*R1Zkn_ide(1:2:(end-1),2) - sin(Xk10e_ide(3,3))*R1Zkn_ide(2:2:end,2);
+                R1Xfn_ide(2:2:end,2) = Xk10e_ide(2,3) + sin(Xk10e_ide(3,3))*R1Zkn_ide(1:2:(end-1),2) + cos(Xk10e_ide(3,3))*R1Zkn_ide(2:2:end,2);
 
                 % Cov
                 DeltaGX_ide(size(Xk10e_ide,1)+(1:2:(size(R1Xfn_ide,1)-1)),1:3) = [repmat([1, 0],size(R1Xfn_ide,1)/2,1), ...
@@ -384,18 +386,18 @@ for mc = 1:mcNum
                     DeltaGV(size(Xk10e,1)+size(R1Zkn,1)+(R2jn-1)*2+(1:2),size(R1Zkn,1)+(R2jn-1)*2+(1:2)) = rotationMatrix(Xk10e(6,3));
                 end
             %% ideal EKF
-                R2Xfn_ide(1:2:(end-1),2) = Xk10e_ide(4,3) + cos(Xk10e_ide(6,3))*R2Zkn(1:2:end,2) - sin(Xk10e_ide(6,3))*R2Zkn(2:2:end,2);
-                R2Xfn_ide(2:2:end,2) = Xk10e_ide(5,3) + sin(Xk10e_ide(6,3))*R2Zkn(1:2:end,2) + cos(Xk10e_ide(6,3))*R2Zkn(2:2:end,2);
+                R2Xfn_ide(1:2:(end-1),2) = Xk10e_ide(4,3) + cos(Xk10e_ide(6,3))*R2Zkn_ide(1:2:end,2) - sin(Xk10e_ide(6,3))*R2Zkn_ide(2:2:end,2);
+                R2Xfn_ide(2:2:end,2) = Xk10e_ide(5,3) + sin(Xk10e_ide(6,3))*R2Zkn_ide(1:2:end,2) + cos(Xk10e_ide(6,3))*R2Zkn_ide(2:2:end,2);
                 
                 % Cov
                 DeltaGX_ide(size(Xk10e_ide,1)+size(R1Xfn_ide,1)+(1:2:(size(R2Xfn_ide,1)-1)),4:6) = [repmat([1, 0],size(R2Xfn_ide,1)/2,1), ...
-                    -sin(Xk10e_ide(6,3))*R2Zkn(1:2:(end-1),2)-cos(Xk10e_ide(6,3))*R2Zkn(2:2:end,2)];
+                    -sin(Xk10e_ide(6,3))*R2Zkn_ide(1:2:(end-1),2)-cos(Xk10e_ide(6,3))*R2Zkn_ide(2:2:end,2)];
                 DeltaGX_ide(size(Xk10e_ide,1)+size(R1Xfn_ide,1)+(2:2:size(R2Xfn_ide,1)),4:6) = [repmat([0, 1],size(R2Xfn_ide,1)/2,1), ...
-                    cos(Xk10e_ide(6,3))*R2Zkn(1:2:(end-1),2)-sin(Xk10e_ide(6,3))*R2Zkn(2:2:end,2)];
+                    cos(Xk10e_ide(6,3))*R2Zkn_ide(1:2:(end-1),2)-sin(Xk10e_ide(6,3))*R2Zkn_ide(2:2:end,2)];
 
-                for R2jn_ide = 1:(size(R2Zkn,1)/2)
+                for R2jn_ide = 1:(size(R2Zkn_ide,1)/2)
                     % R2nRn = blkdiag(R2nRn, R2R);
-                    DeltaGV_ide(size(Xk10e_ide,1)+size(R1Zkn,1)+(R2jn_ide-1)*2+(1:2),size(R1Zkn,1)+(R2jn_ide-1)*2+(1:2)) = rotationMatrix(Xk10e_ide(6,3));
+                    DeltaGV_ide(size(Xk10e_ide,1)+size(R1Zkn_ide,1)+(R2jn_ide-1)*2+(1:2),size(R1Zkn_ide,1)+(R2jn_ide-1)*2+(1:2)) = rotationMatrix(Xk10e_ide(6,3));
                 end
             end
             
@@ -551,7 +553,8 @@ for mc = 1:mcNum
             DV = blkdiag(R1DV,R2DV);
 
             %% Innovation Covariance S and Kalman Gain K
-            % standard EKF            Ss = JHX10e * Pk10fi * JHX10e' + DV;
+            % standard EKF            
+            Ss = JHX10e * Pk10fi * JHX10e' + DV;
             Ks = Pk10fi * JHX10e' /Ss;
 
             % ideal EKF
@@ -575,10 +578,14 @@ for mc = 1:mcNum
 
         R2XpFull = [R2XpFull;Xk11e(4:6,2:3)];
         R2PFull = [R2PFull;Pk11(4:6,4:6)];
-
+        
+        % standard EKF
         Xk00e = Xk11e;
         Pk00 = Pk11;
-
+        
+        % ideal EKF
+        Xk00e_ide = Xk11e_ide;
+        Pk00_ide = Pk11_ide;
     end
 
     R1XpFullSet = [R1XpFullSet,R1XpFull(:,2)];
@@ -646,22 +653,23 @@ FRMSE = [XfFullSet(1:2:(end-1),1),zeros(feaNum,1)];
 
 R1XrRMSE(:,2) =  sqrt((sum(DeltaR1XrFullSet(1:2:(end-1),:).^2,2)+sum(DeltaR1XrFullSet(2:2:end,:).^2,2))/mcNum);
 R1XrRMSE_mean = mean(R1XrRMSE(:,2));
-fprintf('Std EKF R1 Position Err.RMS (m): %.2f \n',R1XrRMSE_mean);
 
 R1XphiRMSE(:,2) = sqrt(sum(DeltaR1XphiFullSet(1:end,:).^2,2));
 R1XphiRMSE_mean = mean(R1XphiRMSE(:,2));
-fprintf('Std EKF R1 Heading Err.RMS (rad): %.2f \n',R1XphiRMSE_mean);
 
 R2XrRMSE(:,2) =  sqrt((sum(DeltaR2XrFullSet(1:2:(end-1),:).^2,2)+sum(DeltaR2XrFullSet(2:2:end,:).^2,2))/mcNum);
 R2XrRMSE_mean = mean(R2XrRMSE(:,2));
-fprintf('Std EKF R2 Position Err.RMS (m): %.2f \n',R2XrRMSE_mean);
 
 R2XphiRMSE(:,2) = sqrt(sum(DeltaR2XphiFullSet(1:end,:).^2,2));
 R2XphiRMSE_mean = mean(R2XphiRMSE(:,2));
-fprintf('Std EKF R2 Heading Err.RMS (rad): %.2f \n',R2XphiRMSE_mean);
 
 FRMSE(:,2) = sqrt((sum(DeltaFFullSet(1:2:(end-1),:).^2,2)+sum(DeltaFFullSet(2:2:end,:).^2,2))/mcNum);
 FRMSE_mean = mean(FRMSE(:,2));
+
+fprintf('Std EKF R1 Position Err.RMS (m): %.2f \n',R1XrRMSE_mean);
+fprintf('Std EKF R1 Heading Err.RMS (rad): %.2f \n',R1XphiRMSE_mean);
+fprintf('Std EKF R2 Position Err.RMS (m): %.2f \n',R2XrRMSE_mean);
+fprintf('Std EKF R2 Heading Err.RMS (rad): %.2f \n',R2XphiRMSE_mean);
 fprintf('Std EKF Landmark Position Err.RMS (m): %.2f \n',FRMSE_mean);
 
 figure(1)
@@ -692,6 +700,10 @@ hold off
 R1NEES_k = [(1:poseNum)',zeros(poseNum,mcNum)];
 R2NEES_k = [(0:poseNum)',zeros(poseNum+1,mcNum)];
 for k = 0:poseNum
+    
+    if k == 34 || k == 60
+        keyboard;
+    end
 
     for mn = 1:mcNum
         R2xri_e = DeltaR2XpFullSet(k*3+(1:3),mn);
@@ -712,20 +724,23 @@ R1XpNEES = [R1NEES_k(:,1),mean(R1NEES_k(:,2:end),2)];
 R2XpNEES = [R2NEES_k(:,1),mean(R2NEES_k(:,2:end),2)];
 
 R1XpNEES_mean = mean(R1XpNEES(:,2));
-fprintf('Std EKF R1 Pose ANEES: %.2f \n',R1XpNEES_mean);
 
 R2XpNEES_mean = mean(R2XpNEES(:,2));
-fprintf('Std EKF R2 Pose ANEES: %.2f \n',R2XpNEES_mean);
 
-XfNEES = 0;
-for mn = 1:mcNum
-    xfi_e = DeltaFFullSet(:,mn);
-    C_xfie = PfFullSet(:,(mn-1)*feaNum*2+(1:(2*feaNum)));
-    XfNEES = XfNEES+xfi_e'/C_xfie*xfi_e;
+XfNEES_k = [XfFullSet(1:2:(end-1),1),zeros(feaNum,mcNum)];
+for j = 1:feaNum
+    for mn = 1:mcNum
+        xfi_e = DeltaFFullSet((j-1)*2+(1:2),mn);
+        C_xfie = PfFullSet((j-1)*2+(1:2),(mn-1)*feaNum*2+(j-1)*2+(1:2));
+        XfNEES_k(j,1+mn) = xfi_e'/C_xfie*xfi_e;
+    end
 end
 
-XfNEES_mean = XfNEES/mcNum;
-fprintf('Std EKF landmark position ANEES: %.2f \n',XfNEES_mean);
+XfNEES = [XfNEES_k(:,1),mean(XfNEES_k(:,2:end),2)];
+XfNEES_mean = mean(XfNEES(:,2));
+
+fprintf('Std EKF R1 Pose ANEES: %.2f \n',R1XpNEES_mean);
+fprintf('Std EKF R2 Pose ANEES: %.2f \n',R2XpNEES_mean);
 
 figure(2)
 hold on

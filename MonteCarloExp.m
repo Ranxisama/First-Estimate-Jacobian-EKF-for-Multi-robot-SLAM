@@ -47,9 +47,13 @@ for mc = 1:mcNum
     for k = 0:poseNum
 
         % k
-
+        
+        % standard EKF
         R1Obs_k = R1Obs(R1Obs(:,1)==k,2:3);
         R2Obs_k = R2Obs(R2Obs(:,1)==k,2:3);
+
+        R1ObsT_k = R1ObsT(R1ObsT(:,1)==k,2:3);
+        R2ObsT_k = R2ObsT(R2ObsT(:,1)==k,2:3);
 
         if k == 0
             % find the shared observed feature IDs in 1st robot
@@ -287,14 +291,13 @@ for mc = 1:mcNum
         R2Zkn = R2Obs_k(R2Zkn_idx,:);
 
         %% ideal EKF
-        R1Zkn_lv = ~ismember(R1Obs_k(:,1),Xk10e(7:end,2));
-        R1Zkn_idx = find(R1Zkn_lv);
-        R1Zkn_ide = R1Obs_k(R1Zkn_idx,:);
+        % find the feature observations in R2 from new features of
+        % Xk10e_ide
+        R1Zkn_ide = R1ObsT_k(R1Zkn_idx,:);
 
-        % find the feature observations in R2 from new features of Xk10e
-        R2Zkn_lv = ~ismember(R2Obs_k(:,1),Xk10e(7:end,2));
-        R2Zkn_idx = find(R2Zkn_lv);
-        R2Zkn = R2Obs_k(R2Zkn_idx,:);
+        % find the feature observations in R2 from new features of 
+        % Xk10e_ide
+        R2Zkn = R1ObsT_k(R2Zkn_idx,:);
 
         %% R1和R2都看到同一个新feature怎么办
         Zkns = intersect(R1Zkn(:,1),R2Zkn(:,1));
@@ -334,6 +337,8 @@ for mc = 1:mcNum
             R1nRn = [];
             R2nRn = [];
             DeltaGV = sparse(size(Xk10efi,1),size(Zkn,1));
+            DeltaGV_ide = sparse(size(Xk10efi_ide,1),size(Zkn,1));
+            
 
             if ~isempty(R1Xfn)
                 %% standard EKF
@@ -352,8 +357,8 @@ for mc = 1:mcNum
                 end
 
                  %% ideal EKF
-                R1Xfn_ide(1:2:(end-1),2) = Xk10e_ide(1,3) + cos(Xk10e_ide(3,3))*R1Zkn(1:2:(end-1),2) - sin(Xk10e_ide(3,3))*R1Zkn(2:2:end,2);
-                R1Xfn_ide(2:2:end,2) = Xk10e_ide(2,3) + sin(Xk10e_ide(3,3))*R1Zkn(1:2:(end-1),2) + cos(Xk10e_ide(3,3))*R1Zkn(2:2:end,2);
+                R1Xfn_ide(1:2:(end-1),2) = Xk10e_ide(1,3) + cos(Xk10e_ide(3,3))*R1Zkn_ide(1:2:(end-1),2) - sin(Xk10e_ide(3,3))*R1Zkn_ide(2:2:end,2);
+                R1Xfn_ide(2:2:end,2) = Xk10e_ide(2,3) + sin(Xk10e_ide(3,3))*R1Zkn_ide(1:2:(end-1),2) + cos(Xk10e_ide(3,3))*R1Zkn_ide(2:2:end,2);
 
                 % Cov
                 DeltaGX_ide(size(Xk10e_ide,1)+(1:2:(size(R1Xfn_ide,1)-1)),1:3) = [repmat([1, 0],size(R1Xfn_ide,1)/2,1), ...
@@ -384,18 +389,18 @@ for mc = 1:mcNum
                     DeltaGV(size(Xk10e,1)+size(R1Zkn,1)+(R2jn-1)*2+(1:2),size(R1Zkn,1)+(R2jn-1)*2+(1:2)) = rotationMatrix(Xk10e(6,3));
                 end
             %% ideal EKF
-                R2Xfn_ide(1:2:(end-1),2) = Xk10e_ide(4,3) + cos(Xk10e_ide(6,3))*R2Zkn(1:2:end,2) - sin(Xk10e_ide(6,3))*R2Zkn(2:2:end,2);
-                R2Xfn_ide(2:2:end,2) = Xk10e_ide(5,3) + sin(Xk10e_ide(6,3))*R2Zkn(1:2:end,2) + cos(Xk10e_ide(6,3))*R2Zkn(2:2:end,2);
+                R2Xfn_ide(1:2:(end-1),2) = Xk10e_ide(4,3) + cos(Xk10e_ide(6,3))*R2Zkn_ide(1:2:end,2) - sin(Xk10e_ide(6,3))*R2Zkn_ide(2:2:end,2);
+                R2Xfn_ide(2:2:end,2) = Xk10e_ide(5,3) + sin(Xk10e_ide(6,3))*R2Zkn_ide(1:2:end,2) + cos(Xk10e_ide(6,3))*R2Zkn_ide(2:2:end,2);
                 
                 % Cov
                 DeltaGX_ide(size(Xk10e_ide,1)+size(R1Xfn_ide,1)+(1:2:(size(R2Xfn_ide,1)-1)),4:6) = [repmat([1, 0],size(R2Xfn_ide,1)/2,1), ...
-                    -sin(Xk10e_ide(6,3))*R2Zkn(1:2:(end-1),2)-cos(Xk10e_ide(6,3))*R2Zkn(2:2:end,2)];
+                    -sin(Xk10e_ide(6,3))*R2Zkn_ide(1:2:(end-1),2)-cos(Xk10e_ide(6,3))*R2Zkn_ide(2:2:end,2)];
                 DeltaGX_ide(size(Xk10e_ide,1)+size(R1Xfn_ide,1)+(2:2:size(R2Xfn_ide,1)),4:6) = [repmat([0, 1],size(R2Xfn_ide,1)/2,1), ...
-                    cos(Xk10e_ide(6,3))*R2Zkn(1:2:(end-1),2)-sin(Xk10e_ide(6,3))*R2Zkn(2:2:end,2)];
+                    cos(Xk10e_ide(6,3))*R2Zkn_ide(1:2:(end-1),2)-sin(Xk10e_ide(6,3))*R2Zkn_ide(2:2:end,2)];
 
-                for R2jn_ide = 1:(size(R2Zkn,1)/2)
+                for R2jn_ide = 1:(size(R2Zkn_ide,1)/2)
                     % R2nRn = blkdiag(R2nRn, R2R);
-                    DeltaGV_ide(size(Xk10e_ide,1)+size(R1Zkn,1)+(R2jn_ide-1)*2+(1:2),size(R1Zkn,1)+(R2jn_ide-1)*2+(1:2)) = rotationMatrix(Xk10e_ide(6,3));
+                    DeltaGV_ide(size(Xk10e_ide,1)+size(R1Zkn_ide,1)+(R2jn_ide-1)*2+(1:2),size(R1Zkn_ide,1)+(R2jn_ide-1)*2+(1:2)) = rotationMatrix(Xk10e_ide(6,3));
                 end
             end
             
@@ -551,7 +556,8 @@ for mc = 1:mcNum
             DV = blkdiag(R1DV,R2DV);
 
             %% Innovation Covariance S and Kalman Gain K
-            % standard EKF            Ss = JHX10e * Pk10fi * JHX10e' + DV;
+            % standard EKF            
+            Ss = JHX10e * Pk10fi * JHX10e' + DV;
             Ks = Pk10fi * JHX10e' /Ss;
 
             % ideal EKF
