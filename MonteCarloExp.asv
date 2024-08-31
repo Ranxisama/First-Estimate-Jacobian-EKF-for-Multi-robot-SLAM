@@ -363,7 +363,9 @@ for mc = 1:mcNum
                 R2Xfn(1:2:(end-1),2) = Xk10e(4,3) + cos(Xk10e(6,3))*R2Zkn(1:2:end,2) - sin(Xk10e(6,3))*R2Zkn(2:2:end,2);
                 R2Xfn(2:2:end,2) = Xk10e(5,3) + sin(Xk10e(6,3))*R2Zkn(1:2:end,2) + cos(Xk10e(6,3))*R2Zkn(2:2:end,2);
 
-                % Cov
+                
+                
+                %% Cov
                 DeltaGX(size(Xk10e,1)+size(R1Xfn,1)+(1:2:(size(R2Xfn,1)-1)),4:6) = [repmat([1, 0],size(R2Xfn,1)/2,1), ...
                     -sin(Xk10e(6,3))*R2Zkn(1:2:(end-1),2)-cos(Xk10e(6,3))*R2Zkn(2:2:end,2)];
                 DeltaGX(size(Xk10e,1)+size(R1Xfn,1)+(2:2:size(R2Xfn,1)),4:6) = [repmat([0, 1],size(R2Xfn,1)/2,1), ...
@@ -372,21 +374,6 @@ for mc = 1:mcNum
                 for R2jn = 1:(size(R2Zkn,1)/2)
                     R2nRn = blkdiag(R2nRn, R2R);
                     DeltaGV(size(Xk10e,1)+size(R1Zkn,1)+(R2jn-1)*2+(1:2),size(R1Zkn,1)+(R2jn-1)*2+(1:2)) = rotationMatrix(Xk10e(6,3));
-                end
-
-                %% ideal EKF
-                R2Xfn_ide(1:2:(end-1),2) = Xk10e_ide(4,3) + cos(Xk10e_ide(6,3))*R2Zkn(1:2:end,2) - sin(Xk10e_ide(6,3))*R2Zkn(2:2:end,2);
-                R2Xfn_ide(2:2:end,2) = Xk10e_ide(5,3) + sin(Xk10e_ide(6,3))*R2Zkn(1:2:end,2) + cos(Xk10e_ide(6,3))*R2Zkn(2:2:end,2);
-                
-                % Cov
-                DeltaGX_ide(size(Xk10e_ide,1)+size(R1Xfn_ide,1)+(1:2:(size(R2Xfn_ide,1)-1)),4:6) = [repmat([1, 0],size(R2Xfn_ide,1)/2,1), ...
-                    -sin(Xk10e_ide(6,3))*R2Zkn(1:2:(end-1),2)-cos(Xk10e_ide(6,3))*R2Zkn(2:2:end,2)];
-                DeltaGX_ide(size(Xk10e_ide,1)+size(R1Xfn_ide,1)+(2:2:size(R2Xfn_ide,1)),4:6) = [repmat([0, 1],size(R2Xfn_ide,1)/2,1), ...
-                    cos(Xk10e_ide(6,3))*R2Zkn(1:2:(end-1),2)-sin(Xk10e_ide(6,3))*R2Zkn(2:2:end,2)];
-
-                for R2jn_ide = 1:(size(R2Zkn,1)/2)
-                    % R2nRn = blkdiag(R2nRn, R2R);
-                    DeltaGV_ide(size(Xk10e_ide,1)+size(R1Zkn,1)+(R2jn_ide-1)*2+(1:2),size(R1Zkn,1)+(R2jn_ide-1)*2+(1:2)) = rotationMatrix(Xk10e_ide(6,3));
                 end
             end
             
@@ -405,7 +392,7 @@ for mc = 1:mcNum
             Pk10fi = DeltaGX*Pk10*DeltaGX'+DeltaGV*nRn*DeltaGV';
             Pk10fi(abs(Pk10fi)<CovT) = 0;
             
-            Pk10fi_ide = DeltaGX_ide*Pk10_ide*DeltaGX_ide'+DeltaGV_ide*nRn*DeltaGV_ide';
+            Pk10fi_ide = DeltaGX*Pk10_ide*DeltaGX'+DeltaGV*nRn*DeltaGV';
             Pk10fi_ide(abs(Pk10fi_ide)<CovT) = 0;
         end
 
@@ -430,8 +417,8 @@ for mc = 1:mcNum
         % R1ZkS_idx: index of R1's shared features with R1Zks at step k
         R1Zks2 = R1Zks1(R1ZkS_idx,:);
 
-        % find the shared true feature R1XfksT in feature truth XfTrueAll 
-        % and re-order them to to make them consistent with R1Xfks
+        % find the shared true feature R1XfksT in feature truth XfTrueAll and
+        % reorder them to to make them consistent with R1Xfks
         [~,R1XfksT_idx] = ismember(R1Xfks(:,1),XfTrueAll(:,1));
         R1XfksT_idx(2:2:end,1)=R1XfksT_idx(2:2:end,1)+1;
         R1XfksT = XfTrueAll(R1XfksT_idx,:);
@@ -481,13 +468,6 @@ for mc = 1:mcNum
                 HX10e(2:2:size(R1Zks2,1),1) = -sin(Xk10efi(3,3))*(R1Xfks(1:2:(end-1),2)-Xk10efi(1,3)) + ...
                     cos(Xk10efi(3,3))*(R1Xfks(2:2:end,2)-Xk10efi(2,3));
 
-                % standard EKF
-                JHX10e(1:2:(size(R1Zks2,1)-1),1:3) = [repmat([-cos(Xk10efi(3,3)),-sin(Xk10efi(3,3))],size(R1Zks2,1)/2,1), ...
-                    -sin(Xk10efi(3,3))*(R1Xfks(1:2:(end-1),2)-Xk10efi(1,3))+cos(Xk10efi(3,3))*(R1Xfks(2:2:end,2)-Xk10efi(2,3))];
-
-                JHX10e(2:2:size(R1Zks2,1),1:3) = [repmat([sin(Xk10efi(3,3)),-cos(Xk10efi(3,3))],size(R1Zks2,1)/2,1), ...
-                    -cos(Xk10efi(3,3))*(R1Xfks(1:2:(end-1),2)-Xk10efi(1,3))-sin(Xk10efi(3,3))*(R1Xfks(2:2:end,2)-Xk10efi(2,3))];
-
                 % ideal EKF
                 JHX10e_ide(1:2:(size(R1Zks2,1)-1),1:3) = [repmat([-cos(Xrk10Tfi(3,1)),-sin(Xrk10Tfi(3,1))],size(R1Zks2,1)/2,1), ...
                     -sin(Xrk10Tfi(3,1))*(R1XfksT(1:2:(end-1),2)-Xrk10Tfi(1,1))+cos(Xrk10Tfi(3,1))*(R1XfksT(2:2:end,2)-Xrk10Tfi(2,1))];
@@ -495,13 +475,20 @@ for mc = 1:mcNum
                 JHX10e_ide(2:2:size(R1Zks2,1),1:3) = [repmat([sin(Xrk10Tfi(3,1)),-cos(Xrk10Tfi(3,1))],size(R1Zks2,1)/2,1), ...
                     -cos(Xrk10Tfi(3,1))*(R1XfksT(1:2:(end-1),2)-Xrk10Tfi(1,1))-sin(Xrk10Tfi(3,1))*(R1XfksT(2:2:end,2)-Xrk10Tfi(2,1))];
 
+                % standard EKF
+                JHX10e(1:2:(size(R1Zks2,1)-1),1:3) = [repmat([-cos(Xk10efi(3,3)),-sin(Xk10efi(3,3))],size(R1Zks2,1)/2,1), ...
+                    -sin(Xk10efi(3,3))*(R1Xfks(1:2:(end-1),2)-Xk10efi(1,3))+cos(Xk10efi(3,3))*(R1Xfks(2:2:end,2)-Xk10efi(2,3))];
+
+                JHX10e(2:2:size(R1Zks2,1),1:3) = [repmat([sin(Xk10efi(3,3)),-cos(Xk10efi(3,3))],size(R1Zks2,1)/2,1), ...
+                    -cos(Xk10efi(3,3))*(R1Xfks(1:2:(end-1),2)-Xk10efi(1,3))-sin(Xk10efi(3,3))*(R1Xfks(2:2:end,2)-Xk10efi(2,3))];
+
                 for R1kj = 1:size(R1Zks2,1)/2
                     R1DV = blkdiag(R1DV,R1R);
                     
-                    % standard EKF
-                    JHX10e((R1kj-1)*2+(1:2), R1Xfks_idx((R1kj-1)*2+(1:2),1)') = rotationMatrix(Xk10efi(3,3))';
                     % ideal EKF
                     JHX10e_ide((R1kj-1)*2+(1:2), R1Xfks_idx((R1kj-1)*2+(1:2),1)') = rotationMatrix(Xrk10Tfi(3,1))';
+                    % standard EKF
+                    JHX10e((R1kj-1)*2+(1:2), R1Xfks_idx((R1kj-1)*2+(1:2),1)') = rotationMatrix(Xk10efi(3,3))';
                 end
             end
 
@@ -511,13 +498,6 @@ for mc = 1:mcNum
                 HX10e(size(R1Zks2,1)+(2:2:size(R2Zks2,1)),1) = -sin(Xk10efi(6,3))*(R2Xfks(1:2:(end-1),2)-Xk10efi(4,3)) + ...
                     cos(Xk10efi(6,3))*(R2Xfks(2:2:end,2)-Xk10efi(5,3));
                 
-                % standard EKF
-                JHX10e(size(R1Zks2,1)+(1:2:size(R2Zks2,1)-1),4:6) = [repmat([-cos(Xk10efi(6,3)),-sin(Xk10efi(6,3))],size(R2Zks2,1)/2,1), ...
-                    -sin(Xk10efi(6,3))*(R2Xfks(1:2:(end-1),2)-Xk10efi(4,3))+cos(Xk10efi(6,3))*(R2Xfks(2:2:end,2)-Xk10efi(5,3))];
-
-                JHX10e(size(R1Zks2,1)+(2:2:size(R2Zks2,1)),4:6) = [repmat([sin(Xk10efi(6,3)),-cos(Xk10efi(6,3))],size(R2Zks2,1)/2,1), ...
-                    -cos(Xk10efi(6,3))*(R2Xfks(1:2:(end-1),2)-Xk10efi(4,3))-sin(Xk10efi(6,3))*(R2Xfks(2:2:end,2)-Xk10efi(5,3))];
-
                 % ideal EKF
                 JHX10e_ide(size(R1Zks2,1)+(1:2:size(R2Zks2,1)-1),4:6) = [repmat([-cos(Xrk10Tfi(6,1)),-sin(Xrk10Tfi(6,1))],size(R2Zks2,1)/2,1), ...
                     -sin(Xrk10Tfi(6,1))*(R2XfksT(1:2:(end-1),2)-Xrk10Tfi(4,1))+cos(Xrk10Tfi(6,1))*(R2XfksT(2:2:end,2)-Xrk10Tfi(5,1))];
@@ -525,13 +505,20 @@ for mc = 1:mcNum
                 JHX10e_ide(size(R1Zks2,1)+(2:2:size(R2Zks2,1)),4:6) = [repmat([sin(Xrk10Tfi(6,1)),-cos(Xrk10Tfi(6,1))],size(R2Zks2,1)/2,1), ...
                     -cos(Xrk10Tfi(6,1))*(R2XfksT(1:2:(end-1),2)-Xrk10Tfi(4,1))-sin(Xrk10Tfi(6,1))*(R2XfksT(2:2:end,2)-Xrk10Tfi(5,1))];
 
+                % standard EKF
+                JHX10e(size(R1Zks2,1)+(1:2:size(R2Zks2,1)-1),4:6) = [repmat([-cos(Xk10efi(6,3)),-sin(Xk10efi(6,3))],size(R2Zks2,1)/2,1), ...
+                    -sin(Xk10efi(6,3))*(R2Xfks(1:2:(end-1),2)-Xk10efi(4,3))+cos(Xk10efi(6,3))*(R2Xfks(2:2:end,2)-Xk10efi(5,3))];
+
+                JHX10e(size(R1Zks2,1)+(2:2:size(R2Zks2,1)),4:6) = [repmat([sin(Xk10efi(6,3)),-cos(Xk10efi(6,3))],size(R2Zks2,1)/2,1), ...
+                    -cos(Xk10efi(6,3))*(R2Xfks(1:2:(end-1),2)-Xk10efi(4,3))-sin(Xk10efi(6,3))*(R2Xfks(2:2:end,2)-Xk10efi(5,3))];
+
                 for R2kj = 1:size(R2Zks2,1)/2
                     R2DV = blkdiag(R2DV,R2R);
                     
-                    % standard EKF
-                    JHX10e(size(R1Zks2,1)+(R2kj-1)*2+(1:2), R2Xfks_idx((R2kj-1)*2+(1:2),1)') = rotationMatrix(Xk10efi(6,3))';
                     % ideal EKF
                     JHX10e_ide(size(R1Zks2,1)+(R2kj-1)*2+(1:2), R2Xfks_idx((R2kj-1)*2+(1:2),1)') = rotationMatrix(Xrk10Tfi(6,1))';
+                    % standard EKF
+                    JHX10e(size(R1Zks2,1)+(R2kj-1)*2+(1:2), R2Xfks_idx((R2kj-1)*2+(1:2),1)') = rotationMatrix(Xk10efi(6,3))';
                 end
             end
 
@@ -622,7 +609,7 @@ for pn = 0:poseNum
 
 end
 
-%% re-order the true features XfTrueAll's IDs to make it consistent with FFullSet 每一步的
+%% re-order the true features XfTrueAll's IDs to make it consistent with FFullSet
 [~,XfTrue_idx] = ismember(XfFullSet(:,1),XfTrueAll(:,1));
 XfTrue_idx(2:2:end,1) = XfTrue_idx(2:2:end,1)+1;
 XfTrue = XfTrueAll(XfTrue_idx,:);
@@ -682,12 +669,7 @@ legend([R1XphiRMSEP,R2XphiRMSEP])
 
 hold off
 
-<<<<<<< Updated upstream
 %% Average Normalized (state) Estimation Error Squared (ANEES)
-=======
-%% Average Normalized (state) Estimation Error Squared (ANEES) 最后一步的
-
->>>>>>> Stashed changes
 R1NEES_k = [(1:poseNum)',zeros(poseNum,mcNum)];
 R2NEES_k = [(0:poseNum)',zeros(poseNum+1,mcNum)];
 for k = 0:poseNum

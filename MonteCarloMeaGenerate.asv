@@ -71,5 +71,5 @@ if sharedObs0Num < reqSharedObsNum
 end
 
 save('MT_Parameters.mat', ...
-    'R1XrTrue','R1XphiT','R2XrTrue','R2XphiT','XfTrueAll','R1OdoT','R2OdoT','R1ObsT','R2ObsT')
+    'R1XrTrue','R1XphiT','R2XrTrue','R2XphiT','XfTrueAll')
 save('MT_Measurements.mat','R1Xp0Set','R1OdoSet','R1ObsSet','R2Xp0Set','R2OdoSet','R2ObsSet')
