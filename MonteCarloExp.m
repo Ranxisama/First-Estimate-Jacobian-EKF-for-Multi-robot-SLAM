@@ -297,7 +297,7 @@ for mc = 1:mcNum
 
         % find the feature observations in R2 from new features of 
         % Xk10e_ide
-        R2Zkn = R1ObsT_k(R2Zkn_idx,:);
+        R2Zkn_ide = R2ObsT_k(R2Zkn_idx,:);
 
         %% R1和R2都看到同一个新feature怎么办
         Zkns = intersect(R1Zkn(:,1),R2Zkn(:,1));

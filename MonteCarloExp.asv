@@ -291,10 +291,13 @@ for mc = 1:mcNum
         R2Zkn = R2Obs_k(R2Zkn_idx,:);
 
         %% ideal EKF
+        % find the feature observations in R2 from new features of
+        % Xk10e_ide
         R1Zkn_ide = R1ObsT_k(R1Zkn_idx,:);
 
-        % find the feature observations in R2 from new features of Xk10e
-        R2Zkn = R1ObsT_k(R2Zkn_idx,:);
+        % find the feature observations in R2 from new features of 
+        % Xk10e_ide
+        R2Zkn_ide = R1ObsT_k(R2Zkn_idx,:);
 
         %% R1和R2都看到同一个新feature怎么办
         Zkns = intersect(R1Zkn(:,1),R2Zkn(:,1));
