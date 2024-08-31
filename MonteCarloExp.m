@@ -483,23 +483,22 @@ FRMSE = [XfFullSet(1:2:(end-1),1),zeros(feaNum,1)];
 
 R1XrRMSE(:,2) =  sqrt((sum(DeltaR1XrFullSet(1:2:(end-1),:).^2,2)+sum(DeltaR1XrFullSet(2:2:end,:).^2,2))/mcNum);
 R1XrRMSE_mean = mean(R1XrRMSE(:,2));
+fprintf('Std EKF R1 Position Err.RMS (m): %.2f \n',R1XrRMSE_mean);
 
 R1XphiRMSE(:,2) = sqrt(sum(DeltaR1XphiFullSet(1:end,:).^2,2));
 R1XphiRMSE_mean = mean(R1XphiRMSE(:,2));
+fprintf('Std EKF R1 Heading Err.RMS (rad): %.2f \n',R1XphiRMSE_mean);
 
 R2XrRMSE(:,2) =  sqrt((sum(DeltaR2XrFullSet(1:2:(end-1),:).^2,2)+sum(DeltaR2XrFullSet(2:2:end,:).^2,2))/mcNum);
 R2XrRMSE_mean = mean(R2XrRMSE(:,2));
+fprintf('Std EKF R2 Position Err.RMS (m): %.2f \n',R2XrRMSE_mean);
 
 R2XphiRMSE(:,2) = sqrt(sum(DeltaR2XphiFullSet(1:end,:).^2,2));
 R2XphiRMSE_mean = mean(R2XphiRMSE(:,2));
+fprintf('Std EKF R2 Heading Err.RMS (rad): %.2f \n',R2XphiRMSE_mean);
 
 FRMSE(:,2) = sqrt((sum(DeltaFFullSet(1:2:(end-1),:).^2,2)+sum(DeltaFFullSet(2:2:end,:).^2,2))/mcNum);
 FRMSE_mean = mean(FRMSE(:,2));
-
-fprintf('Std EKF R1 Position Err.RMS (m): %.2f \n',R1XrRMSE_mean);
-fprintf('Std EKF R1 Heading Err.RMS (rad): %.2f \n',R1XphiRMSE_mean);
-fprintf('Std EKF R2 Position Err.RMS (m): %.2f \n',R2XrRMSE_mean);
-fprintf('Std EKF R2 Heading Err.RMS (rad): %.2f \n',R2XphiRMSE_mean);
 fprintf('Std EKF Landmark Position Err.RMS (m): %.2f \n',FRMSE_mean);
 
 figure(1)
@@ -530,10 +529,6 @@ hold off
 R1NEES_k = [(1:poseNum)',zeros(poseNum,mcNum)];
 R2NEES_k = [(0:poseNum)',zeros(poseNum+1,mcNum)];
 for k = 0:poseNum
-    
-    if k == 34 || k == 60
-        keyboard;
-    end
 
     for mn = 1:mcNum
         R2xri_e = DeltaR2XpFullSet(k*3+(1:3),mn);
@@ -554,24 +549,19 @@ R1XpNEES = [R1NEES_k(:,1),mean(R1NEES_k(:,2:end),2)];
 R2XpNEES = [R2NEES_k(:,1),mean(R2NEES_k(:,2:end),2)];
 
 R1XpNEES_mean = mean(R1XpNEES(:,2));
+fprintf('Std EKF R1 Pose ANEES: %.2f \n',R1XpNEES_mean);
 
 R2XpNEES_mean = mean(R2XpNEES(:,2));
-
-
-XfNEES_k = [XfFullSet(1:2:(end-1),1),zeros(feaNum,mcNum)];
-for j = 1:feaNum
-for mn = 1:mcNum
-    xfi_e = DeltaFFullSet((j-1)*2+(1:2),mn);
-    C_xfie = PfFullSet((j-1)*2+(1:2),(mn-1)*feaNum*2+(j-1)*2+(1:2));
-    XfNEES_k(j,1+mn) = xfi_e'/C_xfie*xfi_e;
-end
-end
-
-XfNEES = [XfNEES_k(:,1),mean(XfNEES_k(:,2:end),2)];
-XfNEES_mean = mean(XfNEES(:,2));
-
-fprintf('Std EKF R1 Pose ANEES: %.2f \n',R1XpNEES_mean);
 fprintf('Std EKF R2 Pose ANEES: %.2f \n',R2XpNEES_mean);
+
+XfNEES = 0;
+for mn = 1:mcNum
+    xfi_e = DeltaFFullSet(:,mn);
+    C_xfie = PfFullSet(:,(mn-1)*feaNum*2+(1:(2*feaNum)));
+    XfNEES = XfNEES+xfi_e'/C_xfie*xfi_e;
+end
+
+XfNEES_mean = XfNEES/mcNum;
 fprintf('Std EKF landmark position ANEES: %.2f \n',XfNEES_mean);
 
 figure(2)
