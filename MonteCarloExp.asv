@@ -117,12 +117,12 @@ for mc = 1:mcNum
             % R1Zkn_idx: index of new feature observation of
             % 1st robot in R1Obs_k
             R1Zkn_idx = find(R1Zkn_lv);
-            % R1Z0n: new feature observation of 1st robot
-            R1Z0n = R1Obs_k(R1Zkn_idx,:);
+            % R1Zkn: new feature observation of 1st robot
+            R1Zkn = R1Obs_k(R1Zkn_idx,:);
 
-            R1Xfkn = R1Z0n;
-            R1Xfkn(1:2:(end-1),2) = X0(1,3) + cos(X0(3,3))*(R1Z0n(1:2:(end-1),2)) - sin(X0(3,3))*(R1Z0n(2:2:end,2));
-            R1Xfkn(2:2:end,2) = X0(2,3) + sin(X0(3,3))*(R1Z0n(1:2:(end-1),2)) + cos(X0(3,3))*(R1Z0n(2:2:end,2));
+            R1Xfkn = R1Zkn;
+            R1Xfkn(1:2:(end-1),2) = X0(1,3) + cos(X0(3,3))*(R1Zkn(1:2:(end-1),2)) - sin(X0(3,3))*(R1Zkn(2:2:end,2));
+            R1Xfkn(2:2:end,2) = X0(2,3) + sin(X0(3,3))*(R1Zkn(1:2:(end-1),2)) + cos(X0(3,3))*(R1Zkn(2:2:end,2));
 
             % find the new observed feature IDs in 2nd robot
             % R2Zkn_lv: logical vector of new feature observation of
@@ -131,14 +131,14 @@ for mc = 1:mcNum
             % R2Zkn_idx: index of new feature observation of
             % 2nd robot in R2Obs_k
             R2Zkn_idx = find(R2Zkn_lv);
-            % R2Z0n: new feature observation of 2nd robot
-            R2Z0n = R2Obs_k(R2Zkn_idx,:);
+            % R2Zkn: new feature observation of 2nd robot
+            R2Zkn = R2Obs_k(R2Zkn_idx,:);
 
-            % Zkns = intersect(R1Z0n(:,1),R2Z0n(:,1));
+            % Zkns = intersect(R1Zkn(:,1),R2Zkn(:,1));
 
-            R2Xfkn = R2Z0n;
-            R2Xfkn(1:2:(end-1),2) = X0(4,3) + cos(X0(6,3))*(R2Z0n(1:2:(end-1),2)) - sin(X0(6,3))*(R2Z0n(2:2:end,2));
-            R2Xfkn(2:2:end,2) = X0(5,3) + sin(X0(6,3))*(R2Z0n(1:2:(end-1),2)) + cos(X0(6,3))*(R2Z0n(2:2:end,2));
+            R2Xfkn = R2Zkn;
+            R2Xfkn(1:2:(end-1),2) = X0(4,3) + cos(X0(6,3))*(R2Zkn(1:2:(end-1),2)) - sin(X0(6,3))*(R2Zkn(2:2:end,2));
+            R2Xfkn(2:2:end,2) = X0(5,3) + sin(X0(6,3))*(R2Zkn(1:2:(end-1),2)) + cos(X0(6,3))*(R2Zkn(2:2:end,2));
 
             % Xk00e: state estimate
             % first column: 1 -> robot posture; 2 -> feature position
@@ -151,23 +151,23 @@ for mc = 1:mcNum
             % Jacobian of Xk
             JFXk = sparse(size(Xk00e,1),size(X0,1));
             JFXk(1:size(X0,1),1:size(X0,1)) = eye(size(X0,1));
-            JFXk(size(X0,1)+(1:2:(size(R1Xfkn,1)-1)),1:3) = [repmat([1,0],size(R1Xfkn,1)/2,1), -sin(X0(3,3))*R1Z0n(1:2:(end-1),2) - cos(X0(3,3))*R1Z0n(2:2:end,2)];
-            JFXk(size(X0,1)+(2:2:size(R1Xfkn,1)),1:3) = [repmat([0,1],size(R1Xfkn,1)/2,1), cos(X0(3,3))*R1Z0n(1:2:(end-1),2) - sin(X0(3,3))*R1Z0n(2:2:end,2)];
+            JFXk(size(X0,1)+(1:2:(size(R1Xfkn,1)-1)),1:3) = [repmat([1,0],size(R1Xfkn,1)/2,1), -sin(X0(3,3))*R1Zkn(1:2:(end-1),2) - cos(X0(3,3))*R1Zkn(2:2:end,2)];
+            JFXk(size(X0,1)+(2:2:size(R1Xfkn,1)),1:3) = [repmat([0,1],size(R1Xfkn,1)/2,1), cos(X0(3,3))*R1Zkn(1:2:(end-1),2) - sin(X0(3,3))*R1Zkn(2:2:end,2)];
 
-            JFXk(size(X0,1)+size(R1Xfkn,1)+(1:2:(size(R2Xfkn,1)-1)),4:6) = [repmat([1,0],size(R2Xfkn,1)/2,1), -sin(X0(6,3))*R2Z0n(1:2:(end-1),2) - cos(X0(6,3))*R2Z0n(2:2:end,2)];
-            JFXk(size(X0,1)+size(R1Xfkn,1)+(2:2:size(R2Xfkn,1)),4:6) = [repmat([0,1],size(R2Xfkn,1)/2,1), cos(X0(6,3))*R2Z0n(1:2:(end-1),2) - sin(X0(6,3))*R2Z0n(2:2:end,2)];
+            JFXk(size(X0,1)+size(R1Xfkn,1)+(1:2:(size(R2Xfkn,1)-1)),4:6) = [repmat([1,0],size(R2Xfkn,1)/2,1), -sin(X0(6,3))*R2Zkn(1:2:(end-1),2) - cos(X0(6,3))*R2Zkn(2:2:end,2)];
+            JFXk(size(X0,1)+size(R1Xfkn,1)+(2:2:size(R2Xfkn,1)),4:6) = [repmat([0,1],size(R2Xfkn,1)/2,1), cos(X0(6,3))*R2Zkn(1:2:(end-1),2) - sin(X0(6,3))*R2Zkn(2:2:end,2)];
 
 
             R1nRn = [];
             R2nRn = [];
-            JFWk = sparse(size(Xk00e,1),size(R1Z0n,1)+size(R2Z0n,1));
-            for R1jn = 1:(size(R1Z0n,1)/2)
+            JFWk = sparse(size(Xk00e,1),size(R1Zkn,1)+size(R2Zkn,1));
+            for R1jn = 1:(size(R1Zkn,1)/2)
                 R1nRn = blkdiag(R1nRn, R1R);
                 JFWk(size(X0,1)+(R1jn-1)*2+(1:2),(R1jn-1)*2+(1:2)) = rotationMatrix(X0(3,3));
             end
-            for R2jn = 1:(size(R2Z0n,1)/2)
+            for R2jn = 1:(size(R2Zkn,1)/2)
                 R2nRn = blkdiag(R2nRn, R2R);
-                JFWk(size(X0,1)+size(R1Z0n,1)+(R2jn-1)*2+(1:2),size(R1Z0n,1)+(R2jn-1)*2+(1:2)) = rotationMatrix(X0(6,3));
+                JFWk(size(X0,1)+size(R1Zkn,1)+(R2jn-1)*2+(1:2),size(R1Zkn,1)+(R2jn-1)*2+(1:2)) = rotationMatrix(X0(6,3));
             end
 
             nRn = blkdiag(R1nRn,R2nRn);
@@ -290,12 +290,13 @@ for mc = 1:mcNum
         %% ideal EKF
         R1Zkn_lv = ~ismember(R1Obs_k(:,1),Xk10e(7:end,2));
         R1Zkn_idx = find(R1Zkn_lv);
-        R1Zkn_ide = R1Obs_k(R1Zkn_idx,:);
+        R1Zkn = R1Obs_k(R1Zkn_idx,:);
 
         % find the feature observations in R2 from new features of Xk10e
         R2Zkn_lv = ~ismember(R2Obs_k(:,1),Xk10e(7:end,2));
         R2Zkn_idx = find(R2Zkn_lv);
         R2Zkn = R2Obs_k(R2Zkn_idx,:);
+        R1Zkn_ide
 
         %% R1和R2都看到同一个新feature怎么办
         Zkns = intersect(R1Zkn(:,1),R2Zkn(:,1));
