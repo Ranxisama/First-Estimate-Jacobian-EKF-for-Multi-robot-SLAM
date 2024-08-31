@@ -1,7 +1,7 @@
 clc
 close all
 
-load('MT_Parameters.mat','R1XrTrue','R1XphiT','R2XrTrue','R2XphiT','XfTrueAll','R1OdoT','R2OdoT','R1ObsT','R2ObsT')
+load('MT_Parameters.mat','R1XrTrue','R1XphiT','R2XrTrue','R2XphiT','XfTrueAll')
 load('MT_Measurements.mat','R1Xp0Set','R1OdoSet','R1ObsSet','R2Xp0Set','R2OdoSet','R2ObsSet')
 
 Config;
@@ -36,13 +36,9 @@ for mc = 1:mcNum
     Xs = [];
     X0 = [];
     Xk00e = [];
-    Xk00e_ide = [];
     Xk10e = [];
-    % Xk10e_ide
     Xk10efi = [];
-    Xk10efi_ide = [];
     Xk11e = [];
-    Xk11e_ide = [];
 
     for k = 0:poseNum
 
@@ -185,7 +181,6 @@ for mc = 1:mcNum
         end
 
         %% Prediction using the motion model
-        %% standard EKF
         R1Odo_k = R1Odo(R1Odo(:,2)==k,3);
         R2Odo_k = R2Odo(R2Odo(:,2)==k,3);
 
@@ -218,60 +213,12 @@ for mc = 1:mcNum
             [cos(Xk00e(6,3)),-sin(Xk00e(6,3)),0; ...
             sin(Xk00e(6,3)),cos(Xk00e(6,3)),0; ...
             0,0,1]);
-        
-        DWk = blkdiag(R1Q,R2Q);
 
+        DWk = blkdiag(R1Q,R2Q);
         Pk10 = DeltaFX * Pk00 * DeltaFX' + DeltaFW * DWk * DeltaFW';
 
-        % Set the elements that are less than CovT to zero. This can be 
-        % useful for dealing with numerical errors or avoiding unnecessary 
-        % imaginary parts in calculations.
+        % Set the elements that are less than CovT to zero. This can be useful for dealing with numerical errors or avoiding unnecessary imaginary parts in calculations.
         Pk10(abs(Pk10)<CovT) = 0;
-
-        %% ideal EKF
-        R1OdoT_k = R1OdoT(R1OdoT(:,2)==k,3);
-        R2OdoT_k = R2OdoT(R2OdoT(:,2)==k,3);
-       
-        if k == 1
-            Xk00e_ide = Xk00e;
-            Pk00_ide = Pk00;
-        end
-
-        Xk10e_ide = Xk00e_ide;
-        Xk10e_ide(1:6,2) = Xk10e_ide(1:6,2)+1;
-        Xk10e_ide(1:3,3) = Xk00e_ide(1:3,3) + ...
-            [cos(Xk00e(3,3))*R1Odo_k(1,1) - sin(Xk00e(3,3))*R1Odo_k(2,1);
-            sin(Xk00e(3,3))*R1Odo_k(1,1) + cos(Xk00e(3,3))*R1Odo_k(2,1);
-            R1Odo_k(3,1)];
-        Xk10e_ide(4:6,3) = Xk00e_ide(4:6,3) + ...
-            [cos(Xk00e(6,3))*R2Odo_k(1,1) - sin(Xk00e(6,3))*R2Odo_k(2,1);
-            sin(Xk00e(6,3))*R2Odo_k(1,1) + cos(Xk00e(6,3))*R2Odo_k(2,1);
-            R2Odo_k(3,1)];
-
-        Xk10e_ide([3,6],3) = wrap(Xk10e_ide([3,6],3));
-
-        Xrk00T = [R1XrTrue(R1XrTrue(:,1)==k-1,2);R1XphiT(R1XphiT(:,1)==k-1,2); ...
-            R2XrTrue(R2XrTrue(:,1)==k-1,2);R2XphiT(R2XphiT(:,1)==k-1,2)];
-        
-        DeltaFX_ide = sparse(size(Xk10e_ide,1),size(Xk10e_ide,1));
-        DeltaFX_ide(1:6,1:6) = blkdiag([1,0,-sin(Xrk00T(3,1))*R1OdoT_k(1,1) - cos(Xrk00T(3,1))*R1OdoT_k(2,1); ...
-            0,1,cos(Xrk00T(3,1))*R1OdoT_k(1,1) - sin(Xrk00T(3,1))*R1OdoT_k(2,1); ...
-            0,0,1], ...
-            [1,0,-sin(Xrk00T(6,1))*R2OdoT_k(1,1) - cos(Xrk00T(6,1))*R2OdoT_k(2,1); ...
-            0,1,cos(Xrk00T(6,1))*R2OdoT_k(1,1) - sin(Xrk00T(6,1))*R2OdoT_k(2,1); ...
-            0,0,1]);
-        DeltaFX_ide(7:end,7:end) = eye(size(DeltaFX_ide(7:end,7:end)));
-
-        DeltaFW_ide = sparse(size(Xk10e_ide,1),6);
-        DeltaFW_ide(1:6,1:6) = blkdiag([cos(Xrk00T(3,1)),-sin(Xrk00T(3,1)),0; ...
-            sin(Xrk00T(3,1)),cos(Xrk00T(3,1)),0; ...
-            0,0,1], ...
-            [cos(Xrk00T(6,1)),-sin(Xrk00T(6,1)),0; ...
-            sin(Xrk00T(6,1)),cos(Xrk00T(6,1)),0; ...
-            0,0,1]);
-
-        Pk10_ide = DeltaFX_ide * Pk00_ide * DeltaFX_ide' + DeltaFW_ide * DWk * DeltaFW_ide';
-        Pk10_ide(abs(Pk10_ide)<CovT) = 0;
 
 
 
@@ -308,41 +255,24 @@ for mc = 1:mcNum
 
         Zkn = [R1Zkn;R2Zkn];
 
-        % standard EKF
         Xk10efi = Xk10e;
         Pk10fi = Pk10;
 
-        % ideal EKF
-        Xk10efi_ide = Xk10e_ide;
-        Pk10fi_ide = Pk10_ide;
-
-
         if ~isempty(Zkn)
-            %% standard EKF
             R1Xfn = R1Zkn;
             R2Xfn = R2Zkn;
 
             DeltaGX = sparse(size(Xk10efi,1),size(Xk10e,1));
             DeltaGX(1:size(Xk10e,1),1:size(Xk10e,1)) = eye(size(Xk10e,1));
 
-            %% ideal EKF
-            R1Xfn_ide = R1Zkn;
-            R2Xfn_ide = R2Zkn;
-
-            DeltaGX_ide = sparse(size(Xk10efi_ide,1),size(Xk10e_ide,1));
-            DeltaGX_ide(1:size(Xk10e_ide,1),1:size(Xk10e_ide,1)) = eye(size(Xk10e_ide,1));
-            
-            %% Observation noise Cov
             R1nRn = [];
             R2nRn = [];
             DeltaGV = sparse(size(Xk10efi,1),size(Zkn,1));
 
             if ~isempty(R1Xfn)
-                %% standard EKF
                 R1Xfn(1:2:(end-1),2) = Xk10e(1,3) + cos(Xk10e(3,3))*R1Zkn(1:2:(end-1),2) - sin(Xk10e(3,3))*R1Zkn(2:2:end,2);
                 R1Xfn(2:2:end,2) = Xk10e(2,3) + sin(Xk10e(3,3))*R1Zkn(1:2:(end-1),2) + cos(Xk10e(3,3))*R1Zkn(2:2:end,2);
 
-                % Cov
                 DeltaGX(size(Xk10e,1)+(1:2:(size(R1Xfn,1)-1)),1:3) = [repmat([1, 0],size(R1Xfn,1)/2,1), ...
                     -sin(Xk10e(3,3))*R1Zkn(1:2:(end-1),2)-cos(Xk10e(3,3))*R1Zkn(2:2:end,2)];
                 DeltaGX(size(Xk10e,1)+(2:2:size(R1Xfn,1)),1:3) = [repmat([0, 1],size(R1Xfn,1)/2,1), ...
@@ -352,29 +282,12 @@ for mc = 1:mcNum
                     R1nRn = blkdiag(R1nRn, R1R);
                     DeltaGV(size(Xk10e,1)+(R1jn-1)*2+(1:2),(R1jn-1)*2+(1:2)) = rotationMatrix(Xk10e(3,3));
                 end
-
-                %% ideal EKF
-                R1Xfn_ide(1:2:(end-1),2) = Xk10e_ide(1,3) + cos(Xk10e_ide(3,3))*R1Zkn(1:2:(end-1),2) - sin(Xk10e_ide(3,3))*R1Zkn(2:2:end,2);
-                R1Xfn_ide(2:2:end,2) = Xk10e_ide(2,3) + sin(Xk10e_ide(3,3))*R1Zkn(1:2:(end-1),2) + cos(Xk10e_ide(3,3))*R1Zkn(2:2:end,2);
-
-                % Cov
-                DeltaGX_ide(size(Xk10e_ide,1)+(1:2:(size(R1Xfn_ide,1)-1)),1:3) = [repmat([1, 0],size(R1Xfn_ide,1)/2,1), ...
-                    -sin(Xk10e_ide(3,3))*R1Zkn_ide(1:2:(end-1),2)-cos(Xk10e_ide(3,3))*R1Zkn_ide(2:2:end,2)];
-                DeltaGX_ide(size(Xk10e_ide,1)+(2:2:size(R1Xfn_ide,1)),1:3) = [repmat([0, 1],size(R1Xfn_ide,1)/2,1), ...
-                    cos(Xk10e_ide(3,3))*R1Zkn_ide(1:2:(end-1),2)-sin(Xk10e_ide(3,3))*R1Zkn_ide(2:2:end,2)];
-
-                for R1jn_ide = 1:(size(R1Zkn_ide,1)/2)
-                    % R1nRn_ide = blkdiag(R1nRn_ide, R1R);
-                    DeltaGV_ide(size(Xk10e_ide,1)+(R1jn_ide-1)*2+(1:2),(R1jn_ide-1)*2+(1:2)) = rotationMatrix(Xk10e_ide(3,3));
-                end
             end
 
             if ~isempty(R2Xfn)
-                %% standard EKF
                 R2Xfn(1:2:(end-1),2) = Xk10e(4,3) + cos(Xk10e(6,3))*R2Zkn(1:2:end,2) - sin(Xk10e(6,3))*R2Zkn(2:2:end,2);
                 R2Xfn(2:2:end,2) = Xk10e(5,3) + sin(Xk10e(6,3))*R2Zkn(1:2:end,2) + cos(Xk10e(6,3))*R2Zkn(2:2:end,2);
 
-                % Cov
                 DeltaGX(size(Xk10e,1)+size(R1Xfn,1)+(1:2:(size(R2Xfn,1)-1)),4:6) = [repmat([1, 0],size(R2Xfn,1)/2,1), ...
                     -sin(Xk10e(6,3))*R2Zkn(1:2:(end-1),2)-cos(Xk10e(6,3))*R2Zkn(2:2:end,2)];
                 DeltaGX(size(Xk10e,1)+size(R1Xfn,1)+(2:2:size(R2Xfn,1)),4:6) = [repmat([0, 1],size(R2Xfn,1)/2,1), ...
@@ -384,46 +297,22 @@ for mc = 1:mcNum
                     R2nRn = blkdiag(R2nRn, R2R);
                     DeltaGV(size(Xk10e,1)+size(R1Zkn,1)+(R2jn-1)*2+(1:2),size(R1Zkn,1)+(R2jn-1)*2+(1:2)) = rotationMatrix(Xk10e(6,3));
                 end
-
-                %% ideal EKF
-                R2Xfn_ide(1:2:(end-1),2) = Xk10e_ide(4,3) + cos(Xk10e_ide(6,3))*R2Zkn(1:2:end,2) - sin(Xk10e_ide(6,3))*R2Zkn(2:2:end,2);
-                R2Xfn_ide(2:2:end,2) = Xk10e_ide(5,3) + sin(Xk10e_ide(6,3))*R2Zkn(1:2:end,2) + cos(Xk10e_ide(6,3))*R2Zkn(2:2:end,2);
-                
-                % Cov
-                DeltaGX_ide(size(Xk10e_ide,1)+size(R1Xfn_ide,1)+(1:2:(size(R2Xfn_ide,1)-1)),4:6) = [repmat([1, 0],size(R2Xfn_ide,1)/2,1), ...
-                    -sin(Xk10e_ide(6,3))*R2Zkn(1:2:(end-1),2)-cos(Xk10e_ide(6,3))*R2Zkn(2:2:end,2)];
-                DeltaGX_ide(size(Xk10e_ide,1)+size(R1Xfn_ide,1)+(2:2:size(R2Xfn_ide,1)),4:6) = [repmat([0, 1],size(R2Xfn_ide,1)/2,1), ...
-                    cos(Xk10e_ide(6,3))*R2Zkn(1:2:(end-1),2)-sin(Xk10e_ide(6,3))*R2Zkn(2:2:end,2)];
-
-                for R2jn_ide = 1:(size(R2Zkn,1)/2)
-                    % R2nRn = blkdiag(R2nRn, R2R);
-                    DeltaGV_ide(size(Xk10e_ide,1)+size(R1Zkn,1)+(R2jn_ide-1)*2+(1:2),size(R1Zkn,1)+(R2jn_ide-1)*2+(1:2)) = rotationMatrix(Xk10e_ide(6,3));
-                end
             end
-            
-            %% standard EKF
+
             Xfn = [R1Xfn;R2Xfn];
             Xk10efi = [Xk10e;
                 [ones(size(R1Xfn,1),1);2*ones(size(R2Xfn,1),1)],Xfn];
 
-            %% ideal EKF
-            Xfn_ide = [R1Xfn_ide;R2Xfn_ide];
-            Xk10efi_ide = [Xk10e_ide;
-                [ones(size(R1Xfn,1),1);2*ones(size(R2Xfn,1),1)],Xfn_ide];
-
             nRn = blkdiag(R1nRn,R2nRn);
-
             Pk10fi = DeltaGX*Pk10*DeltaGX'+DeltaGV*nRn*DeltaGV';
+
             Pk10fi(abs(Pk10fi)<CovT) = 0;
-            
-            Pk10fi_ide = DeltaGX_ide*Pk10_ide*DeltaGX_ide'+DeltaGV_ide*nRn*DeltaGV_ide';
-            Pk10fi_ide(abs(Pk10fi_ide)<CovT) = 0;
+
         end
 
 
 
         %% Update using shared feature observations from R1 and R2
-        %% R1
         % find the shared feature observations in R1 and R2 of Xk10e
         R1Zks_lv = ismember(R1Obs_k(:,1),Xk10efi(7:end,2));
         R1Zks_idx = find(R1Zks_lv);
@@ -435,19 +324,14 @@ for mc = 1:mcNum
         % R1Xfks_idx: index of R1's shared features with Xk10efi at step k
         R1Xfks = Xk10efi(R1Xfks_idx,2:3);
 
-        % re-order the shared feature R1Zks to make it consistent with R1Xfks
+        % re-order the shared features R1Zks to make it consistent with R1Xfks
         [~,R1ZkS_idx] = ismember(R1Xfks(:,1),R1Zks1(:,1));
         R1ZkS_idx(2:2:end,1)=R1ZkS_idx(2:2:end,1)+1;
         % R1ZkS_idx: index of R1's shared features with R1Zks at step k
         R1Zks2 = R1Zks1(R1ZkS_idx,:);
 
-        % find the shared true feature R1XfksT in feature truth XfTrueAll 
-        % and re-order them to to make them consistent with R1Xfks
-        [~,R1XfksT_idx] = ismember(R1Xfks(:,1),XfTrueAll(:,1));
-        R1XfksT_idx(2:2:end,1)=R1XfksT_idx(2:2:end,1)+1;
-        R1XfksT = XfTrueAll(R1XfksT_idx,:);
-        
-        %% R2
+
+
         R2Zks_lv = ismember(R2Obs_k(:,1),Xk10efi(7:end,2));
         R2Zks_idx = find(R2Zks_lv);
         R2Zks1 = R2Obs_k(R2Zks_idx,:);
@@ -461,28 +345,14 @@ for mc = 1:mcNum
         % R1ZkS_idx: index of R1's shared features with R1Zks at step k
         R2Zks2 = R2Zks1(R2ZkS_idx,:);
 
-        [~,R2XfksT_idx] = ismember(R2Xfks(:,1),XfTrueAll(:,1));
-        R2XfksT_idx(2:2:end,1)=R2XfksT_idx(2:2:end,1)+1;
-        R2XfksT = XfTrueAll(R2XfksT_idx,:);
-
         Zks = [ones(size(R1Zks2,1),1),R1Zks2;2*ones(size(R2Zks2,1),1),R2Zks2];
         % Xfks_idx = [R1Xfks_idx;R2Xfks_idx];
 
-        % standard EKF
         Xk11e = Xk10efi;
         Pk11 = Pk10fi;
-
-        % ideal EKF
-        Xk11e_ide = Xk10efi;
-        Pk11_ide = Pk10fi_ide;
-
         if ~isempty(Zks)
             HX10e = sparse(size(Zks,1), 1);
-            JHX10e = sparse(size(Zks,1), size(Xk10efi,1)); % standard EKF
-            JHX10e_ide = sparse(size(Zks,1), size(Xk10efi,1)); % ideal EKF
-
-            Xrk10Tfi = [R1XrTrue(R1XrTrue(:,1)==k,2);R1XphiT(R1XphiT(:,1)==k,2); ...
-            R2XrTrue(R2XrTrue(:,1)==k,2);R2XphiT(R2XphiT(:,1)==k,2)];
+            JHX10e = sparse(size(Zks,1), size(Xk10efi,1));
 
             R1DV = [];
             R2DV = [];
@@ -492,27 +362,15 @@ for mc = 1:mcNum
                 HX10e(2:2:size(R1Zks2,1),1) = -sin(Xk10efi(3,3))*(R1Xfks(1:2:(end-1),2)-Xk10efi(1,3)) + ...
                     cos(Xk10efi(3,3))*(R1Xfks(2:2:end,2)-Xk10efi(2,3));
 
-                % standard EKF
                 JHX10e(1:2:(size(R1Zks2,1)-1),1:3) = [repmat([-cos(Xk10efi(3,3)),-sin(Xk10efi(3,3))],size(R1Zks2,1)/2,1), ...
                     -sin(Xk10efi(3,3))*(R1Xfks(1:2:(end-1),2)-Xk10efi(1,3))+cos(Xk10efi(3,3))*(R1Xfks(2:2:end,2)-Xk10efi(2,3))];
 
                 JHX10e(2:2:size(R1Zks2,1),1:3) = [repmat([sin(Xk10efi(3,3)),-cos(Xk10efi(3,3))],size(R1Zks2,1)/2,1), ...
                     -cos(Xk10efi(3,3))*(R1Xfks(1:2:(end-1),2)-Xk10efi(1,3))-sin(Xk10efi(3,3))*(R1Xfks(2:2:end,2)-Xk10efi(2,3))];
 
-                % ideal EKF
-                JHX10e_ide(1:2:(size(R1Zks2,1)-1),1:3) = [repmat([-cos(Xrk10Tfi(3,1)),-sin(Xrk10Tfi(3,1))],size(R1Zks2,1)/2,1), ...
-                    -sin(Xrk10Tfi(3,1))*(R1XfksT(1:2:(end-1),2)-Xrk10Tfi(1,1))+cos(Xrk10Tfi(3,1))*(R1XfksT(2:2:end,2)-Xrk10Tfi(2,1))];
-
-                JHX10e_ide(2:2:size(R1Zks2,1),1:3) = [repmat([sin(Xrk10Tfi(3,1)),-cos(Xrk10Tfi(3,1))],size(R1Zks2,1)/2,1), ...
-                    -cos(Xrk10Tfi(3,1))*(R1XfksT(1:2:(end-1),2)-Xrk10Tfi(1,1))-sin(Xrk10Tfi(3,1))*(R1XfksT(2:2:end,2)-Xrk10Tfi(2,1))];
-
                 for R1kj = 1:size(R1Zks2,1)/2
                     R1DV = blkdiag(R1DV,R1R);
-                    
-                    % standard EKF
                     JHX10e((R1kj-1)*2+(1:2), R1Xfks_idx((R1kj-1)*2+(1:2),1)') = rotationMatrix(Xk10efi(3,3))';
-                    % ideal EKF
-                    JHX10e_ide((R1kj-1)*2+(1:2), R1Xfks_idx((R1kj-1)*2+(1:2),1)') = rotationMatrix(Xrk10Tfi(3,1))';
                 end
             end
 
@@ -521,53 +379,32 @@ for mc = 1:mcNum
                     sin(Xk10efi(6,3))*(R2Xfks(2:2:end,2)-Xk10efi(5,3));
                 HX10e(size(R1Zks2,1)+(2:2:size(R2Zks2,1)),1) = -sin(Xk10efi(6,3))*(R2Xfks(1:2:(end-1),2)-Xk10efi(4,3)) + ...
                     cos(Xk10efi(6,3))*(R2Xfks(2:2:end,2)-Xk10efi(5,3));
-                
-                % standard EKF
+
                 JHX10e(size(R1Zks2,1)+(1:2:size(R2Zks2,1)-1),4:6) = [repmat([-cos(Xk10efi(6,3)),-sin(Xk10efi(6,3))],size(R2Zks2,1)/2,1), ...
                     -sin(Xk10efi(6,3))*(R2Xfks(1:2:(end-1),2)-Xk10efi(4,3))+cos(Xk10efi(6,3))*(R2Xfks(2:2:end,2)-Xk10efi(5,3))];
 
                 JHX10e(size(R1Zks2,1)+(2:2:size(R2Zks2,1)),4:6) = [repmat([sin(Xk10efi(6,3)),-cos(Xk10efi(6,3))],size(R2Zks2,1)/2,1), ...
                     -cos(Xk10efi(6,3))*(R2Xfks(1:2:(end-1),2)-Xk10efi(4,3))-sin(Xk10efi(6,3))*(R2Xfks(2:2:end,2)-Xk10efi(5,3))];
 
-                % ideal EKF
-                JHX10e_ide(size(R1Zks2,1)+(1:2:size(R2Zks2,1)-1),4:6) = [repmat([-cos(Xrk10Tfi(6,1)),-sin(Xrk10Tfi(6,1))],size(R2Zks2,1)/2,1), ...
-                    -sin(Xrk10Tfi(6,1))*(R2XfksT(1:2:(end-1),2)-Xrk10Tfi(4,1))+cos(Xrk10Tfi(6,1))*(R2XfksT(2:2:end,2)-Xrk10Tfi(5,1))];
-
-                JHX10e_ide(size(R1Zks2,1)+(2:2:size(R2Zks2,1)),4:6) = [repmat([sin(Xrk10Tfi(6,1)),-cos(Xrk10Tfi(6,1))],size(R2Zks2,1)/2,1), ...
-                    -cos(Xrk10Tfi(6,1))*(R2XfksT(1:2:(end-1),2)-Xrk10Tfi(4,1))-sin(Xrk10Tfi(6,1))*(R2XfksT(2:2:end,2)-Xrk10Tfi(5,1))];
-
                 for R2kj = 1:size(R2Zks2,1)/2
                     R2DV = blkdiag(R2DV,R2R);
-                    
-                    % standard EKF
                     JHX10e(size(R1Zks2,1)+(R2kj-1)*2+(1:2), R2Xfks_idx((R2kj-1)*2+(1:2),1)') = rotationMatrix(Xk10efi(6,3))';
-                    % ideal EKF
-                    JHX10e_ide(size(R1Zks2,1)+(R2kj-1)*2+(1:2), R2Xfks_idx((R2kj-1)*2+(1:2),1)') = rotationMatrix(Xrk10Tfi(6,1))';
                 end
             end
 
             % JHX10_e = full(JHX10e)
             DV = blkdiag(R1DV,R2DV);
 
-            %% Innovation Covariance S and Kalman Gain K
-            % standard EKF
+            % Innovation Covariance S and Kalman Gain K
             Ss = JHX10e * Pk10fi * JHX10e' + DV;
             Ks = Pk10fi * JHX10e' /Ss;
 
-            % ideal EKF
-            Ssi = JHX10e_ide * Pk10fi_ide * JHX10e_ide' + DV;
-            Ksi = Pk10fi_ide * JHX10e_ide' /Ssi;
-
-            %% Updating process using observation model
-            % standard EKF
+            % Updating process using observation model
+            % Xk11e(:,3) = Xk10efi(:,3) + Ks*(Zks(:,3)-HX10e);
             Xk11e(:,3) = Xk10efi(:,3) + Ks*(Zks(:,3)-HX10e);
             Xk11e([3,6],3) = wrap(Xk11e([3,6],3));
-            Pk11 = Pk10fi - Ks*Ss*Ks'; 
-            
-            % ideal EKF
-            Xk11e_ide(:,3) = Xk10efi_ide(:,3) + Ksi*(Zks(:,3)-HX10e);
-            Xk11e_ide([3,6],3) = wrap(Xk11e_ide([3,6],3));
-            Pk11_ide = Pk10fi_ide - Ksi*Ssi*Ksi'; 
+
+            Pk11 = Pk10fi - Ks*Ss*Ks';
         end
 
         R1XpFull = [R1XpFull;Xk11e(1:3,2:3)];
@@ -575,14 +412,10 @@ for mc = 1:mcNum
 
         R2XpFull = [R2XpFull;Xk11e(4:6,2:3)];
         R2PFull = [R2PFull;Pk11(4:6,4:6)];
-        
-        % standard EKF
+
         Xk00e = Xk11e;
         Pk00 = Pk11;
-        
-        % ideal EKF
-        Xk00e_ide = Xk11e_ide;
-        Pk00_ide = Pk11_ide;
+
     end
 
     R1XpFullSet = [R1XpFullSet,R1XpFull(:,2)];

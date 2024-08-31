@@ -30,7 +30,7 @@ R1Xp0 = pose0Generation(R1XrTrue,R1XphiT,R1addPose0Noise,R1O);
 R2Xp0 = pose0Generation(R2XrTrue,R2XphiT,R2addPose0Noise,R2O);
 
 %% Odometry measurements Generation
-R1Odo = odometryGeneration(R1XrTrue,R1XphiT,PosNum,R1addOdoNoise,R1Q); % R1OdoT: true R1 odometry; R1Odo: estimated R1 odometry
+R1Odo = odometryGeneration(R1XrTrue,R1XphiT,PosNum,R1addOdoNoise,R1Q);
 R2Odo = odometryGeneration(R2XrTrue,R2XphiT,PosNum,R2addOdoNoise,R2Q);
 
 %% Observation measurements Generation
