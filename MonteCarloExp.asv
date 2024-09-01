@@ -8,13 +8,21 @@ Config;
 
 poseNum = size(R1OdoSet,1)/3;
 
-
+% standard EKF
 R1XpFullSet = [];
 R1PFullSet = [];
 R2XpFullSet = [];
 R2PFullSet = [];
 XfFullSet = [];
 PfFullSet = [];
+
+% ideal EKF
+R1XpIdeFullSet = [];
+R1PIdeFullSet = [];
+R2XpIdeFullSet = [];
+R2PIdeFullSet = [];
+XfIdeFullSet = [];
+PfIdeFullSet = [];
 
 for mc = 1:mcNum
 
@@ -26,12 +34,20 @@ for mc = 1:mcNum
 
     R1Obs = R1ObsSet(:,[1,2,2+mc]);
     R2Obs = R2ObsSet(:,[1,2,2+mc]);
-
+    
+    % standard EKF
     R1XpFull = [];
     R1PFull = [];
     R2XpFull = [];
     R2PFull = [];
     PfFull = [];
+
+    % ideal EKF
+    R1XpIdeFull = [];
+    R1PIdeFull = [];
+    R2XpIdeFull = [];
+    R2PIdeFull = [];
+    PfIdeFull = [];
 
     Xs = [];
     X0 = [];
@@ -178,12 +194,20 @@ for mc = 1:mcNum
             Pk00 = JFXk*P0*JFXk'+JFWk*nRn*JFWk';
 
             Pk00(abs(Pk00)<CovT) = 0;
-
+            
+            % standard EKF
             R1XpFull = Xk00e(1:3,2:3); % save all robot postures of R1
             R2XpFull = Xk00e(4:6,2:3); % save all robot postures of R2
 
             R1PFull = Pk00(1:3,1:3);
             R2PFull = Pk00(4:6,4:6);
+
+            % ideal EKF
+            R1XpIdeFull = Xk00e(1:3,2:3); % save all robot postures of R1
+            R2XpIdeFull = Xk00e(4:6,2:3); % save all robot postures of R2
+
+            R1PIdeFull = Pk00(1:3,1:3);
+            R2PIdeFull = Pk00(4:6,4:6);
 
             continue
         end
@@ -297,7 +321,7 @@ for mc = 1:mcNum
 
         % find the feature observations in R2 from new features of 
         % Xk10e_ide
-        R2Zkn_ide = R1ObsT_k(R2Zkn_idx,:);
+        R2Zkn_ide = R2ObsT_k(R2Zkn_idx,:);
 
         %% R1和R2都看到同一个新feature怎么办
         Zkns = intersect(R1Zkn(:,1),R2Zkn(:,1));
@@ -575,22 +599,29 @@ for mc = 1:mcNum
             Xk11e_ide([3,6],3) = wrap(Xk11e_ide([3,6],3));
             Pk11_ide = Pk10fi_ide - Ksi*Ssi*Ksi'; 
         end
-
+        
+        % standard EKF
         R1XpFull = [R1XpFull;Xk11e(1:3,2:3)];
         R1PFull = [R1PFull;Pk11(1:3,1:3)];
 
         R2XpFull = [R2XpFull;Xk11e(4:6,2:3)];
         R2PFull = [R2PFull;Pk11(4:6,4:6)];
         
-        % standard EKF
         Xk00e = Xk11e;
         Pk00 = Pk11;
         
         % ideal EKF
+        R1XpIdeFull = [R1XpIdeFull;Xk11e_ide(1:3,2:3)];
+        R1PIdeFull = [R1PIdeFull;Pk11_ide(1:3,1:3)];
+
+        R2XpIdeFull = [R2XpIdeFull;Xk11e_ide(4:6,2:3)];
+        R2PIdeFull = [R2PIdeFull;Pk11_ide(4:6,4:6)];
+        
         Xk00e_ide = Xk11e_ide;
         Pk00_ide = Pk11_ide;
     end
-
+    
+    % standard EKF
     R1XpFullSet = [R1XpFullSet,R1XpFull(:,2)];
     R1PFullSet = [R1PFullSet,R1PFull];
 
@@ -600,10 +631,21 @@ for mc = 1:mcNum
     XfFullSet = [XfFullSet,Xk11e(7:end,3)];
     PfFullSet = [PfFullSet,Pk11(7:end,7:end)];
 
+    % ideal EKF
+    R1XpIdeFullSet = [R1XpIdeFullSet,R1XpIdeFull(:,2)];
+    R1PIdeFullSet = [R1PIdeFullSet,R1PIdeFull];
+
+    R2XpIdeFullSet = [R2XpIdeFullSet,R2XpIdeFull(:,2)];
+    R2PIdeFullSet = [R2PIdeFullSet,R2PIdeFull];
+
+    XfIdeFullSet = [XfIdeFullSet,Xk11e_ide(7:end,3)];
+    PfIdeFullSet = [PfIdeFullSet,Pk11_ide(7:end,7:end)];
+
 end
 
 feaNum = size(Xk11e(7:end,1),1)/2;
 
+% standard EKF
 R1XpFullSet = [R1XpFull(:,1),R1XpFullSet];
 R2XpFullSet = [R2XpFull(:,1),R2XpFullSet];
 XfFullSet = [Xk11e(7:end,2),XfFullSet];
@@ -622,8 +664,28 @@ DeltaR2XrFullSet = [];
 DeltaR1XphiFullSet = [];
 DeltaR2XphiFullSet = [];
 
-for pn = 0:poseNum
+% ideal EKF
+R1XpIdeFullSet = [R1XpIdeFull(:,1),R1XpIdeFullSet];
+R2XpIdeFullSet = [R2XpIdeFull(:,1),R2XpIdeFullSet];
+XfIdeFullSet = [Xk11e_ide(7:end,2),XfIdeFullSet];
 
+R1XrIdeFullSet = [];
+R2XrIdeFullSet = [];
+R1XphiIdeFullSet = [];
+R2XphiIdeFullSet = [];
+
+DeltaR1XpIdeFullSet = [];
+DeltaR2XpIdeFullSet = [];
+
+DeltaR1XrIdeFullSet = [];
+DeltaR2XrIdeFullSet = [];
+
+DeltaR1XphiIdeFullSet = [];
+DeltaR2XphiIdeFullSet = [];
+
+for pn = 0:poseNum
+    
+    %% standard EKF
     DeltaR1XpFullSet((end+1):(end+3),:) = R1XpFullSet(pn*3+(1:3),2:end) - [R1XrTrue(pn*2+(1:2),2);R1XphiT(pn+1,2)];
     DeltaR2XpFullSet((end+1):(end+3),:) = R2XpFullSet(pn*3+(1:3),2:end) - [R2XrTrue(pn*2+(1:2),2);R2XphiT(pn+1,2)];
 
@@ -637,37 +699,45 @@ for pn = 0:poseNum
     DeltaR1XphiFullSet(end+1,:) = DeltaR1XpFullSet(end,:);
     DeltaR2XphiFullSet(end+1,:) = DeltaR2XpFullSet(end,:);
 
+    %% ideal EKF
+    DeltaR1XpIdeFullSet((end+1):(end+3),:) = R1XpIdeFullSet(pn*3+(1:3),2:end) - [R1XrTrue(pn*2+(1:2),2);R1XphiT(pn+1,2)];
+    DeltaR2XpIdeFullSet((end+1):(end+3),:) = R2XpIdeFullSet(pn*3+(1:3),2:end) - [R2XrTrue(pn*2+(1:2),2);R2XphiT(pn+1,2)];
+
+    % wrap the delta angle
+    DeltaR1XpIdeFullSet(end,:) = wrap(DeltaR1XpIdeFullSet(end,:));
+    DeltaR2XpIdeFullSet(end,:) = wrap(DeltaR2XpIdeFullSet(end,:));
+
+    DeltaR1XrIdeFullSet((end+1):(end+2),:) = DeltaR1XpIdeFullSet((end-2):(end-1),:);
+    DeltaR2XrIdeFullSet((end+1):(end+2),:) = DeltaR2XpIdeFullSet((end-2):(end-1),:);
+
+    DeltaR1XphiIdeFullSet(end+1,:) = DeltaR1XpIdeFullSet(end,:);
+    DeltaR2XphiIdeFullSet(end+1,:) = DeltaR2XpIdeFullSet(end,:);
+
 end
 
 %% re-order the true features XfTrueAll's IDs to make it consistent with FFullSet 每一步的
 [~,XfTrue_idx] = ismember(XfFullSet(:,1),XfTrueAll(:,1));
 XfTrue_idx(2:2:end,1) = XfTrue_idx(2:2:end,1)+1;
 XfTrue = XfTrueAll(XfTrue_idx,:);
-DeltaFFullSet = XfFullSet(:,2:end)-XfTrue(:,2);
+% standard EKF
+DeltaFFullSet = [XfFullSet(:,1),XfFullSet(:,2:end)-XfTrue(:,2)];
+% ideal EKF
+DeltaFIdeFullSet = XfIdeFullSet(:,2:end)-XfTrue(:,2);
+
+%% save the Monte Carlo Experiments result
+save('MTE_results_StdEKF.mat','poseNum','feaNum', ...
+    'DeltaR1XrFullSet','DeltaR2XrFullSet','DeltaR1XphiFullSet','DeltaR2XphiFullSet','DeltaFFullSet', ...
+    'DeltaR2XpFullSet','R2PFullSet',)
 
 %% Root Mean Square Error (RMSE)
-R1XrRMSE = [(0:poseNum)',zeros(poseNum+1,1)];
-R1XphiRMSE = [(0:poseNum)',zeros(poseNum+1,1)];
+% standard EKF
+[R1XrRMSE,R1XrRMSE_mean] = XrRMSE(poseNum,mcNum,DeltaR1XrFullSet);
+[R2XrRMSE,R2XrRMSE_mean] = XrRMSE(poseNum,mcNum,DeltaR2XrFullSet);
 
-R2XrRMSE = [(0:poseNum)',zeros(poseNum+1,1)];
-R2XphiRMSE = [(0:poseNum)',zeros(poseNum+1,1)];
+[R1XphiRMSE,R1XphiRMSE_mean] = XphiRMSE(poseNum,DeltaR1XphiFullSet);
+[R2XphiRMSE,R2XphiRMSE_mean] = XphiRMSE(poseNum,DeltaR2XphiFullSet);
 
-FRMSE = [XfFullSet(1:2:(end-1),1),zeros(feaNum,1)];
-
-R1XrRMSE(:,2) =  sqrt((sum(DeltaR1XrFullSet(1:2:(end-1),:).^2,2)+sum(DeltaR1XrFullSet(2:2:end,:).^2,2))/mcNum);
-R1XrRMSE_mean = mean(R1XrRMSE(:,2));
-
-R1XphiRMSE(:,2) = sqrt(sum(DeltaR1XphiFullSet(1:end,:).^2,2));
-R1XphiRMSE_mean = mean(R1XphiRMSE(:,2));
-
-R2XrRMSE(:,2) =  sqrt((sum(DeltaR2XrFullSet(1:2:(end-1),:).^2,2)+sum(DeltaR2XrFullSet(2:2:end,:).^2,2))/mcNum);
-R2XrRMSE_mean = mean(R2XrRMSE(:,2));
-
-R2XphiRMSE(:,2) = sqrt(sum(DeltaR2XphiFullSet(1:end,:).^2,2));
-R2XphiRMSE_mean = mean(R2XphiRMSE(:,2));
-
-FRMSE(:,2) = sqrt((sum(DeltaFFullSet(1:2:(end-1),:).^2,2)+sum(DeltaFFullSet(2:2:end,:).^2,2))/mcNum);
-FRMSE_mean = mean(FRMSE(:,2));
+[FRMSE,FRMSE_mean] = XfRMSE(feaNum,mcNum,DeltaFFullSet);
 
 fprintf('Std EKF R1 Position Err.RMS (m): %.2f \n',R1XrRMSE_mean);
 fprintf('Std EKF R1 Heading Err.RMS (rad): %.2f \n',R1XphiRMSE_mean);
