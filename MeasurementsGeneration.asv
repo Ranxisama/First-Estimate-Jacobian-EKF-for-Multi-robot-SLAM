@@ -2,7 +2,7 @@ clc
 close all
 
 load('TrueState\RobotsWaypoints.mat')
-load('TrueState\CheckedTrueState_100features.mat')
+load('TrueState\CheckedTrueState_20features.mat')
 
 R1XrTrueAll = dataModify(fliplr(wp1));
 R2XrTrueAll = dataModify(wp2);
@@ -108,7 +108,7 @@ text(R2Xp(1:3:(end-2),2)+0.3,R2Xp(2:3:(end-1),2),num2str(R2Xp(2:3:(end-1),1)),'C
 % plot(R2Xf(1:2:(end-1),2),R2Xf(2:2:end,2),'*','Color',paleGreen)
 % text(R2Xf(1:2:(end-1),2),R2Xf(2:2:end,2),num2str(R2Xf(2:2:end,1)),"Color",paleGreen)
 legend([R1XrTrueP,R2XrTrueP,R1XpP,R2XpP])
-xlim([1.2*fea_xlb,1.2*fea_xub])
-ylim([1.2*fea_ylb,1.2*fea_yub])
+xlim([1.2*fea_xlb,fea_xub])
+ylim([fea_ylb,fea_yub])
 hold off
 end

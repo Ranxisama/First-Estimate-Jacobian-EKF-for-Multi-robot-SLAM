@@ -187,7 +187,7 @@ R1XpNEES_mean = mean(R1XpNEES(:,2));
 
 R2XpNEES_mean = mean(R2XpNEES(:,2));
 
-XfNEES_k = [DeltaXfFullSet(1:2:(end-1),1),zeros(feaNum,mcNum)];
+XfNEES_k = [XfFullSet(1:2:(end-1),1),zeros(feaNum,mcNum)];
 
 for j = 1:feaNum
     for mn = 1:mcNum
@@ -233,7 +233,7 @@ R1XpIdeNEES_mean = mean(R1XpIdeNEES(:,2));
 
 R2XpIdeNEES_mean = mean(R2XpIdeNEES(:,2));
 
-XfIdeNEES_k = [DeltaXfIdeFullSet(1:2:(end-1),1),zeros(feaNum,mcNum)];
+XfIdeNEES_k = [XfIdeFullSet(1:2:(end-1),1),zeros(feaNum,mcNum)];
 for j = 1:feaNum
     for mn = 1:mcNum
         Idexfi_e = DeltaXfIdeFullSet((j-1)*2+(1:2),1+mn);
@@ -277,8 +277,7 @@ R2XpFejNEES = [R2FejNEES_k(:,1),mean(R2FejNEES_k(:,2:end),2)];
 R1XpFejNEES_mean = mean(R1XpFejNEES(:,2));
 R2XpFejNEES_mean = mean(R2XpFejNEES(:,2));
 
-XfFejNEES_k = [DeltaXfFejFullSet(1:2:(end-1),1),zeros(feaNum,mcNum)];
-
+XfFejNEES_k = [XfFejFullSet(1:2:(end-1),1),zeros(feaNum,mcNum)];
 for j = 1:feaNum
     for mn = 1:mcNum
         Fejxfi_e = DeltaXfFejFullSet((j-1)*2+(1:2),1+mn);
@@ -290,13 +289,13 @@ end
 XfFejNEES = [XfFejNEES_k(:,1),mean(XfFejNEES_k(:,2:end),2)];
 XfFejNEES_mean = mean(XfFejNEES(:,2));
 
-fprintf('FEJ EKF R1 Pose ANEES with %d features: %.2f \n',feaNum,R1XpFejNEES_mean);
-fprintf('FEJ EKF R2 Pose ANEES with %d features: %.2f \n',feaNum,R2XpFejNEES_mean);
-fprintf('FEJ EKF Feature ANEES with %d features: %.2f \n',feaNum,XfFejNEES_mean);
+fprintf('FEJ EKF R1 Pose ANEES: %.2f \n',R1XpFejNEES_mean);
+fprintf('FEJ EKF R2 Pose ANEES: %.2f \n',R2XpFejNEES_mean);
+fprintf('FEJ EKF Feature ANEES: %.2f \n',XfFejNEES_mean);
 
 figure(2)
 %% R1 pose
-subplot(3,2,(i-1)*2+1)
+subplot(2,1,1)
 hold on
 % standard EKF
 R1XpNEESP = plot(R1XpNEES(:,1)',R1XpNEES(:,2)','-bo','DisplayName','R1 std EKF');
@@ -309,12 +308,10 @@ xlabel('Steps')
 ylabel('R1 Pose ANEES')
 xlim([0,poseNum])
 legend([R1XpNEESP,R1XpIdeNEESP,R1XpFejNEESP])
-title(sprintf('%d features',feaNum))
-
 hold off
 
 %% R2 pose
-subplot(3,2,(i-1)*2+2)
+subplot(2,1,2)
 hold on
 R2XpNEESP = plot(R2XpNEES(:,1)',R2XpNEES(:,2)','-ro','DisplayName','R2 std EKF');
 R2XpIdeNEESP = plot(R2XpIdeNEES(:,1)',R2XpIdeNEES(:,2)','-mo','DisplayName','R2 ideal EKF');
@@ -324,8 +321,4 @@ xlabel('Steps')
 ylabel('R2 Pose ANEES')
 xlim([0,poseNum])
 legend([R2XpNEESP,R2XpIdeNEESP,R2XpFejNEESP])
-title(sprintf('%d features',feaNum))
-
 hold off
-
-end
