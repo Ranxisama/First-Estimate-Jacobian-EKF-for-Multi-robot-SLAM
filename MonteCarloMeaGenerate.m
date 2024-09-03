@@ -3,7 +3,7 @@ close all
 
 load('TrueState\RobotsWaypoints.mat')
 
-R1XrTrueAll = dataModify(fliplr(wp1));
+R1XrTrueAll = dataModify(wp1);
 R2XrTrueAll = dataModify(wp2);
 
 
@@ -79,10 +79,12 @@ for i = 1:3
 
 
     %% Shared feature Observation at step 0
+    if i == 1
     sharedObs0Num = numel(intersect(R1Obs(R1Obs(:,1)==0,2),R2Obs(R2Obs(:,1)==0,2)));
     disp(['Number of shared feature observations at step 0: ',num2str(sharedObs0Num)])
     if sharedObs0Num < reqSharedObsNum
         error('Shared feature observations at step 0 not enough, need to adjust sensor range and rerun')
+    end
     end
 
     if i == 1

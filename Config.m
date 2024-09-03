@@ -8,7 +8,7 @@ measurementsCheck = 1; % if 1, check the measurements by running MeasurementsGen
 %% Simulation check
 % real time check, use more computer performance by running EKF_SLAM_simulation.m
 % Cov check
-poseCovCheck =  0; % if 1, check the pose Cov of R1 and R2
+robPositionCovCheck =  0; % if 1, check the position Cov of R1 and R2
 feaCovCheck = 0; % if 1, check the features Cov
 
 %% Noise Switch
@@ -31,6 +31,12 @@ reqSharedObsNum = 8; % Required number of shared feature observations
 
 %% MarkerSize
 MS = 2;
+
+%% Arrow length
+al = 1;
+
+%% LineWidth
+LW = 2;
 
 %% Robot bearing ranges
 R1bearingRange = pi/60; % pi/60: 3°
@@ -135,6 +141,6 @@ end
 R2R = [R2sigma_zv^2,0;
     0,R2sigma_zv^2];
 
-if poseCovCheck ==  0 && feaCovCheck == 1
-    error('To check feature Cov, you must switch on poseCovCheck')
+if robPositionCovCheck ==  0 && feaCovCheck == 1
+    error('To check feature Cov, you must switch on robPositionCovCheck')
 end
