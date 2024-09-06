@@ -63,7 +63,7 @@ for fc = 1:3 % feature choice
     [R1XphiRMSE,R1XphiRMSE_mean] = XphiRMSE(poseNum,DeltaR1XphiFullSet);
     [R2XphiRMSE,R2XphiRMSE_mean] = XphiRMSE(poseNum,DeltaR2XphiFullSet);
 
-    [XfRMSE,XfRMSE_mean] = XFRMSE(feaNum,mcNum,DeltaXfFullSet);
+    [XfStdRMSE,XfStdRMSE_mean] = XfRMSE(feaNum,mcNum,DeltaXfFullSet);
 
 
 
@@ -74,7 +74,7 @@ for fc = 1:3 % feature choice
     [R1XphiIdeRMSE,R1XphiIdeRMSE_mean] = XphiRMSE(poseNum,DeltaR1XphiIdeFullSet);
     [R2XphiIdeRMSE,R2XphiIdeRMSE_mean] = XphiRMSE(poseNum,DeltaR2XphiIdeFullSet);
 
-    [XfIdeRMSE,XfIdeRMSE_mean] = XFRMSE(feaNum,mcNum,DeltaXfIdeFullSet);
+    [XfIdeRMSE,XfIdeRMSE_mean] = XfRMSE(feaNum,mcNum,DeltaXfIdeFullSet);
 
 
 
@@ -85,7 +85,7 @@ for fc = 1:3 % feature choice
     [R1XphiFejRMSE,R1XphiFejRMSE_mean] = XphiRMSE(poseNum,DeltaR1XphiFejFullSet);
     [R2XphiFejRMSE,R2XphiFejRMSE_mean] = XphiRMSE(poseNum,DeltaR2XphiFejFullSet);
 
-    [XfFejRMSE,XfFejRMSE_mean] = XFRMSE(feaNum,mcNum,DeltaXfFejFullSet);
+    [XfFejRMSE,XfFejRMSE_mean] = XfRMSE(feaNum,mcNum,DeltaXfFejFullSet);
 
 
 
@@ -344,7 +344,7 @@ for fc = 1:3 % feature choice
 
         disp('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 20 features %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
         IdeEKFColumn = [R1XrIdeRMSE_mean;R1XphiIdeRMSE_mean;R2XrIdeRMSE_mean;R2XphiIdeRMSE_mean;XfIdeRMSE_mean;R1XpIdeNEES_mean;R2XpIdeNEES_mean;XfIdeNEES_mean];
-        StdEKFColumn = [R1XrRMSE_mean;R1XphiRMSE_mean;R2XrRMSE_mean;R2XphiRMSE_mean;XfRMSE_mean;R1XpNEES_mean;R2XpNEES_mean;XfNEES_mean];
+        StdEKFColumn = [R1XrRMSE_mean;R1XphiRMSE_mean;R2XrRMSE_mean;R2XphiRMSE_mean;XfStdRMSE_mean;R1XpNEES_mean;R2XpNEES_mean;XfNEES_mean];
         FejEKFColumn = [R1XrFejRMSE_mean;R1XphiFejRMSE_mean;R2XrFejRMSE_mean;R2XphiFejRMSE_mean;XfFejRMSE_mean;R1XpFejNEES_mean;R2XpFejNEES_mean;XfFejNEES_mean];
 
         % 创建表格并插入动态列名称
@@ -361,7 +361,7 @@ for fc = 1:3 % feature choice
 
         disp('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 60 features %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
         IdeEKFColumn = [R1XrIdeRMSE_mean;R1XphiIdeRMSE_mean;R2XrIdeRMSE_mean;R2XphiIdeRMSE_mean;XfIdeRMSE_mean;R1XpIdeNEES_mean;R2XpIdeNEES_mean;XfIdeNEES_mean];
-        StdEKFColumn = [R1XrRMSE_mean;R1XphiRMSE_mean;R2XrRMSE_mean;R2XphiRMSE_mean;XfRMSE_mean;R1XpNEES_mean;R2XpNEES_mean;XfNEES_mean];
+        StdEKFColumn = [R1XrRMSE_mean;R1XphiRMSE_mean;R2XrRMSE_mean;R2XphiRMSE_mean;XfStdRMSE_mean;R1XpNEES_mean;R2XpNEES_mean;XfNEES_mean];
         FejEKFColumn = [R1XrFejRMSE_mean;R1XphiFejRMSE_mean;R2XrFejRMSE_mean;R2XphiFejRMSE_mean;XfFejRMSE_mean;R1XpFejNEES_mean;R2XpFejNEES_mean;XfFejNEES_mean];
 
         % 创建表格并插入动态列名称
@@ -378,7 +378,7 @@ for fc = 1:3 % feature choice
 
         disp('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 100 features %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
         IdeEKFColumn = [R1XrIdeRMSE_mean;R1XphiIdeRMSE_mean;R2XrIdeRMSE_mean;R2XphiIdeRMSE_mean;XfIdeRMSE_mean;R1XpIdeNEES_mean;R2XpIdeNEES_mean;XfIdeNEES_mean];
-        StdEKFColumn = [R1XrRMSE_mean;R1XphiRMSE_mean;R2XrRMSE_mean;R2XphiRMSE_mean;XfRMSE_mean;R1XpNEES_mean;R2XpNEES_mean;XfNEES_mean];
+        StdEKFColumn = [R1XrRMSE_mean;R1XphiRMSE_mean;R2XrRMSE_mean;R2XphiRMSE_mean;XfStdRMSE_mean;R1XpNEES_mean;R2XpNEES_mean;XfNEES_mean];
         FejEKFColumn = [R1XrFejRMSE_mean;R1XphiFejRMSE_mean;R2XrFejRMSE_mean;R2XphiFejRMSE_mean;XfFejRMSE_mean;R1XpFejNEES_mean;R2XpFejNEES_mean;XfFejNEES_mean];
 
         % 创建表格并插入动态列名称
