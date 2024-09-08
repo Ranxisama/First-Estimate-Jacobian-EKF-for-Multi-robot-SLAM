@@ -1,3 +1,5 @@
+% Monte Carlo Measurements Generation
+
 clc
 close all
 
@@ -44,7 +46,6 @@ for mc = 1:mcNum
     R2Odo = odometryGeneration(R2XrTrue,R2XphiT,PosNum,R2addOdoNoise,R2Q);
     R1OdoSet = [R1OdoSet,R1Odo(:,3)];
     R2OdoSet = [R2OdoSet,R2Odo(:,3)];
-
 end
 
 R1OdoSet = [R1Odo(:,1:2),R1OdoSet];
@@ -75,6 +76,8 @@ for i = 1:3
 
     R1ObsSet = [R1Obs(:,1:2),R1ObsSet];
     R2ObsSet = [R2Obs(:,1:2),R2ObsSet];
+        
+    feaNum = numel(unique([R1ObsSet(:,2);R2ObsSet(:,2)]));
 
 
 
@@ -88,14 +91,17 @@ for i = 1:3
     end
 
     if i == 1
+        disp(['Number of features: ',num2str(feaNum)])
         save('MT_Parameters_20fea.mat', ...
             'R1XrTrue','R1XphiT','R2XrTrue','R2XphiT','XfTrueAll','R1OdoT','R2OdoT','R1ObsT','R2ObsT')
         save('MT_Measurements_20fea.mat','R1Xp0Set','R1OdoSet','R1ObsSet','R2Xp0Set','R2OdoSet','R2ObsSet')
     elseif i == 2
+        disp(['Number of features: ',num2str(feaNum)])
         save('MT_Parameters_60fea.mat', ...
             'R1XrTrue','R1XphiT','R2XrTrue','R2XphiT','XfTrueAll','R1OdoT','R2OdoT','R1ObsT','R2ObsT')
         save('MT_Measurements_60fea.mat','R1Xp0Set','R1OdoSet','R1ObsSet','R2Xp0Set','R2OdoSet','R2ObsSet')
     else
+        disp(['Number of features: ',num2str(feaNum)])
         save('MT_Parameters_100fea.mat', ...
             'R1XrTrue','R1XphiT','R2XrTrue','R2XphiT','XfTrueAll','R1OdoT','R2OdoT','R1ObsT','R2ObsT')
         save('MT_Measurements_100fea.mat','R1Xp0Set','R1OdoSet','R1ObsSet','R2Xp0Set','R2OdoSet','R2ObsSet')
