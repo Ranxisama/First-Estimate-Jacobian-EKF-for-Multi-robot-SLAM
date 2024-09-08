@@ -1,6 +1,7 @@
 clc
 close all
 
+% for i = 1:3
 for i = 1:3
     if i == 1
         load('MT_Parameters_20fea.mat','R1XrTrue','R1XphiT','R2XrTrue','R2XphiT','XfTrueAll','R1OdoT','R2OdoT','R1ObsT','R2ObsT')
@@ -110,7 +111,7 @@ for i = 1:3
                 % find the shared observed feature IDs in 1st robot
                 % R1Z0s_lv: logical vector of shared feature observation of
                 % 1st robot at step 0
-                R1Z0s_lv = ismember(R1Obs_k(:,1), R2Obs_k(:,1));
+                R1Z0s_lv = ismember(R1Obs_k(:,1),R2Obs_k(:,1));
                 % R1Z0s_idx: index of shared feature observation of
                 % 1st robot in R2Obs_k
                 R1Z0s_idx = find(R1Z0s_lv);
@@ -250,7 +251,8 @@ for i = 1:3
 
                 R1PFejFull = Pk00(1:3,1:3);
                 R2PFejFull = Pk00(4:6,4:6);
-
+                
+                % record the initialized features for FEJ
                 XfFe = Xk00e(7:end,:); % First estimated feature position
 
                 continue
@@ -265,12 +267,10 @@ for i = 1:3
             Xk10e = Xk00e;
             Xk10e(1:6,2) = Xk10e(1:6,2)+1;
             Xk10e(1:3,3) = Xk00e(1:3,3) + ...
-                [cos(Xk00e(3,3))*R1Odo_k(1,1) - sin(Xk00e(3,3))*R1Odo_k(2,1);
-                sin(Xk00e(3,3))*R1Odo_k(1,1) + cos(Xk00e(3,3))*R1Odo_k(2,1);
+                [rotationMatrix(Xk00e(3,3))*R1Odo_k(1:2,1);
                 R1Odo_k(3,1)];
             Xk10e(4:6,3) = Xk00e(4:6,3) + ...
-                [cos(Xk00e(6,3))*R2Odo_k(1,1) - sin(Xk00e(6,3))*R2Odo_k(2,1);
-                sin(Xk00e(6,3))*R2Odo_k(1,1) + cos(Xk00e(6,3))*R2Odo_k(2,1);
+                [rotationMatrix(Xk00e(6,3))*R2Odo_k(1:2,1);
                 R2Odo_k(3,1)];
 
             Xk10e([3,6],3) = wrap(Xk10e([3,6],3));
@@ -284,13 +284,8 @@ for i = 1:3
                 0,0,1]);
             DeltaXfX(7:end,7:end) = eye(size(DeltaXfX(7:end,7:end)));
 
-            DeltaXfW = sparse(size(Xk00e,1),6);
-            DeltaXfW(1:6,1:6) = blkdiag([cos(Xk00e(3,3)),-sin(Xk00e(3,3)),0; ...
-                sin(Xk00e(3,3)),cos(Xk00e(3,3)),0; ...
-                0,0,1], ...
-                [cos(Xk00e(6,3)),-sin(Xk00e(6,3)),0; ...
-                sin(Xk00e(6,3)),cos(Xk00e(6,3)),0; ...
-                0,0,1]);
+            DeltaXfW = sparse(size(Xk10e,1),6);
+            DeltaXfW(1:6,1:6) = blkdiag(rotationMatrix(Xk00e(3,3)),1,rotationMatrix(Xk00e(6,3)),1);
 
             DWk = blkdiag(R1Q,R2Q);
             Pk10 = DeltaXfX * Pk00 * DeltaXfX' + DeltaXfW * DWk * DeltaXfW';
@@ -312,12 +307,10 @@ for i = 1:3
             Xk10e_ide = Xk00e_ide;
             Xk10e_ide(1:6,2) = Xk10e_ide(1:6,2)+1;
             Xk10e_ide(1:3,3) = Xk00e_ide(1:3,3) + ...
-                [cos(Xk00e_ide(3,3))*R1Odo_k(1,1) - sin(Xk00e_ide(3,3))*R1Odo_k(2,1);
-                sin(Xk00e_ide(3,3))*R1Odo_k(1,1) + cos(Xk00e_ide(3,3))*R1Odo_k(2,1);
+                [rotationMatrix(Xk00e_ide(3,3))*R1Odo_k(1:2,1);
                 R1Odo_k(3,1)];
             Xk10e_ide(4:6,3) = Xk00e_ide(4:6,3) + ...
-                [cos(Xk00e_ide(6,3))*R2Odo_k(1,1) - sin(Xk00e_ide(6,3))*R2Odo_k(2,1);
-                sin(Xk00e_ide(6,3))*R2Odo_k(1,1) + cos(Xk00e_ide(6,3))*R2Odo_k(2,1);
+                [rotationMatrix(Xk00e_ide(6,3))*R2Odo_k(1:2,1);
                 R2Odo_k(3,1)];
 
             Xk10e_ide([3,6],3) = wrap(Xk10e_ide([3,6],3));
@@ -333,24 +326,9 @@ for i = 1:3
                 0,1,cos(Xrk00T(6,1))*R2OdoT_k(1,1) - sin(Xrk00T(6,1))*R2OdoT_k(2,1); ...
                 0,0,1]);
             DeltaXfX_ide(7:end,7:end) = eye(size(DeltaXfX_ide(7:end,7:end)));
-            
-            %%
+
             DeltaXfW_ide = sparse(size(Xk00e_ide,1),6);
-            DeltaXfW_ide(1:6,1:6) = blkdiag([cos(Xrk00T(3,1)),-sin(Xrk00T(3,1)),0; ...
-                sin(Xrk00T(3,1)),cos(Xrk00T(3,1)),0; ...
-                0,0,1], ...
-                [cos(Xrk00T(6,1)),-sin(Xrk00T(6,1)),0; ...
-                sin(Xrk00T(6,1)),cos(Xrk00T(6,1)),0; ...
-                0,0,1]);
-            
-            % DeltaXfW_ide = sparse(size(Xk00e_ide,1),6);
-            % DeltaXfW_ide(1:6,1:6) = blkdiag([cos(Xk00e_ide(3,3)),-sin(Xk00e_ide(3,3)),0; ...
-            %     sin(Xk00e_ide(3,3)),cos(Xk00e_ide(3,3)),0; ...
-            %     0,0,1], ...
-            %     [cos(Xk00e_ide(6,3)),-sin(Xk00e_ide(6,3)),0; ...
-            %     sin(Xk00e_ide(6,3)),cos(Xk00e_ide(6,3)),0; ...
-            %     0,0,1]);
-            %%
+            DeltaXfW_ide(1:6,1:6) = blkdiag(rotationMatrix(Xrk00T(3,1)),1,rotationMatrix(Xrk00T(6,1)),1);
 
             Pk10_ide = DeltaXfX_ide * Pk00_ide * DeltaXfX_ide' + DeltaXfW_ide * DWk * DeltaXfW_ide';
             Pk10_ide(abs(Pk10_ide)<CovT) = 0;
@@ -374,39 +352,23 @@ for i = 1:3
                 [1,0,-sin(Xk10e_fej(6,3))*R2Odo_k(1,1) - cos(Xk10e_fej(6,3))*R2Odo_k(2,1); ...
                 0,1,cos(Xk10e_fej(6,3))*R2Odo_k(1,1) - sin(Xk10e_fej(6,3))*R2Odo_k(2,1); ...
                 0,0,1]);
-            DeltaXfX_fej(7:end,7:end) = eye(size(DeltaXfX_fej(7:end,7:end)));
-            
-            %%
+            DeltaXfX_fej(7:end,7:end) = eye(size(DeltaXfX_fej(7:end,7:end),1));
+
             DeltaXfW_fej = sparse(size(Xk00e_fej,1),6);
-            DeltaXfW_fej(1:6,1:6) = blkdiag([cos(Xk10e_fej(3,3)),-sin(Xk10e_fej(3,3)),0; ...
-                sin(Xk10e_fej(3,3)),cos(Xk10e_fej(3,3)),0; ...
-                0,0,1], ...
-                [cos(Xk10e_fej(6,3)),-sin(Xk10e_fej(6,3)),0; ...
-                sin(Xk10e_fej(6,3)),cos(Xk10e_fej(6,3)),0; ...
-                0,0,1]);
-
-            % DeltaXfW_fej = sparse(size(Xk00e_fej,1),6);
-            % DeltaXfW_fej(1:6,1:6) = blkdiag([cos(Xk00e_fej(3,3)),-sin(Xk00e_fej(3,3)),0; ...
-            %     sin(Xk00e_fej(3,3)),cos(Xk00e_fej(3,3)),0; ...
-            %     0,0,1], ...
-            %     [cos(Xk00e_fej(6,3)),-sin(Xk00e_fej(6,3)),0; ...
-            %     sin(Xk00e_fej(6,3)),cos(Xk00e_fej(6,3)),0; ...
-            %     0,0,1]);
-            %%
-
+            DeltaXfW_fej(1:6,1:6) = blkdiag(rotationMatrix(Xk10e_fej(3,3)),1,rotationMatrix(Xk10e_fej(6,3)),1);
+            
+            % Debug
             % if k == 8
             %     keyboard
             % end
 
             Xk10e_fej = Xk00e_fej;
-            Xk10e_fej(1:6,2) = Xk10e_fej(1:6,2)+1;
+            Xk10e_fej(1:6,2) = Xk00e_fej(1:6,2)+1;
             Xk10e_fej(1:3,3) = Xk00e_fej(1:3,3) + ...
-                [cos(Xk00e_fej(3,3))*R1Odo_k(1,1) - sin(Xk00e_fej(3,3))*R1Odo_k(2,1);
-                sin(Xk00e_fej(3,3))*R1Odo_k(1,1) + cos(Xk00e_fej(3,3))*R1Odo_k(2,1);
+                [rotationMatrix(Xk00e_fej(3,3))*R1Odo_k(1:2,1);
                 R1Odo_k(3,1)];
             Xk10e_fej(4:6,3) = Xk00e_fej(4:6,3) + ...
-                [cos(Xk00e_fej(6,3))*R2Odo_k(1,1) - sin(Xk00e_fej(6,3))*R2Odo_k(2,1);
-                sin(Xk00e_fej(6,3))*R2Odo_k(1,1) + cos(Xk00e_fej(6,3))*R2Odo_k(2,1);
+                [rotationMatrix(Xk00e_fej(6,3))*R2Odo_k(1:2,1);
                 R2Odo_k(3,1)];
 
             Xk10e_fej([3,6],3) = wrap(Xk10e_fej([3,6],3));
@@ -431,6 +393,10 @@ for i = 1:3
             Zkns = intersect(R1Zkn(:,1),R2Zkn(:,1));
             % 用R1的来initialization,R2的从R2Zkn中去掉，后面用来做update
             if ~isempty(Zkns)
+                
+                % Debug
+                keyboard;
+
                 for ZknsNum = 1:size(Zkns,1)
                     R2Zkn(R2Zkn(:,1)==Zkns(ZknsNum,1),:) = [];
                 end
@@ -866,12 +832,6 @@ for i = 1:3
             R2XpFull = [R2XpFull;Xk11e(4:6,2:3)];
             R2PFull = [R2PFull;Pk11(4:6,4:6)];
 
-            R1ee = errorEllipse(Pk11(1:2,1:2), Xk11e(1:2,3), CI);
-            R2ee = errorEllipse(Pk11(4:5,4:5), Xk11e(4:5,3), CI);
-
-            R1eeFull = [R1eeFull,R1ee];
-            R2eeFull = [R2eeFull,R2ee];
-
             Xk00e = Xk11e;
             Pk00 = Pk11;
 
@@ -905,23 +865,6 @@ for i = 1:3
 
         XfFullSet = [XfFullSet,Xk11e(7:end,3)];
         PfFullSet = [PfFullSet,Pk11(7:end,7:end)];
-
-        if robPositionCovCheck == 1 && mc == 1
-            figure(19)
-            R1eeP = plot(R1eeFull(:,1:2:(end-1)),R1eeFull(:,2:2:end),'r');
-            R2eeP = plot(R2eeFull(:,1:2:(end-1)),R2eeFull(:,2:2:end),'m');
-            R1eeP(1).DisplayName = 'R1 estimated pose Cov';
-            R2eeP(1).DisplayName = 'R1 estimated pose Cov';
-        end
-
-        if feaCovCheck == 1
-            Fee = [];
-            for feanum = 1:((size(Xk11e,1)-6)/2)
-                Fee = [Fee,errorEllipse(Pk11(6+(feanum-1)*2+(1:2),6+(feanum-1)*2+(1:2)), Xk11e(6+(feanum-1)*2+(1:2),3), CI)];
-            end
-            FeeP = plot(Fee(:,1:2:(end-1)),Fee(:,2:2:end),'Color',brightGreen);
-            FeeP(1).DisplayName = 'Estimated features Cov';
-        end
 
         % Ideal EKF
         R1XpIdeFullSet = [R1XpIdeFullSet,R1XpIdeFull(:,2)];
