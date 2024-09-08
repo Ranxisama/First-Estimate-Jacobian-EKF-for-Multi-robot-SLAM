@@ -8,8 +8,8 @@ measurementsCheck = 1; % if 1, check the measurements by running MeasurementsGen
 %% Simulation check
 % real time check, use more computer performance by running EKF_SLAM_simulation.m
 % Cov check
-robPositionCovCheck =  0; % if 1, check the position Cov of R1 and R2
-feaCovCheck = 0; % if 1, check the features Cov
+robPositionCovCheck =  1; % if 1, check the position Cov of R1 and R2
+feaCovCheck = 1; % if 1, check the features Cov
 
 %% Noise Switch
 R1addPose0Noise = 0; % if 0, R1 initial position is accurate

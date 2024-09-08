@@ -1,15 +1,6 @@
 clc
 close all
 
-%% save output figures
-currentFolder = fileparts(mfilename('fullpath'));
-subFolder = 'saved_figures';
-figuresFolderPath = fullfile(currentFolder, subFolder);
-if ~exist(figuresFolderPath, 'dir')
-    mkdir(figuresFolderPath);
-end
-
-
 Config;
 
 %% load the Monte Carlo Experiments result
@@ -60,10 +51,10 @@ for fc = 1:3 % feature choice
     [R1XrRMSE,R1XrRMSE_mean] = XrRMSE(poseNum,mcNum,DeltaR1XrFullSet);
     [R2XrRMSE,R2XrRMSE_mean] = XrRMSE(poseNum,mcNum,DeltaR2XrFullSet);
 
-    [R1XphiRMSE,R1XphiRMSE_mean] = XphiRMSE(poseNum,DeltaR1XphiFullSet);
-    [R2XphiRMSE,R2XphiRMSE_mean] = XphiRMSE(poseNum,DeltaR2XphiFullSet);
+    [R1XphiRMSE,R1XphiRMSE_mean] = XphiRMSE(poseNum,mcNum,DeltaR1XphiFullSet);
+    [R2XphiRMSE,R2XphiRMSE_mean] = XphiRMSE(poseNum,mcNum,DeltaR2XphiFullSet);
 
-    [XfRMSE,XfRMSE_mean] = XFRMSE(feaNum,mcNum,DeltaXfFullSet);
+    [XfStdRMSE,XfStdRMSE_mean] = XfRMSE(feaNum,mcNum,DeltaXfFullSet);
 
 
 
@@ -71,10 +62,10 @@ for fc = 1:3 % feature choice
     [R1XrIdeRMSE,R1XrIdeRMSE_mean] = XrRMSE(poseNum,mcNum,DeltaR1XrIdeFullSet);
     [R2XrIdeRMSE,R2XrIdeRMSE_mean] = XrRMSE(poseNum,mcNum,DeltaR2XrIdeFullSet);
 
-    [R1XphiIdeRMSE,R1XphiIdeRMSE_mean] = XphiRMSE(poseNum,DeltaR1XphiIdeFullSet);
-    [R2XphiIdeRMSE,R2XphiIdeRMSE_mean] = XphiRMSE(poseNum,DeltaR2XphiIdeFullSet);
+    [R1XphiIdeRMSE,R1XphiIdeRMSE_mean] = XphiRMSE(poseNum,mcNum,DeltaR1XphiIdeFullSet);
+    [R2XphiIdeRMSE,R2XphiIdeRMSE_mean] = XphiRMSE(poseNum,mcNum,DeltaR2XphiIdeFullSet);
 
-    [XfIdeRMSE,XfIdeRMSE_mean] = XFRMSE(feaNum,mcNum,DeltaXfIdeFullSet);
+    [XfIdeRMSE,XfIdeRMSE_mean] = XfRMSE(feaNum,mcNum,DeltaXfIdeFullSet);
 
 
 
@@ -82,18 +73,17 @@ for fc = 1:3 % feature choice
     [R1XrFejRMSE,R1XrFejRMSE_mean] = XrRMSE(poseNum,mcNum,DeltaR1XrFejFullSet);
     [R2XrFejRMSE,R2XrFejRMSE_mean] = XrRMSE(poseNum,mcNum,DeltaR2XrFejFullSet);
 
-    [R1XphiFejRMSE,R1XphiFejRMSE_mean] = XphiRMSE(poseNum,DeltaR1XphiFejFullSet);
-    [R2XphiFejRMSE,R2XphiFejRMSE_mean] = XphiRMSE(poseNum,DeltaR2XphiFejFullSet);
+    [R1XphiFejRMSE,R1XphiFejRMSE_mean] = XphiRMSE(poseNum,mcNum,DeltaR1XphiFejFullSet);
+    [R2XphiFejRMSE,R2XphiFejRMSE_mean] = XphiRMSE(poseNum,mcNum,DeltaR2XphiFejFullSet);
 
-    [XfFejRMSE,XfFejRMSE_mean] = XFRMSE(feaNum,mcNum,DeltaXfFejFullSet);
+    [XfFejRMSE,XfFejRMSE_mean] = XfRMSE(feaNum,mcNum,DeltaXfFejFullSet);
 
 
 
     %% Plot RMSE
-    % figure(1)
-    figure((fc-1)*6+1)
+    figure(1)
     %% R1 postion
-    % subplot(3,4,(fc-1)*4+1)
+    subplot(3,4,(fc-1)*4+1)
     hold on
     % standard EKF
     R1XrRMSEP = plot(R1XrRMSE(:,1)',R1XrRMSE(:,2)','-bo','DisplayName','R1 std EKF');
@@ -111,8 +101,7 @@ for fc = 1:3 % feature choice
     hold off
 
     %% R2 postion
-    figure((fc-1)*6+2)
-    % subplot(3,4,(fc-1)*4+2)
+    subplot(3,4,(fc-1)*4+2)
     hold on
     R2XrRMSEP = plot(R2XrRMSE(:,1)',R2XrRMSE(:,2)','-ro','DisplayName','R2 std EKF');
     R2XrIdeRMSEP = plot(R2XrIdeRMSE(:,1)',R2XrIdeRMSE(:,2)','-mo','DisplayName','R2 ideal EKF');
@@ -127,8 +116,7 @@ for fc = 1:3 % feature choice
     hold off
 
     %% R1 orientation
-    figure((fc-1)*6+3)
-    % subplot(3,4,(fc-1)*4+3)
+    subplot(3,4,(fc-1)*4+3)
     hold on
     % standard EKF
     R1XphiRMSEP = plot(R1XphiRMSE(:,1)',R1XphiRMSE(:,2)','-bo','DisplayName','R1 std EKF');
@@ -146,8 +134,7 @@ for fc = 1:3 % feature choice
     hold off
 
     %% R2 orientation
-    figure((fc-1)*6+4)
-    % subplot(3,4,(fc-1)*4+4)
+    subplot(3,4,(fc-1)*4+4)
     hold on
     R2XphiRMSEP = plot(R2XphiRMSE(:,1)',R2XphiRMSE(:,2)','-ro','DisplayName','R2 std EKF');
     R2XphiIdeRMSEP = plot(R2XphiIdeRMSE(:,1)',R2XphiIdeRMSE(:,2)','-mo','DisplayName','R2 ideal EKF');
@@ -301,10 +288,9 @@ for fc = 1:3 % feature choice
 
 
 
-    % figure(2)
+    figure(2)
     %% R1 pose
-    figure((fc-1)*6+5)
-    % subplot(3,2,(fc-1)*2+1)
+    subplot(3,2,(fc-1)*2+1)
     hold on
     % standard EKF
     R1XpNEESP = plot(R1XpNEES(:,1)',R1XpNEES(:,2)','-bo','DisplayName','R1 std EKF');
@@ -322,8 +308,7 @@ for fc = 1:3 % feature choice
     hold off
 
     %% R2 pose
-    figure((fc-1)*6+6)
-    % subplot(3,2,(fc-1)*2+2)
+    subplot(3,2,(fc-1)*2+2)
     hold on
     R2XpNEESP = plot(R2XpNEES(:,1)',R2XpNEES(:,2)','-ro','DisplayName','R2 std EKF');
     R2XpIdeNEESP = plot(R2XpIdeNEES(:,1)',R2XpIdeNEES(:,2)','-mo','DisplayName','R2 ideal EKF');
@@ -344,7 +329,7 @@ for fc = 1:3 % feature choice
 
         disp('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 20 features %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
         IdeEKFColumn = [R1XrIdeRMSE_mean;R1XphiIdeRMSE_mean;R2XrIdeRMSE_mean;R2XphiIdeRMSE_mean;XfIdeRMSE_mean;R1XpIdeNEES_mean;R2XpIdeNEES_mean;XfIdeNEES_mean];
-        StdEKFColumn = [R1XrRMSE_mean;R1XphiRMSE_mean;R2XrRMSE_mean;R2XphiRMSE_mean;XfRMSE_mean;R1XpNEES_mean;R2XpNEES_mean;XfNEES_mean];
+        StdEKFColumn = [R1XrRMSE_mean;R1XphiRMSE_mean;R2XrRMSE_mean;R2XphiRMSE_mean;XfStdRMSE_mean;R1XpNEES_mean;R2XpNEES_mean;XfNEES_mean];
         FejEKFColumn = [R1XrFejRMSE_mean;R1XphiFejRMSE_mean;R2XrFejRMSE_mean;R2XphiFejRMSE_mean;XfFejRMSE_mean;R1XpFejNEES_mean;R2XpFejNEES_mean;XfFejNEES_mean];
 
         % 创建表格并插入动态列名称
@@ -361,7 +346,7 @@ for fc = 1:3 % feature choice
 
         disp('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 60 features %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
         IdeEKFColumn = [R1XrIdeRMSE_mean;R1XphiIdeRMSE_mean;R2XrIdeRMSE_mean;R2XphiIdeRMSE_mean;XfIdeRMSE_mean;R1XpIdeNEES_mean;R2XpIdeNEES_mean;XfIdeNEES_mean];
-        StdEKFColumn = [R1XrRMSE_mean;R1XphiRMSE_mean;R2XrRMSE_mean;R2XphiRMSE_mean;XfRMSE_mean;R1XpNEES_mean;R2XpNEES_mean;XfNEES_mean];
+        StdEKFColumn = [R1XrRMSE_mean;R1XphiRMSE_mean;R2XrRMSE_mean;R2XphiRMSE_mean;XfStdRMSE_mean;R1XpNEES_mean;R2XpNEES_mean;XfNEES_mean];
         FejEKFColumn = [R1XrFejRMSE_mean;R1XphiFejRMSE_mean;R2XrFejRMSE_mean;R2XphiFejRMSE_mean;XfFejRMSE_mean;R1XpFejNEES_mean;R2XpFejNEES_mean;XfFejNEES_mean];
 
         % 创建表格并插入动态列名称
@@ -378,7 +363,7 @@ for fc = 1:3 % feature choice
 
         disp('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 100 features %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
         IdeEKFColumn = [R1XrIdeRMSE_mean;R1XphiIdeRMSE_mean;R2XrIdeRMSE_mean;R2XphiIdeRMSE_mean;XfIdeRMSE_mean;R1XpIdeNEES_mean;R2XpIdeNEES_mean;XfIdeNEES_mean];
-        StdEKFColumn = [R1XrRMSE_mean;R1XphiRMSE_mean;R2XrRMSE_mean;R2XphiRMSE_mean;XfRMSE_mean;R1XpNEES_mean;R2XpNEES_mean;XfNEES_mean];
+        StdEKFColumn = [R1XrRMSE_mean;R1XphiRMSE_mean;R2XrRMSE_mean;R2XphiRMSE_mean;XfStdRMSE_mean;R1XpNEES_mean;R2XpNEES_mean;XfNEES_mean];
         FejEKFColumn = [R1XrFejRMSE_mean;R1XphiFejRMSE_mean;R2XrFejRMSE_mean;R2XphiFejRMSE_mean;XfFejRMSE_mean;R1XpFejNEES_mean;R2XpFejNEES_mean;XfFejNEES_mean];
 
         % 创建表格并插入动态列名称
@@ -394,24 +379,3 @@ for fc = 1:3 % feature choice
     end
 
 end
-
-exportgraphics(figure(1),fullfile(figuresFolderPath, 'R1Postion_RMSE_20feas.jpg'), 'Resolution', 300)
-exportgraphics(figure(2),fullfile(figuresFolderPath, 'R2Postion_RMSE_20feas.jpg'), 'Resolution', 300)
-exportgraphics(figure(3),fullfile(figuresFolderPath, 'R1Orientation_RMSE_20feas.jpg'), 'Resolution', 300)
-exportgraphics(figure(4),fullfile(figuresFolderPath, 'R2Orientation_RMSE_20feas.jpg'), 'Resolution', 300)
-exportgraphics(figure(5),fullfile(figuresFolderPath, 'R1Pose_ANEES_20feas.jpg'), 'Resolution', 300)
-exportgraphics(figure(6),fullfile(figuresFolderPath, 'R2Pose_ANEES_20feas.jpg'), 'Resolution', 300)
-
-exportgraphics(figure(7),fullfile(figuresFolderPath, 'R1Postion_RMSE_60feas.jpg'), 'Resolution', 300)
-exportgraphics(figure(8),fullfile(figuresFolderPath, 'R2Postion_RMSE_60feas.jpg'), 'Resolution', 300)
-exportgraphics(figure(9),fullfile(figuresFolderPath, 'R1Orientation_RMSE_60feas.jpg'), 'Resolution', 300)
-exportgraphics(figure(10),fullfile(figuresFolderPath, 'R2Orientation_RMSE_60feas.jpg'), 'Resolution', 300)
-exportgraphics(figure(11),fullfile(figuresFolderPath, 'R1Pose_ANEES_60feas.jpg'), 'Resolution', 300)
-exportgraphics(figure(12),fullfile(figuresFolderPath, 'R2Pose_ANEES_60feas.jpg'), 'Resolution', 300)
-
-exportgraphics(figure(13),fullfile(figuresFolderPath, 'R1Postion_RMSE_100feas.jpg'), 'Resolution', 300)
-exportgraphics(figure(14),fullfile(figuresFolderPath, 'R2Postion_RMSE_100feas.jpg'), 'Resolution', 300)
-exportgraphics(figure(15),fullfile(figuresFolderPath, 'R1Orientation_RMSE_100feas.jpg'), 'Resolution', 300)
-exportgraphics(figure(16),fullfile(figuresFolderPath, 'R2Orientation_RMSE_100feas.jpg'), 'Resolution', 300)
-exportgraphics(figure(17),fullfile(figuresFolderPath, 'R1Pose_ANEES_100feas.jpg'), 'Resolution', 300)
-exportgraphics(figure(18),fullfile(figuresFolderPath, 'R2Pose_ANEES_100feas.jpg'), 'Resolution', 300)
