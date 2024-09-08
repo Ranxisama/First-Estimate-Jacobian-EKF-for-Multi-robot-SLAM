@@ -257,6 +257,8 @@ for i = 1:3
                 R2Odo_k(3,1)];
 
             Xk10e_fej([3,6],3) = wrap(Xk10e_fej([3,6],3));
+            
+            DWk = blkdiag(R1Q,R2Q);
 
             Pk10_fej = DeltaXfX_fej * Pk00_fej * DeltaXfX_fej' + DeltaXfW_fej * DWk * DeltaXfW_fej';
             Pk10_fej(abs(Pk10_fej)<CovT) = 0;

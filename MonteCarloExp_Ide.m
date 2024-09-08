@@ -254,6 +254,8 @@ for i = 1:3
             %     sin(Xk00e_ide(6,3)),cos(Xk00e_ide(6,3)),0; ...
             %     0,0,1]);
             %%
+            
+            DWk = blkdiag(R1Q,R2Q);
 
             Pk10_ide = DeltaXfX_ide * Pk00_ide * DeltaXfX_ide' + DeltaXfW_ide * DWk * DeltaXfW_ide';
             Pk10_ide(abs(Pk10_ide)<CovT) = 0;

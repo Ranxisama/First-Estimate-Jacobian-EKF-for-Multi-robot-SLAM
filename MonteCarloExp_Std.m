@@ -231,6 +231,7 @@ for i = 1:3
                 0,0,1]);
 
             DWk = blkdiag(R1Q,R2Q);
+            
             Pk10 = DeltaXfX * Pk00 * DeltaXfX' + DeltaXfW * DWk * DeltaXfW';
 
             % Set the elements that are less than CovT to zero. This can be
