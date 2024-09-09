@@ -54,7 +54,7 @@ for fc = 1:3 % feature choice
     [R1XphiRMSE,R1XphiRMSE_mean] = XphiRMSE(poseNum,mcNum,DeltaR1XphiFullSet);
     [R2XphiRMSE,R2XphiRMSE_mean] = XphiRMSE(poseNum,mcNum,DeltaR2XphiFullSet);
 
-    [XfStdRMSE,XfStdRMSE_mean] = XfRMSE(feaNum,mcNum,DeltaXfFullSet);
+    [XfStdRMSE,XfStdRMSE_mean] = XFRMSE(feaNum,mcNum,DeltaXfFullSet);
 
 
 
@@ -65,7 +65,7 @@ for fc = 1:3 % feature choice
     [R1XphiIdeRMSE,R1XphiIdeRMSE_mean] = XphiRMSE(poseNum,mcNum,DeltaR1XphiIdeFullSet);
     [R2XphiIdeRMSE,R2XphiIdeRMSE_mean] = XphiRMSE(poseNum,mcNum,DeltaR2XphiIdeFullSet);
 
-    [XfIdeRMSE,XfIdeRMSE_mean] = XfRMSE(feaNum,mcNum,DeltaXfIdeFullSet);
+    [XfIdeRMSE,XfIdeRMSE_mean] = XFRMSE(feaNum,mcNum,DeltaXfIdeFullSet);
 
 
 
@@ -76,13 +76,13 @@ for fc = 1:3 % feature choice
     [R1XphiFejRMSE,R1XphiFejRMSE_mean] = XphiRMSE(poseNum,mcNum,DeltaR1XphiFejFullSet);
     [R2XphiFejRMSE,R2XphiFejRMSE_mean] = XphiRMSE(poseNum,mcNum,DeltaR2XphiFejFullSet);
 
-    [XfFejRMSE,XfFejRMSE_mean] = XfRMSE(feaNum,mcNum,DeltaXfFejFullSet);
+    [XfFejRMSE,XfFejRMSE_mean] = XFRMSE(feaNum,mcNum,DeltaXfFejFullSet);
 
 
 
-    %% Plot RMSE
+    % Plot RMSE
     figure(1)
-    %% R1 postion
+    % R1 postion
     subplot(3,4,(fc-1)*4+1)
     hold on
     % standard EKF

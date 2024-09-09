@@ -11,7 +11,9 @@ eeXf11ePHandles = [];
 
 for k = 0:size(R1Odo,1)/3
 
-    % k
+    if k == 74
+        keyboard
+    end
 
     R1Obs_k = R1Obs(R1Obs(:,1)==k,2:3);
     R2Obs_k = R2Obs(R2Obs(:,1)==k,2:3);

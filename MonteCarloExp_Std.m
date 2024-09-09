@@ -231,7 +231,7 @@ for i = 1:3
                 0,0,1]);
 
             DWk = blkdiag(R1Q,R2Q);
-            
+
             Pk10 = DeltaXfX * Pk00 * DeltaXfX' + DeltaXfW * DWk * DeltaXfW';
 
             % Set the elements that are less than CovT to zero. This can be
@@ -252,37 +252,38 @@ for i = 1:3
             R2Zkn_idx = find(R2Zkn_lv);
             R2Zkn = R2Obs_k(R2Zkn_idx,:);
 
-            % R1和R2都看到同一个新feature怎么办
+            %% R1和R2都看到同一个新feature怎么办
             Zkns = intersect(R1Zkn(:,1),R2Zkn(:,1));
             % 用R1的来initialization,R2的从R2Zkn中去掉，后面用来做update
+            R2Zkns = [];
             if ~isempty(Zkns)
                 for ZknsNum = 1:size(Zkns,1)
+                    R2Zkns = [R2Zkns;R2Zkn(R2Zkn(:,1)==Zkns(ZknsNum,1),:)];
                     R2Zkn(R2Zkn(:,1)==Zkns(ZknsNum,1),:) = [];
                 end
             end
+            %%
 
             Zkn = [R1Zkn;R2Zkn];
 
             % Standard EKF
-            Xk10efi = Xk10e;
-            Pk10fi = Pk10;
-
             if ~isempty(Zkn)
                 % Standard EKF
-                R1Xfn = R1Zkn;
-                R2Xfn = R2Zkn;
-
-                DeltaGX = sparse(size(Xk10efi,1),size(Xk10e,1));
+                DeltaGX = sparse(size(Xk10e,1)+size(Zkn,1),size(Xk10e,1));
                 DeltaGX(1:size(Xk10e,1),1:size(Xk10e,1)) = eye(size(Xk10e,1));
 
-                %% Observation noise Cov
+                % Observation noise Cov
                 R1nRn = [];
                 R2nRn = [];
                 % Standard ekf
                 DeltaGV = sparse(size(Xk10efi,1),size(Zkn,1));
 
-                if ~isempty(R1Xfn)
-                    %% Standard EKF
+                R1Xfn = [];
+                R2Xfn = [];
+
+                if ~isempty(R1Zkn)
+                    % Standard EKF
+                    R1Xfn = R1Zkn;
                     R1Xfn(1:2:(end-1),2) = Xk10e(1,3) + cos(Xk10e(3,3))*R1Zkn(1:2:(end-1),2) - sin(Xk10e(3,3))*R1Zkn(2:2:end,2);
                     R1Xfn(2:2:end,2) = Xk10e(2,3) + sin(Xk10e(3,3))*R1Zkn(1:2:(end-1),2) + cos(Xk10e(3,3))*R1Zkn(2:2:end,2);
 
@@ -298,8 +299,9 @@ for i = 1:3
                     end
                 end
 
-                if ~isempty(R2Xfn)
+                if ~isempty(R2Zkn)
                     % Standard EKF
+                    R2Xfn = R2Zkn;
                     R2Xfn(1:2:(end-1),2) = Xk10e(4,3) + cos(Xk10e(6,3))*R2Zkn(1:2:end,2) - sin(Xk10e(6,3))*R2Zkn(2:2:end,2);
                     R2Xfn(2:2:end,2) = Xk10e(5,3) + sin(Xk10e(6,3))*R2Zkn(1:2:end,2) + cos(Xk10e(6,3))*R2Zkn(2:2:end,2);
 
@@ -324,53 +326,60 @@ for i = 1:3
 
                 Pk10fi = DeltaGX*Pk10*DeltaGX'+DeltaGV*nRn*DeltaGV';
                 Pk10fi(abs(Pk10fi)<CovT) = 0;
+            else
+                Xk10efi = Xk10e;
+                Pk10fi = Pk10;
             end
 
 
 
             %% Update using shared feature observations from R1 and R2
-            %% R1
+            % R1
             % find the shared feature observations in R1 and R2 of Xk10e
-            R1Zks_lv = ismember(R1Obs_k(:,1),Xk10efi(7:end,2));
+            R1Zks_lv = ismember(R1Obs_k(:,1),Xk10e(7:end,2));
             R1Zks_idx = find(R1Zks_lv);
             R1Zks1 = R1Obs_k(R1Zks_idx,:);
 
             % Standard EKF
             % find the shared features in Xk10efi
-            R1Xfks_lv = ismember(Xk10efi(7:end,2),R1Obs_k(:,1));
+            R1Xfks_lv = ismember(Xk10efi(7:end,2),R1Zks1(:,1));
             R1Xfks_idx = find(R1Xfks_lv)+6; % R1Xfks_idx: index of R1's shared features with Xk10efi at step k
             R1Xfks = Xk10efi(R1Xfks_idx,2:3);
 
-            % re-order the shared feature R1Zks to make it consistent with R1Xfks
-            [~,R1ZkS_idx] = ismember(R1Xfks(:,1),R1Zks1(:,1));
-            R1ZkS_idx(2:2:end,1)=R1ZkS_idx(2:2:end,1)+1;
-            % R1ZkS_idx: index of R1's shared features with R1Zks at step k
-            R1Zks2 = R1Zks1(R1ZkS_idx,:);
+            % re-order the shared feature R1Zks1 to make it consistent with R1Xfks
+            R1Zks2 = [];
+            if ~isempty(R1Zks1)
+                [~,R1ZkS_idx] = ismember(R1Xfks(:,1),R1Zks1(:,1));
+                R1ZkS_idx(2:2:end,1)=R1ZkS_idx(2:2:end,1)+1;
+                % R1ZkS_idx: index of R1's shared features with R1Zks at step k
+                R1Zks2 = R1Zks1(R1ZkS_idx,:);
+            end
 
-            %% R2
-            R2Zks_lv = ismember(R2Obs_k(:,1),Xk10efi(7:end,2));
+            % R2
+            R2Zks_lv = ismember(R2Obs_k(:,1),Xk10e(7:end,2));
             R2Zks_idx = find(R2Zks_lv);
-            R2Zks1 = R2Obs_k(R2Zks_idx,:);
+            R2Zks1 = [R2Obs_k(R2Zks_idx,:);R2Zkns];
 
             % Standard EKF
-            R2Xfks_lv = ismember(Xk10efi(7:end,2),R2Obs_k(:,1));
+            R2Xfks_lv = ismember(Xk10efi(7:end,2),R2Zks1(:,1));
             R2Xfks_idx = find(R2Xfks_lv)+6;
             R2Xfks = Xk10efi(R2Xfks_idx,2:3);
+            
+            R2Zks2 = [];
+            if ~isempty(R2Zks1)
+                [~,R2ZkS_idx] = ismember(R2Xfks(:,1),R2Zks1(:,1));
+                R2ZkS_idx(2:2:end,1)=R2ZkS_idx(2:2:end,1)+1;
+                R2Zks2 = R2Zks1(R2ZkS_idx,:);
+            end
 
-            [~,R2ZkS_idx] = ismember(R2Xfks(:,1),R2Zks1(:,1));
-            R2ZkS_idx(2:2:end,1)=R2ZkS_idx(2:2:end,1)+1;
-            R2Zks2 = R2Zks1(R2ZkS_idx,:);
-
-            %%
             Zks = [ones(size(R1Zks2,1),1),R1Zks2;2*ones(size(R2Zks2,1),1),R2Zks2];
 
-            % Standard EKF
+            % Observation model
             Xk11e = Xk10efi;
             Pk11 = Pk10fi;
-
+            
             if ~isempty(Zks)
 
-                % Standard EKF
                 HX10e = sparse(size(Zks,1), 1);
                 JHX10e = sparse(size(Zks,1), size(Xk10efi,1));
 

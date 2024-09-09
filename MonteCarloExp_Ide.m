@@ -238,23 +238,23 @@ for i = 1:3
             DeltaXfX_ide(7:end,7:end) = eye(size(DeltaXfX_ide(7:end,7:end)));
             
             %%
-            DeltaXfW_ide = sparse(size(Xk00e_ide,1),6);
-            DeltaXfW_ide(1:6,1:6) = blkdiag([cos(Xrk00T(3,1)),-sin(Xrk00T(3,1)),0; ...
-                sin(Xrk00T(3,1)),cos(Xrk00T(3,1)),0; ...
-                0,0,1], ...
-                [cos(Xrk00T(6,1)),-sin(Xrk00T(6,1)),0; ...
-                sin(Xrk00T(6,1)),cos(Xrk00T(6,1)),0; ...
-                0,0,1]);
-            
             % DeltaXfW_ide = sparse(size(Xk00e_ide,1),6);
-            % DeltaXfW_ide(1:6,1:6) = blkdiag([cos(Xk00e_ide(3,3)),-sin(Xk00e_ide(3,3)),0; ...
-            %     sin(Xk00e_ide(3,3)),cos(Xk00e_ide(3,3)),0; ...
+            % DeltaXfW_ide(1:6,1:6) = blkdiag([cos(Xrk00T(3,1)),-sin(Xrk00T(3,1)),0; ...
+            %     sin(Xrk00T(3,1)),cos(Xrk00T(3,1)),0; ...
             %     0,0,1], ...
-            %     [cos(Xk00e_ide(6,3)),-sin(Xk00e_ide(6,3)),0; ...
-            %     sin(Xk00e_ide(6,3)),cos(Xk00e_ide(6,3)),0; ...
+            %     [cos(Xrk00T(6,1)),-sin(Xrk00T(6,1)),0; ...
+            %     sin(Xrk00T(6,1)),cos(Xrk00T(6,1)),0; ...
             %     0,0,1]);
-            %%
             
+            DeltaXfW_ide = sparse(size(Xk00e_ide,1),6);
+            DeltaXfW_ide(1:6,1:6) = blkdiag([cos(Xk00e_ide(3,3)),-sin(Xk00e_ide(3,3)),0; ...
+                sin(Xk00e_ide(3,3)),cos(Xk00e_ide(3,3)),0; ...
+                0,0,1], ...
+                [cos(Xk00e_ide(6,3)),-sin(Xk00e_ide(6,3)),0; ...
+                sin(Xk00e_ide(6,3)),cos(Xk00e_ide(6,3)),0; ...
+                0,0,1]);
+            %%
+
             DWk = blkdiag(R1Q,R2Q);
 
             Pk10_ide = DeltaXfX_ide * Pk00_ide * DeltaXfX_ide' + DeltaXfW_ide * DWk * DeltaXfW_ide';
@@ -276,24 +276,20 @@ for i = 1:3
             % R1和R2都看到同一个新feature怎么办
             ZknsIde = intersect(R1ZknIde(:,1),R2ZknIde(:,1));
             % 用R1的来initialization,R2的从R2Zkn中去掉，后面用来做update
+            R2ZknsIde = [];
             if ~isempty(ZknsIde)
                 for ZknsNum = 1:size(ZknsIde,1)
+                    R2ZknsIde = [R2ZknsIde;R2ZknIde(R2ZknIde(:,1)==ZknsIde(ZknsNum,1),:)];
                     R2ZknIde(R2ZknIde(:,1)==ZknsIde(ZknsNum,1),:) = [];
                 end
             end
 
             ZknIde = [R1ZknIde;R2ZknIde];
 
-            % Ideal EKF
-            Xk10efi_ide = Xk10e_ide;
-            Pk10fi_ide = Pk10_ide;
-
             if ~isempty(ZknIde)
                 % Ideal EKF
-                R1Xfn_ide = R1ZknIde;
-                R2Xfn_ide = R2ZknIde;
 
-                DeltaGX_ide = sparse(size(Xk10efi_ide,1),size(Xk10e_ide,1));
+                DeltaGX_ide = sparse(size(Xk10e_ide,1)+size(ZknIde,1),size(Xk10e_ide,1));
                 DeltaGX_ide(1:size(Xk10e_ide,1),1:size(Xk10e_ide,1)) = eye(size(Xk10e_ide,1));
 
                 % Observation noise Cov
@@ -301,10 +297,15 @@ for i = 1:3
                 R2nRn_ide = [];
 
                 % Ideal ekf
-                DeltaGV_ide = sparse(size(Xk10efi_ide,1),size(ZknIde,1));
-               
-                if ~isempty(R1Xfn_ide)
+                DeltaGV_ide = sparse(size(Xk10e_ide,1)+size(ZknIde,1),size(ZknIde,1));
+
+                R1Xfn_ide = [];
+                R2Xfn_ide = [];
+
+                if ~isempty(R1ZknIde)
                     % Ideal EKF
+                    R1Xfn_ide = R1ZknIde;
+
                     R1Xfn_ide(1:2:(end-1),2) = Xk10e_ide(1,3) + cos(Xk10e_ide(3,3))*R1ZknIde(1:2:(end-1),2) - sin(Xk10e_ide(3,3))*R1ZknIde(2:2:end,2);
                     R1Xfn_ide(2:2:end,2) = Xk10e_ide(2,3) + sin(Xk10e_ide(3,3))*R1ZknIde(1:2:(end-1),2) + cos(Xk10e_ide(3,3))*R1ZknIde(2:2:end,2);
 
@@ -320,10 +321,12 @@ for i = 1:3
                     end
                 end
 
-                if ~isempty(R2Xfn_ide)
+                if ~isempty(R2ZknIde)
                     % Ideal EKF
-                    R2Xfn_ide(1:2:(end-1),2) = Xk10e_ide(4,3) + cos(Xk10e_ide(6,3))*R2ZknIde(1:2:end,2) - sin(Xk10e_ide(6,3))*R2ZknIde(2:2:end,2);
-                    R2Xfn_ide(2:2:end,2) = Xk10e_ide(5,3) + sin(Xk10e_ide(6,3))*R2ZknIde(1:2:end,2) + cos(Xk10e_ide(6,3))*R2ZknIde(2:2:end,2);
+                    R2Xfn_ide = R2ZknIde;
+
+                    R2Xfn_ide(1:2:(end-1),2) = Xk10e_ide(4,3) + cos(Xk10e_ide(6,3))*R2ZknIde(1:2:(end-1),2) - sin(Xk10e_ide(6,3))*R2ZknIde(2:2:end,2);
+                    R2Xfn_ide(2:2:end,2) = Xk10e_ide(5,3) + sin(Xk10e_ide(6,3))*R2ZknIde(1:2:(end-1),2) + cos(Xk10e_ide(6,3))*R2ZknIde(2:2:end,2);
 
                     % Cov
                     DeltaGX_ide(size(Xk10e_ide,1)+size(R1Xfn_ide,1)+(1:2:(size(R2Xfn_ide,1)-1)),4:6) = [repmat([1, 0],size(R2Xfn_ide,1)/2,1), ...
@@ -348,57 +351,73 @@ for i = 1:3
                 Pk10fi_ide = DeltaGX_ide*Pk10_ide*DeltaGX_ide'+DeltaGV_ide*nRn_ide*DeltaGV_ide';
                 Pk10fi_ide(abs(Pk10fi_ide)<CovT) = 0;
 
+            else
+                % Ideal EKF
+                Xk10efi_ide = Xk10e_ide;
+                Pk10fi_ide = Pk10_ide;
             end
 
 
 
             %% Update using shared feature observations from R1 and R2
-            % R1
+            %% R1
             % find the shared feature observations in R1 and R2 of Xk10e
-            R1ZksIde_lv = ismember(R1Obs_k(:,1),Xk10efi_ide(7:end,2));
+            R1ZksIde_lv = ismember(R1Obs_k(:,1),Xk10e_ide(7:end,2));
             R1ZksIde_idx = find(R1ZksIde_lv);
             R1Zks1Ide = R1Obs_k(R1ZksIde_idx,:);
 
             % Ideal EKF
             % find the shared true feature R1XfksT in Xk10efi_ide
             % and re-order them to to make them consistent with R1ObsT_k
-            R1XfksIde_lv = ismember(Xk10efi_ide(7:end,2),R1ObsT_k(:,1));
+            R1XfksIde_lv = ismember(Xk10efi_ide(7:end,2),R1Zks1Ide(:,1));
             R1XfksIde_idx = find(R1XfksIde_lv)+6;
             R1Xfks_ide = Xk10efi_ide(R1XfksIde_idx,2:3); % For Observation function
 
-            [~,R1ZkSIde_idx] = ismember(R1Xfks_ide(:,1),R1Zks1Ide(:,1));
-            R1ZkSIde_idx(2:2:end,1)=R1ZkSIde_idx(2:2:end,1)+1;
-            R1Zks2Ide = R1Zks1Ide(R1ZkSIde_idx,:);
+            R1Zks2Ide = [];
+            R1XfksT = [];
+            if ~isempty(R1Zks1Ide)
+                [~,R1ZkSIde_idx] = ismember(R1Xfks_ide(:,1),R1Zks1Ide(:,1));
+                R1ZkSIde_idx(2:2:end,1)=R1ZkSIde_idx(2:2:end,1)+1;
+                R1Zks2Ide = R1Zks1Ide(R1ZkSIde_idx,:);
 
-            % find the shared true feature R1XfksT in feature truth XfTrueAll
-            % and re-order them to to make them consistent with R1Xfks
-            [~,R1XfksT_idx] = ismember(R1Xfks_ide(:,1),XfTrueAll(:,1));
-            R1XfksT_idx(2:2:end,1)=R1XfksT_idx(2:2:end,1)+1;
-            R1XfksT = XfTrueAll(R1XfksT_idx,:); % True feature position for Jacobian function
+                % find the shared true feature R1XfksT in feature truth XfTrueAll
+                % and re-order them to to make them consistent with R1Xfks
+                [~,R1XfksT_idx] = ismember(R1Xfks_ide(:,1),XfTrueAll(:,1));
+                R1XfksT_idx(2:2:end,1)=R1XfksT_idx(2:2:end,1)+1;
+                R1XfksT = XfTrueAll(R1XfksT_idx,:); % True feature position for Jacobian function
+            end
+            %%
 
-            % R2
-            R2ZksIde_lv = ismember(R2Obs_k(:,1),Xk10efi_ide(7:end,2));
+
+            %% R2
+            R2ZksIde_lv = ismember(R2Obs_k(:,1),Xk10e_ide(7:end,2));
             R2ZksIde_idx = find(R2ZksIde_lv);
-            R2Zks1Ide = R2Obs_k(R2ZksIde_idx,:);
+            R2Zks1Ide = [R2Obs_k(R2ZksIde_idx,:);R2ZknsIde];
 
             % Ideal EKF
             % find the shared true feature R1XfksT in Xk10efi_ide
             % and re-order them to to make them consistent with R1ObsT_k
-            R2XfksIde_lv = ismember(Xk10efi_ide(7:end,2),R2ObsT_k(:,1));
+            R2XfksIde_lv = ismember(Xk10efi_ide(7:end,2),R2Zks1Ide(:,1));
             R2XfksIde_idx = find(R2XfksIde_lv)+6;
             R2Xfks_ide = Xk10efi_ide(R2XfksIde_idx,2:3);
+            
+            R2Zks2Ide = [];
+            R2XfksT = [];
+            if ~isempty(R2Zks1Ide)
+                [~,R2ZkSIde_idx] = ismember(R2Xfks_ide(:,1),R2Zks1Ide(:,1));
+                R2ZkSIde_idx(2:2:end,1)=R2ZkSIde_idx(2:2:end,1)+1;
+                R2Zks2Ide = R2Zks1Ide(R2ZkSIde_idx,:);
 
-            [~,R2ZkSIde_idx] = ismember(R2Xfks_ide(:,1),R2Zks1Ide(:,1));
-            R2ZkSIde_idx(2:2:end,1)=R2ZkSIde_idx(2:2:end,1)+1;
-            R2Zks2Ide = R2Zks1Ide(R2ZkSIde_idx,:);
+                [~,R2XfksT_idx] = ismember(R2Xfks_ide(:,1),XfTrueAll(:,1));
+                R2XfksT_idx(2:2:end,1)=R2XfksT_idx(2:2:end,1)+1;
+                R2XfksT = XfTrueAll(R2XfksT_idx,:);
+            end
+            %%
 
-            [~,R2XfksT_idx] = ismember(R2Xfks_ide(:,1),XfTrueAll(:,1));
-            R2XfksT_idx(2:2:end,1)=R2XfksT_idx(2:2:end,1)+1;
-            R2XfksT = XfTrueAll(R2XfksT_idx,:);
 
-            %
             ZksIde = [ones(size(R1Zks2Ide,1),1),R1Zks2Ide;2*ones(size(R2Zks2Ide,1),1),R2Zks2Ide];
-
+            
+            %% Observation model
             % Ideal EKF
             Xk11e_ide = Xk10efi_ide;
             Pk11_ide = Pk10fi_ide;
@@ -542,7 +561,7 @@ for i = 1:3
         DeltaR2XphiIdeFullSet(end+1,:) = DeltaR2XpIdeFullSet(end,:);
     end
 
-    % re-order the true features XfTrueAll's IDs to make it consistent with FFullSet 每一步的
+    %% re-order the true features XfTrueAll's IDs to make it consistent with FFullSet 每一步的
     [~,XfTrueIde_idx] = ismember(XfIdeFullSet(:,1),XfTrueAll(:,1));
     XfTrueIde_idx(2:2:end,1) = XfTrueIde_idx(2:2:end,1)+1;
     XfTrueIde = XfTrueAll(XfTrueIde_idx,:);
@@ -551,17 +570,17 @@ for i = 1:3
 
     %% save the Monte Carlo Experiments result
     if i == 1
-        save('MTE_results_IdeEKF_20fea.mat', ...
+        save('MTE_results_IdeEKF_20fea.mat','poseNum','feaNum', ...
             'DeltaR1XrIdeFullSet','DeltaR2XrIdeFullSet','DeltaR1XphiIdeFullSet','DeltaR2XphiIdeFullSet', ...
             'DeltaR2XpIdeFullSet','R2PIdeFullSet','DeltaR1XpIdeFullSet','R1PIdeFullSet', ...
             'DeltaXfIdeFullSet','PfIdeFullSet')
     elseif i == 2
-        save('MTE_results_IdeEKF_60fea.mat', ...
+        save('MTE_results_IdeEKF_60fea.mat','poseNum','feaNum', ...
             'DeltaR1XrIdeFullSet','DeltaR2XrIdeFullSet','DeltaR1XphiIdeFullSet','DeltaR2XphiIdeFullSet', ...
             'DeltaR2XpIdeFullSet','R2PIdeFullSet','DeltaR1XpIdeFullSet','R1PIdeFullSet', ...
             'DeltaXfIdeFullSet','PfIdeFullSet')
     else
-        save('MTE_results_IdeEKF_100fea.mat', ...
+        save('MTE_results_IdeEKF_100fea.mat','poseNum','feaNum', ...
             'DeltaR1XrIdeFullSet','DeltaR2XrIdeFullSet','DeltaR1XphiIdeFullSet','DeltaR2XphiIdeFullSet', ...
             'DeltaR2XpIdeFullSet','R2PIdeFullSet','DeltaR1XpIdeFullSet','R1PIdeFullSet', ...
             'DeltaXfIdeFullSet','PfIdeFullSet')
