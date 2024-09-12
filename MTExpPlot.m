@@ -1,6 +1,14 @@
 clc
 close all
 
+%% save output figures
+currentFolder = fileparts(mfilename('fullpath'));
+subFolder = 'saved_figures';
+figuresFolderPath = fullfile(currentFolder, subFolder);
+if ~exist(figuresFolderPath, 'dir')
+    mkdir(figuresFolderPath);
+end
+
 Config;
 
 %% load the Monte Carlo Experiments result
@@ -78,19 +86,20 @@ for fc = 1:3 % feature choice
 
     [XfFejRMSE,XfFejRMSE_mean] = XFRMSE(feaNum,mcNum,DeltaXfFejFullSet);
 
-
+    poseNum_1round = size(DeltaR1XrIdeFullSet,1)/cy;
 
     % Plot RMSE
-    figure(1)
     % R1 postion
-    subplot(3,4,(fc-1)*4+1)
+    figure((fc-1)*6+1)
     hold on
     % standard EKF
-    R1XrRMSEP = plot(R1XrRMSE(:,1)',R1XrRMSE(:,2)','-bo','DisplayName','R1 std EKF');
+    R1XrRMSEP = plot(R1XrRMSE(:,1)',R1XrRMSE(:,2)','--b','DisplayName','R1 std EKF');
     % ideal EKF
-    R1XrIdeRMSEP = plot(R1XrIdeRMSE(:,1)',R1XrIdeRMSE(:,2)','-co','DisplayName','R1 ideal EKF');
+    R1XrIdeRMSEP = plot(R1XrIdeRMSE(:,1)',R1XrIdeRMSE(:,2)','-k','DisplayName','R1 ideal EKF');
     % FEJ EKF
-    R1XrFejRMSEP = plot(R1XrFejRMSE(:,1)',R1XrFejRMSE(:,2)','-o','Color',cadetBlue,'DisplayName','R1 FEJ EKF');
+    R1XrFejRMSEP = plot(R1XrFejRMSE(:,1)',R1XrFejRMSE(:,2)','-r.','DisplayName','R1 FEJ EKF');
+
+    xline(poseNum_1round,'--g',sprintf('x = %d', poseNum_1round))
 
     xlabel('Steps')
     ylabel('R1 Position RMSE (m)')
@@ -101,11 +110,13 @@ for fc = 1:3 % feature choice
     hold off
 
     %% R2 postion
-    subplot(3,4,(fc-1)*4+2)
+    figure((fc-1)*6+2)
     hold on
-    R2XrRMSEP = plot(R2XrRMSE(:,1)',R2XrRMSE(:,2)','-ro','DisplayName','R2 std EKF');
-    R2XrIdeRMSEP = plot(R2XrIdeRMSE(:,1)',R2XrIdeRMSE(:,2)','-mo','DisplayName','R2 ideal EKF');
-    R2XrFejRMSEP = plot(R2XrFejRMSE(:,1)',R2XrFejRMSE(:,2)','-o','Color',darkMagenta,'DisplayName','R2 FEJ EKF');
+    R2XrRMSEP = plot(R2XrRMSE(:,1)',R2XrRMSE(:,2)','--b','DisplayName','R2 std EKF');
+    R2XrIdeRMSEP = plot(R2XrIdeRMSE(:,1)',R2XrIdeRMSE(:,2)','-k','DisplayName','R2 ideal EKF');
+    R2XrFejRMSEP = plot(R2XrFejRMSE(:,1)',R2XrFejRMSE(:,2)','-r.','DisplayName','R2 FEJ EKF');
+
+    xline(poseNum_1round,'--g',sprintf('x = %d', poseNum_1round))
 
     xlabel('Steps')
     ylabel('R2 Position RMSE (m)')
@@ -116,17 +127,19 @@ for fc = 1:3 % feature choice
     hold off
 
     %% R1 orientation
-    subplot(3,4,(fc-1)*4+3)
+    figure((fc-1)*6+3)
     hold on
     % standard EKF
-    R1XphiRMSEP = plot(R1XphiRMSE(:,1)',R1XphiRMSE(:,2)','-bo','DisplayName','R1 std EKF');
+    R1XphiRMSEP = plot(R1XphiRMSE(:,1)',R1XphiRMSE(:,2)','--b','DisplayName','R1 std EKF');
     % ideal EKF
-    R1XphiIdeRMSEP = plot(R1XphiIdeRMSE(:,1)',R1XphiIdeRMSE(:,2)','-co','DisplayName','R1 ideal EKF');
+    R1XphiIdeRMSEP = plot(R1XphiIdeRMSE(:,1)',R1XphiIdeRMSE(:,2)','-k','DisplayName','R1 ideal EKF');
     % FEJ EKF
-    R1XphiFejRMSEP = plot(R1XphiFejRMSE(:,1)',R1XphiFejRMSE(:,2)','-o','Color',cadetBlue,'DisplayName','R1 FEJ EKF');
+    R1XphiFejRMSEP = plot(R1XphiFejRMSE(:,1)',R1XphiFejRMSE(:,2)','-r.','DisplayName','R1 FEJ EKF');
+
+    xline(poseNum_1round,'--g',sprintf('x = %d', poseNum_1round))
 
     xlabel('Steps')
-    ylabel('R1 Heading RMSE (m)')
+    ylabel('R1 Heading RMSE (rad)')
     xlim([0,poseNum])
     legend([R1XphiRMSEP,R1XphiIdeRMSEP,R1XphiFejRMSEP])
     title(sprintf('%d features',feaNum))
@@ -134,14 +147,16 @@ for fc = 1:3 % feature choice
     hold off
 
     %% R2 orientation
-    subplot(3,4,(fc-1)*4+4)
+    figure((fc-1)*6+4)
     hold on
-    R2XphiRMSEP = plot(R2XphiRMSE(:,1)',R2XphiRMSE(:,2)','-ro','DisplayName','R2 std EKF');
-    R2XphiIdeRMSEP = plot(R2XphiIdeRMSE(:,1)',R2XphiIdeRMSE(:,2)','-mo','DisplayName','R2 ideal EKF');
-    R2XphiFejRMSEP = plot(R2XphiFejRMSE(:,1)',R2XphiFejRMSE(:,2)','-o','Color',darkMagenta,'DisplayName','R2 FEJ EKF');
+    R2XphiRMSEP = plot(R2XphiRMSE(:,1)',R2XphiRMSE(:,2)','--b','DisplayName','R2 std EKF');
+    R2XphiIdeRMSEP = plot(R2XphiIdeRMSE(:,1)',R2XphiIdeRMSE(:,2)','-k','DisplayName','R2 ideal EKF');
+    R2XphiFejRMSEP = plot(R2XphiFejRMSE(:,1)',R2XphiFejRMSE(:,2)','-r.','DisplayName','R2 FEJ EKF');
+
+    xline(poseNum_1round,'--g',sprintf('x = %d', poseNum_1round))
 
     xlabel('Steps')
-    ylabel('R2 Heading RMSE (m)')
+    ylabel('R2 Heading RMSE (rad)')
     xlim([0,poseNum])
     legend([R2XphiRMSEP,R2XphiIdeRMSEP,R2XphiFejRMSEP])
     title(sprintf('%d features',feaNum))
@@ -288,16 +303,17 @@ for fc = 1:3 % feature choice
 
 
 
-    figure(2)
     %% R1 pose
-    subplot(3,2,(fc-1)*2+1)
+    figure((fc-1)*6+5)
     hold on
     % standard EKF
-    R1XpNEESP = plot(R1XpNEES(:,1)',R1XpNEES(:,2)','-bo','DisplayName','R1 std EKF');
+    R1XpNEESP = plot(R1XpNEES(:,1)',R1XpNEES(:,2)','--b','DisplayName','R1 std EKF');
     % ideal EKF
-    R1XpIdeNEESP = plot(R1XpIdeNEES(:,1)',R1XpIdeNEES(:,2)','-co','DisplayName','R1 ideal EKF');
+    R1XpIdeNEESP = plot(R1XpIdeNEES(:,1)',R1XpIdeNEES(:,2)','-k','DisplayName','R1 ideal EKF');
     % FEJ EKF
-    R1XpFejNEESP = plot(R1XpFejNEES(:,1)',R1XpFejNEES(:,2)','-o','Color',cadetBlue,'DisplayName','R1 FEJ EKF');
+    R1XpFejNEESP = plot(R1XpFejNEES(:,1)',R1XpFejNEES(:,2)','-r.','DisplayName','R1 FEJ EKF');   
+    
+    xline(poseNum_1round,'--g',sprintf('x = %d', poseNum_1round))
 
     xlabel('Steps')
     ylabel('R1 Pose ANEES')
@@ -308,11 +324,13 @@ for fc = 1:3 % feature choice
     hold off
 
     %% R2 pose
-    subplot(3,2,(fc-1)*2+2)
+    figure((fc-1)*6+6)
     hold on
-    R2XpNEESP = plot(R2XpNEES(:,1)',R2XpNEES(:,2)','-ro','DisplayName','R2 std EKF');
-    R2XpIdeNEESP = plot(R2XpIdeNEES(:,1)',R2XpIdeNEES(:,2)','-mo','DisplayName','R2 ideal EKF');
-    R2XpFejNEESP = plot(R2XpFejNEES(:,1)',R2XpFejNEES(:,2)','-o','Color',darkMagenta,'DisplayName','R2 FEJ EKF');
+    R2XpNEESP = plot(R2XpNEES(:,1)',R2XpNEES(:,2)','--b','DisplayName','R2 std EKF');
+    R2XpIdeNEESP = plot(R2XpIdeNEES(:,1)',R2XpIdeNEES(:,2)','-k','DisplayName','R2 ideal EKF');
+    R2XpFejNEESP = plot(R2XpFejNEES(:,1)',R2XpFejNEES(:,2)','-r.','DisplayName','R2 FEJ EKF');
+    
+    xline(poseNum_1round,'--g',sprintf('x = %d', poseNum_1round))
 
     xlabel('Steps')
     ylabel('R2 Pose ANEES')
@@ -379,3 +397,24 @@ for fc = 1:3 % feature choice
     end
 
 end
+
+exportgraphics(figure(1),fullfile(figuresFolderPath, 'R1Postion_RMSE_20feas.jpg'), 'Resolution', 300)
+exportgraphics(figure(2),fullfile(figuresFolderPath, 'R2Postion_RMSE_20feas.jpg'), 'Resolution', 300)
+exportgraphics(figure(3),fullfile(figuresFolderPath, 'R1Orientation_RMSE_20feas.jpg'), 'Resolution', 300)
+exportgraphics(figure(4),fullfile(figuresFolderPath, 'R2Orientation_RMSE_20feas.jpg'), 'Resolution', 300)
+exportgraphics(figure(5),fullfile(figuresFolderPath, 'R1Pose_ANEES_20feas.jpg'), 'Resolution', 300)
+exportgraphics(figure(6),fullfile(figuresFolderPath, 'R2Pose_ANEES_20feas.jpg'), 'Resolution', 300)
+
+exportgraphics(figure(7),fullfile(figuresFolderPath, 'R1Postion_RMSE_60feas.jpg'), 'Resolution', 300)
+exportgraphics(figure(8),fullfile(figuresFolderPath, 'R2Postion_RMSE_60feas.jpg'), 'Resolution', 300)
+exportgraphics(figure(9),fullfile(figuresFolderPath, 'R1Orientation_RMSE_60feas.jpg'), 'Resolution', 300)
+exportgraphics(figure(10),fullfile(figuresFolderPath, 'R2Orientation_RMSE_60feas.jpg'), 'Resolution', 300)
+exportgraphics(figure(11),fullfile(figuresFolderPath, 'R1Pose_ANEES_60feas.jpg'), 'Resolution', 300)
+exportgraphics(figure(12),fullfile(figuresFolderPath, 'R2Pose_ANEES_60feas.jpg'), 'Resolution', 300)
+
+exportgraphics(figure(13),fullfile(figuresFolderPath, 'R1Postion_RMSE_100feas.jpg'), 'Resolution', 300)
+exportgraphics(figure(14),fullfile(figuresFolderPath, 'R2Postion_RMSE_100feas.jpg'), 'Resolution', 300)
+exportgraphics(figure(15),fullfile(figuresFolderPath, 'R1Orientation_RMSE_100feas.jpg'), 'Resolution', 300)
+exportgraphics(figure(16),fullfile(figuresFolderPath, 'R2Orientation_RMSE_100feas.jpg'), 'Resolution', 300)
+exportgraphics(figure(17),fullfile(figuresFolderPath, 'R1Pose_ANEES_100feas.jpg'), 'Resolution', 300)
+exportgraphics(figure(18),fullfile(figuresFolderPath, 'R2Pose_ANEES_100feas.jpg'), 'Resolution', 300)

@@ -11,9 +11,9 @@ eeXf11ePHandles = [];
 
 for k = 0:size(R1Odo,1)/3
 
-    if k == 74
-        keyboard
-    end
+    % if k == 74
+    %     keyboard
+    % end
 
     R1Obs_k = R1Obs(R1Obs(:,1)==k,2:3);
     R2Obs_k = R2Obs(R2Obs(:,1)==k,2:3);
@@ -386,40 +386,40 @@ hold on
 
 R1XrTrueP = plot(R1XrTrue(1:2:(end-1),2),R1XrTrue(2:2:end,2),'bo','MarkerSize',MS);
 R1XrTrueP(1).DisplayName = 'R1 true pose';
-text(R1XrTrue(1:2:(end-1),2)+0.3,R1XrTrue(2:2:end,2),num2str(R1XrTrue(1:2:(end-1),1)),'Color','b')
+% text(R1XrTrue(1:2:(end-1),2)+0.3,R1XrTrue(2:2:end,2),num2str(R1XrTrue(1:2:(end-1),1)),'Color','b')
 u = al * cos(R1XphiT(:,2));  % x 方向分量
 v = al * sin(R1XphiT(:,2));  % y 方向分量
 quiver(R1XrTrue(1:2:(end-1),2), R1XrTrue(2:2:end,2), u, v, 0, 'b', 'LineWidth', 2);
 
 R2XrTrueP = plot(R2XrTrue(1:2:(end-1),2),R2XrTrue(2:2:end,2),'co','MarkerSize',MS);
 R2XrTrueP(1).DisplayName = 'R2 true pose';
-text(R2XrTrue(1:2:(end-1),2)+0.3,R2XrTrue(2:2:end,2),num2str(R2XrTrue(1:2:(end-1),1)),'Color','c')
+% text(R2XrTrue(1:2:(end-1),2)+0.3,R2XrTrue(2:2:end,2),num2str(R2XrTrue(1:2:(end-1),1)),'Color','c')
 u = al * cos(R2XphiT(:,2));  % x 方向分量
 v = al * sin(R2XphiT(:,2));  % y 方向分量
 quiver(R2XrTrue(1:2:(end-1),2), R2XrTrue(2:2:end,2), u, v, 0, 'c', 'LineWidth', LW);
 
 XfTrueAllP = plot(XfTrueAll(1:2:(end-1),2),XfTrueAll(2:2:end,2),'*','Color',darkGreen,'MarkerSize',MS);
 XfTrueAllP(1).DisplayName = 'True features';
-text(XfTrueAll(1:2:(end-1),2)+0.3,XfTrueAll(2:2:end,2),num2str(XfTrueAll(1:2:(end-1),1)),'Color',darkGreen)
+% text(XfTrueAll(1:2:(end-1),2)+0.3,XfTrueAll(2:2:end,2),num2str(XfTrueAll(1:2:(end-1),1)),'Color',darkGreen)
 
 
 R1XreP = plot(R1XpFull(1:3:(end-2),2),R1XpFull(2:3:(end-1),2),'ro','MarkerSize',MS);
 R1XreP.DisplayName = 'R1 estimated pose';
-text(R1XpFull(1:3:(end-2),2)+0.3,R1XpFull(2:3:(end-1),2),num2str(R1XpFull(1:3:(end-2),1)),'Color','r')
+% text(R1XpFull(1:3:(end-2),2)+0.3,R1XpFull(2:3:(end-1),2),num2str(R1XpFull(1:3:(end-2),1)),'Color','r')
 u = al * cos(R1XpFull(3:3:end,2));  % x 方向分量
 v = al * sin(R1XpFull(3:3:end,2));  % y 方向分量
 quiver(R1XpFull(1:3:(end-2),2), R1XpFull(2:3:(end-1),2), u, v, 0, 'r', 'LineWidth', LW);
 
 R2XreP = plot(R2XpFull(1:3:(end-2),2),R2XpFull(2:3:(end-1),2),'mo','MarkerSize',MS);
 R2XreP(1).DisplayName = 'R2 estimated pose';
-text(R2XpFull(1:3:(end-2),2)+0.3,R2XpFull(2:3:(end-1),2),num2str(R2XpFull(1:3:(end-2),1)),'Color','m')
+% text(R2XpFull(1:3:(end-2),2)+0.3,R2XpFull(2:3:(end-1),2),num2str(R2XpFull(1:3:(end-2),1)),'Color','m')
 u = al * cos(R2XpFull(3:3:end,2));  % x 方向分量
 v = al * sin(R2XpFull(3:3:end,2));  % y 方向分量
 quiver(R2XpFull(1:3:(end-2),2), R2XpFull(2:3:(end-1),2), u, v, 0, 'm', 'LineWidth', LW);
 
 XfeP = plot(Xk11e(7:2:(end-1),3),Xk11e(8:2:end,3),'*','Color',brightGreen,'MarkerSize',MS);
 XfeP(1).DisplayName = 'Estimated features';
-text(Xk11e(7:2:(end-1),3)+0.3,Xk11e(8:2:end,3),num2str(Xk11e(7:2:(end-1),2)),'Color',brightGreen)
+% text(Xk11e(7:2:(end-1),3)+0.3,Xk11e(8:2:end,3),num2str(Xk11e(7:2:(end-1),2)),'Color',brightGreen)
 
 if robPositionCovCheck == 1
     R1eeP = plot(R1eeFull(:,1:2:(end-1)),R1eeFull(:,2:2:end),'r');

@@ -1,6 +1,9 @@
 %% Number of Monte Carlo experiments
 mcNum = 100;
 
+%% Number of robot running cycles
+cy = 10;
+
 %% Check Switch
 %% Measurements check
 measurementsCheck = 1; % if 1, check the measurements by running MeasurementsGeneration.m
@@ -23,8 +26,8 @@ R2addObsNoise = 1; % if 0, R2 observation is perfect
 
 
 %% Sensor Range
-R1sensorRange = 8; % m/s, R1's observation range for the features
-R2sensorRange = 8; % m/s, R2's observation range for the features
+R1sensorRange = 10; % m/s, R1's observation range for the features
+R2sensorRange = 10; % m/s, R2's observation range for the features
 
 %% Required number of shared feature observations at step 0 
 reqSharedObsNum = 8; % Required number of shared feature observations
@@ -39,35 +42,37 @@ al = 1;
 LW = 2;
 
 %% Robot bearing ranges
-R1bearingRange = pi/60; % pi/60: 3°
-R2bearingRange = pi/60; % pi/60: 3°
+% R1bearingRange = 0; % pi/60: 3°
+% R2bearingRange = 0; % pi/60: 3°
+R1bearingRange = pi/12; % pi/60: 3°
+R2bearingRange = pi/12; % pi/60: 3°
 
 %% Gaussian noise level settings
 %% R1
 % standard deviation of 1th robot position at time 0 (equals to 0 as the origin of the 1D coordinate system)
-R1sigma_0r = 0.04; % 0.01: 0.01 m
-R1sigma_0phi = pi/45; % pi/180: 1°
+R1sigma_0r = 0.5; % 0.01: 0.01 m
+R1sigma_0phi = pi/180; % pi/180: 1°
 
 
 % standard deviation of the zero mean Gaussian process noise w(k) of 1th robot
-R1sigma_uv = 0.2; % 0.025 m/time_step
+R1sigma_uv = 0.5; % 0.025 m/time_step
 R1sigma_uw = pi/180; % 0.5°/time_step
 
 % standard deviation of the zero mean Gaussian observation noise v(k) of 1th robot
-R1sigma_zv = 0.25; % m/time_step
+R1sigma_zv = 0.5; % m/time_step
 
 %% R2
 % standard deviation of robot position at time 0 (equals to 0 as the origin of the 1D coordinate system)
-R2sigma_0r = 0.2; % m
+R2sigma_0r = 0.5; % m
 R2sigma_0phi = pi/180; % pi: 180°
 
 % standard deviation of the zero mean Gaussian process noise w(k) of 2nd robot
-R2sigma_uv = 0.1; % m/time_step
-R2sigma_uw = pi/90; % °/time_step
+R2sigma_uv = 0.5; % m/time_step
+R2sigma_uw = pi/180; % °/time_step
 
 
 % standard deviation of the zero mean Gaussian observation noise v(k) of 2nd robot
-R2sigma_zv = 0.25; % m/time_step
+R2sigma_zv = 0.5; % m/time_step
 
 
 

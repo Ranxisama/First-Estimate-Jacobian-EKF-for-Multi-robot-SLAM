@@ -1,6 +1,8 @@
 clc
 close all
 
+Config;
+
 load('TrueState\RobotsWaypoints.mat')
 load('TrueState\CheckedTrueState_100features.mat')
 
@@ -16,10 +18,6 @@ PosNum = min(R1PosNum,R2PosNum);
 
 R1XrTrue = R1XrTrueAll(1:(2*PosNum),:);
 R2XrTrue = R2XrTrueAll(1:(2*PosNum),:);
-
-Config;
-
-
 
 %% Robot Orientation Generation
 R1XphiT = bearingGeneration(R1XrTrue,R1bearingRange);

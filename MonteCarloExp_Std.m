@@ -252,7 +252,7 @@ for i = 1:3
             R2Zkn_idx = find(R2Zkn_lv);
             R2Zkn = R2Obs_k(R2Zkn_idx,:);
 
-            %% R1和R2都看到同一个新feature怎么办
+            % R1和R2都看到同一个新feature怎么办
             Zkns = intersect(R1Zkn(:,1),R2Zkn(:,1));
             % 用R1的来initialization,R2的从R2Zkn中去掉，后面用来做update
             R2Zkns = [];
@@ -262,7 +262,7 @@ for i = 1:3
                     R2Zkn(R2Zkn(:,1)==Zkns(ZknsNum,1),:) = [];
                 end
             end
-            %%
+            
 
             Zkn = [R1Zkn;R2Zkn];
 
@@ -276,7 +276,7 @@ for i = 1:3
                 R1nRn = [];
                 R2nRn = [];
                 % Standard ekf
-                DeltaGV = sparse(size(Xk10efi,1),size(Zkn,1));
+                DeltaGV = sparse(size(Xk10e,1)+size(Zkn,1),size(Zkn,1));
 
                 R1Xfn = [];
                 R2Xfn = [];

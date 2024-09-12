@@ -25,6 +25,9 @@ for i = 1:3
     XfIdeFullSet = [];
     PfIdeFullSet = [];
 
+    R1Xp0T = [R1XrTrue(1:2,:);R1XphiT(1,:)];
+    R2Xp0T = [R2XrTrue(1:2,:);R2XphiT(1,:)];
+
     for mc = 1:mcNum
 
         R1Xp0 = R1Xp0Set(:,mc);
@@ -109,8 +112,8 @@ for i = 1:3
                 XsGni = Xs;
 
                 % 显示GNI的结果是奇异矩阵是因为加噪声随机生成的R2Xp0落在feature的真值上了
-
-                [XsGni(:,3),PzGni] = GNI(R1Xp0,Xs(:,3),Pz,Z0s,CC);
+                [XsGni(:,3),PzGni] = GNI(R1Xp0T,Xs(:,3),Pz,Z0s,CC);
+                % [XsGni(:,3),PzGni] = GNI(R1Xp0,Xs(:,3),Pz,Z0s,CC);
                 XsGni(3,1) = wrap(XsGni(3,1));
 
                 % Set the elements that are less than CovT to zero. This can be useful for dealing with numerical errors or avoiding unnecessary imaginary parts in calculations.
@@ -132,6 +135,10 @@ for i = 1:3
                 R1ZknIde_idx = find(R1ZknIde_lv);
                 % R1Z0n: new feature observation of 1st robot
                 R1Z0n = R1Obs_k(R1ZknIde_idx,:);
+
+                % if ~isempty(R1Z0n)
+                %     keyboard;
+                % end
 
                 R1Xfkn = R1Z0n;
                 R1Xfkn(1:2:(end-1),2) = X0(1,3) + cos(X0(3,3))*(R1Z0n(1:2:(end-1),2)) - sin(X0(3,3))*(R1Z0n(2:2:end,2));
@@ -171,11 +178,11 @@ for i = 1:3
                 JFXk(size(X0,1)+size(R1Xfkn,1)+(2:2:size(R2Xfkn,1)),4:6) = [repmat([0,1],size(R2Xfkn,1)/2,1), cos(X0(6,3))*R2Z0n(1:2:(end-1),2) - sin(X0(6,3))*R2Z0n(2:2:end,2)];
 
 
-                R1nRn = [];
+                R1nRn_ide = [];
                 R2nRn_ide = [];
                 JFWk = sparse(size(Xk00e,1),size(R1Z0n,1)+size(R2Z0n,1));
                 for R1jn = 1:(size(R1Z0n,1)/2)
-                    R1nRn = blkdiag(R1nRn, R1R);
+                    R1nRn_ide = blkdiag(R1nRn_ide, R1R);
                     JFWk(size(X0,1)+(R1jn-1)*2+(1:2),(R1jn-1)*2+(1:2)) = rotationMatrix(X0(3,3));
                 end
                 for R2jn_ide = 1:(size(R2Z0n,1)/2)
@@ -183,7 +190,7 @@ for i = 1:3
                     JFWk(size(X0,1)+size(R1Z0n,1)+(R2jn_ide-1)*2+(1:2),size(R1Z0n,1)+(R2jn_ide-1)*2+(1:2)) = rotationMatrix(X0(6,3));
                 end
 
-                nRn_ide = blkdiag(R1nRn,R2nRn_ide);
+                nRn_ide = blkdiag(R1nRn_ide,R2nRn_ide);
                 Pk00 = JFXk*P0*JFXk'+JFWk*nRn_ide*JFWk';
 
                 Pk00(abs(Pk00)<CovT) = 0;
