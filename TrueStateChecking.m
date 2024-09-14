@@ -26,9 +26,6 @@ else
     error('R2_XState not found');
 end
 
-wp1 = repmat(wp1,1,cy);
-wp2 = repmat(wp2,1,cy);
-
 wp = [wp1,wp2];
 lm = [lm1,lm2];
 

@@ -172,11 +172,11 @@ for i = 1:3
                 JFWk = sparse(size(Xk00e,1),size(R1Z0n,1)+size(R2Z0n,1));
                 for R1jn = 1:(size(R1Z0n,1)/2)
                     R1nRn = blkdiag(R1nRn, R1R);
-                    JFWk(size(X0,1)+(R1jn-1)*2+(1:2),(R1jn-1)*2+(1:2)) = rotationMatrix(X0(3,3));
+                    JFWk(size(X0,1)+(R1jn-1)*2+(1:2),(R1jn-1)*2+(1:2)) = Rot(X0(3,3));
                 end
                 for R2jn = 1:(size(R2Z0n,1)/2)
                     R2nRn = blkdiag(R2nRn, R2R);
-                    JFWk(size(X0,1)+size(R1Z0n,1)+(R2jn-1)*2+(1:2),size(R1Z0n,1)+(R2jn-1)*2+(1:2)) = rotationMatrix(X0(6,3));
+                    JFWk(size(X0,1)+size(R1Z0n,1)+(R2jn-1)*2+(1:2),size(R1Z0n,1)+(R2jn-1)*2+(1:2)) = Rot(X0(6,3));
                 end
 
                 nRn = blkdiag(R1nRn,R2nRn);
@@ -295,7 +295,7 @@ for i = 1:3
 
                     for R1jn = 1:(size(R1Zkn,1)/2)
                         R1nRn = blkdiag(R1nRn, R1R);
-                        DeltaGV(size(Xk10e,1)+(R1jn-1)*2+(1:2),(R1jn-1)*2+(1:2)) = rotationMatrix(Xk10e(3,3));
+                        DeltaGV(size(Xk10e,1)+(R1jn-1)*2+(1:2),(R1jn-1)*2+(1:2)) = Rot(Xk10e(3,3));
                     end
                 end
 
@@ -313,7 +313,7 @@ for i = 1:3
 
                     for R2jn = 1:(size(R2Zkn,1)/2)
                         R2nRn = blkdiag(R2nRn, R2R);
-                        DeltaGV(size(Xk10e,1)+size(R1Zkn,1)+(R2jn-1)*2+(1:2),size(R1Zkn,1)+(R2jn-1)*2+(1:2)) = rotationMatrix(Xk10e(6,3));
+                        DeltaGV(size(Xk10e,1)+size(R1Zkn,1)+(R2jn-1)*2+(1:2),size(R1Zkn,1)+(R2jn-1)*2+(1:2)) = Rot(Xk10e(6,3));
                     end
                 end
 
@@ -404,7 +404,7 @@ for i = 1:3
                         R1DV = blkdiag(R1DV,R1R);
 
                         % Standard EKF
-                        JHX10e((R1kj-1)*2+(1:2), R1Xfks_idx((R1kj-1)*2+(1:2),1)') = rotationMatrix(Xk10efi(3,3))';
+                        JHX10e((R1kj-1)*2+(1:2), R1Xfks_idx((R1kj-1)*2+(1:2),1)') = Rot(Xk10efi(3,3))';
                     end
                 end
 
@@ -427,7 +427,7 @@ for i = 1:3
                         R2DV = blkdiag(R2DV,R2R);
 
                         % Standard EKF
-                        JHX10e(size(R1Zks2,1)+(R2kj-1)*2+(1:2), R2Xfks_idx((R2kj-1)*2+(1:2),1)') = rotationMatrix(Xk10efi(6,3))';
+                        JHX10e(size(R1Zks2,1)+(R2kj-1)*2+(1:2), R2Xfks_idx((R2kj-1)*2+(1:2),1)') = Rot(Xk10efi(6,3))';
                     end
                 end
 

@@ -15,9 +15,9 @@ for k = 0:PosNum-1
         % FeaRobDis: distance from the feature to the robot
         FeaRobDist = sqrt(sum(DeltaDist.^2));
         if FeaRobDist <= sensorRange
-            Rot = rotationMatrix(XphikT);
+            ROT = Rot(XphikT);
             obs((end+1):(end+2),1:3) = [[k;k],XfTrueAll((j-1)*2+(1:2),1), ...
-                Rot'*DeltaDist+R*randn(2,1)]; 
+                ROT'*DeltaDist+ROT*randn(2,1)]; 
         end
     end
 end

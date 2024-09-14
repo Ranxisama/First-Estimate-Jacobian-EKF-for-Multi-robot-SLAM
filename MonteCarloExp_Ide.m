@@ -112,7 +112,7 @@ for i = 1:3
                 XsGni = Xs;
 
                 % 显示GNI的结果是奇异矩阵是因为加噪声随机生成的R2Xp0落在feature的真值上了
-                [XsGni(:,3),PzGni] = GNI(R1Xp0T,Xs(:,3),Pz,Z0s,CC);
+                [XsGni(:,3),PzGni] = GNI(R1Xp0T(:,2),Xs(:,3),Pz,Z0s,CC);
                 % [XsGni(:,3),PzGni] = GNI(R1Xp0,Xs(:,3),Pz,Z0s,CC);
                 XsGni(3,1) = wrap(XsGni(3,1));
 
@@ -164,12 +164,12 @@ for i = 1:3
                 % first column: 1 -> robot posture; 2 -> feature position
                 % second column: posture id or position id
                 % third column: data
-                Xk00e = [X0;
+                Xk00e_ide = [X0;
                     ones(size(R1Xfkn,1),1),R1Xfkn;
                     2*ones(size(R2Xfkn,1),1),R2Xfkn];
 
                 % Jacobian of Xk
-                JFXk = sparse(size(Xk00e,1),size(X0,1));
+                JFXk = sparse(size(Xk00e_ide,1),size(X0,1));
                 JFXk(1:size(X0,1),1:size(X0,1)) = eye(size(X0,1));
                 JFXk(size(X0,1)+(1:2:(size(R1Xfkn,1)-1)),1:3) = [repmat([1,0],size(R1Xfkn,1)/2,1), -sin(X0(3,3))*R1Z0n(1:2:(end-1),2) - cos(X0(3,3))*R1Z0n(2:2:end,2)];
                 JFXk(size(X0,1)+(2:2:size(R1Xfkn,1)),1:3) = [repmat([0,1],size(R1Xfkn,1)/2,1), cos(X0(3,3))*R1Z0n(1:2:(end-1),2) - sin(X0(3,3))*R1Z0n(2:2:end,2)];
@@ -180,27 +180,27 @@ for i = 1:3
 
                 R1nRn_ide = [];
                 R2nRn_ide = [];
-                JFWk = sparse(size(Xk00e,1),size(R1Z0n,1)+size(R2Z0n,1));
+                JFWk = sparse(size(Xk00e_ide,1),size(R1Z0n,1)+size(R2Z0n,1));
                 for R1jn = 1:(size(R1Z0n,1)/2)
                     R1nRn_ide = blkdiag(R1nRn_ide, R1R);
-                    JFWk(size(X0,1)+(R1jn-1)*2+(1:2),(R1jn-1)*2+(1:2)) = rotationMatrix(X0(3,3));
+                    JFWk(size(X0,1)+(R1jn-1)*2+(1:2),(R1jn-1)*2+(1:2)) = Rot(X0(3,3));
                 end
                 for R2jn_ide = 1:(size(R2Z0n,1)/2)
                     R2nRn_ide = blkdiag(R2nRn_ide, R2R);
-                    JFWk(size(X0,1)+size(R1Z0n,1)+(R2jn_ide-1)*2+(1:2),size(R1Z0n,1)+(R2jn_ide-1)*2+(1:2)) = rotationMatrix(X0(6,3));
+                    JFWk(size(X0,1)+size(R1Z0n,1)+(R2jn_ide-1)*2+(1:2),size(R1Z0n,1)+(R2jn_ide-1)*2+(1:2)) = Rot(X0(6,3));
                 end
 
                 nRn_ide = blkdiag(R1nRn_ide,R2nRn_ide);
-                Pk00 = JFXk*P0*JFXk'+JFWk*nRn_ide*JFWk';
+                Pk00_ide = JFXk*P0*JFXk'+JFWk*nRn_ide*JFWk';
 
-                Pk00(abs(Pk00)<CovT) = 0;
+                Pk00_ide(abs(Pk00_ide)<CovT) = 0;
 
                 % Ideal EKF
-                R1XpIdeFull = Xk00e(1:3,2:3); % save all robot postures of R1
-                R2XpIdeFull = Xk00e(4:6,2:3); % save all robot postures of R2
+                R1XpIdeFull = Xk00e_ide(1:3,2:3); % save all robot postures of R1
+                R2XpIdeFull = Xk00e_ide(4:6,2:3); % save all robot postures of R2
 
-                R1PIdeFull = Pk00(1:3,1:3);
-                R2PIdeFull = Pk00(4:6,4:6);
+                R1PIdeFull = Pk00_ide(1:3,1:3);
+                R2PIdeFull = Pk00_ide(4:6,4:6);
 
                 continue
             end
@@ -214,10 +214,10 @@ for i = 1:3
             R1OdoT_k = R1OdoT(R1OdoT(:,2)==k,3);
             R2OdoT_k = R2OdoT(R2OdoT(:,2)==k,3);
 
-            if k == 1
-                Xk00e_ide = Xk00e;
-                Pk00_ide = Pk00;
-            end
+            % if k == 1
+            %     Xk00e_ide = Xk00e_ide;
+            %     Pk00_ide = Pk00_ide;
+            % end
 
             Xk10e_ide = Xk00e_ide;
             Xk10e_ide(1:6,2) = Xk10e_ide(1:6,2)+1;
@@ -235,15 +235,26 @@ for i = 1:3
             Xrk00T = [R1XrTrue(R1XrTrue(:,1)==k-1,2);R1XphiT(R1XphiT(:,1)==k-1,2); ...
                 R2XrTrue(R2XrTrue(:,1)==k-1,2);R2XphiT(R2XphiT(:,1)==k-1,2)];
 
-            DeltaXfX_ide = sparse(size(Xk10e_ide,1),size(Xk00e_ide,1));
-            DeltaXfX_ide(1:6,1:6) = blkdiag([1,0,-sin(Xrk00T(3,1))*R1OdoT_k(1,1) - cos(Xrk00T(3,1))*R1OdoT_k(2,1); ...
-                0,1,cos(Xrk00T(3,1))*R1OdoT_k(1,1) - sin(Xrk00T(3,1))*R1OdoT_k(2,1); ...
-                0,0,1], ...
-                [1,0,-sin(Xrk00T(6,1))*R2OdoT_k(1,1) - cos(Xrk00T(6,1))*R2OdoT_k(2,1); ...
-                0,1,cos(Xrk00T(6,1))*R2OdoT_k(1,1) - sin(Xrk00T(6,1))*R2OdoT_k(2,1); ...
-                0,0,1]);
-            DeltaXfX_ide(7:end,7:end) = eye(size(DeltaXfX_ide(7:end,7:end)));
+            Xrk10T = [R1XrTrue(R1XrTrue(:,1)==k,2);R1XphiT(R1XphiT(:,1)==k,2); ...
+                R2XrTrue(R2XrTrue(:,1)==k,2);R2XphiT(R2XphiT(:,1)==k,2)];
             
+            %%
+            DeltaXfX_ide = sparse(size(Xk10e_ide,1),size(Xk00e_ide,1));
+            DeltaXfX_ide(1:6,1:6) = blkdiag([eye(2),J*(Xrk10T(1:2,1)-Xrk00T(1:2,1));
+                zeros(1,2),1], ...
+                [eye(2),J*(Xrk10T(4:5,1)-Xrk00T(4:5,1));
+                zeros(1,2),1]);
+            DeltaXfX_ide(7:end,7:end) = eye(size(DeltaXfX_ide(7:end,7:end)));  
+
+            % DeltaXfX_ide = sparse(size(Xk10e_ide,1),size(Xk00e_ide,1));
+            % DeltaXfX_ide(1:6,1:6) = blkdiag([1,0,-sin(Xrk00T(3,1))*R1OdoT_k(1,1) - cos(Xrk00T(3,1))*R1OdoT_k(2,1); ...
+            %     0,1,cos(Xrk00T(3,1))*R1OdoT_k(1,1) - sin(Xrk00T(3,1))*R1OdoT_k(2,1); ...
+            %     0,0,1], ...
+            %     [1,0,-sin(Xrk00T(6,1))*R2OdoT_k(1,1) - cos(Xrk00T(6,1))*R2OdoT_k(2,1); ...
+            %     0,1,cos(Xrk00T(6,1))*R2OdoT_k(1,1) - sin(Xrk00T(6,1))*R2OdoT_k(2,1); ...
+            %     0,0,1]);
+            % DeltaXfX_ide(7:end,7:end) = eye(size(DeltaXfX_ide(7:end,7:end)));   
+ 
             %%
             % DeltaXfW_ide = sparse(size(Xk00e_ide,1),6);
             % DeltaXfW_ide(1:6,1:6) = blkdiag([cos(Xrk00T(3,1)),-sin(Xrk00T(3,1)),0; ...
@@ -275,19 +286,25 @@ for i = 1:3
             R1ZknIde_idx = find(R1ZknIde_lv);
             R1ZknIde = R1Obs_k(R1ZknIde_idx,:);
 
+            R1ZknIdeT = R1ObsT_k(R1ZknIde_idx,:);
+
             % find the feature observations in R2 from new features of Xk10e
             R2ZknIde_lv = ~ismember(R2Obs_k(:,1),Xk10e_ide(7:end,2));
             R2ZknIde_idx = find(R2ZknIde_lv);
             R2ZknIde = R2Obs_k(R2ZknIde_idx,:);
 
+            R2ZknIdeT = R2ObsT_k(R2ZknIde_idx,:);
+
             % R1和R2都看到同一个新feature怎么办
-            ZknsIde = intersect(R1ZknIde(:,1),R2ZknIde(:,1));
+            ZknsIde_ID = intersect(R1ZknIde(:,1),R2ZknIde(:,1));
             % 用R1的来initialization,R2的从R2Zkn中去掉，后面用来做update
             R2ZknsIde = [];
-            if ~isempty(ZknsIde)
-                for ZknsNum = 1:size(ZknsIde,1)
-                    R2ZknsIde = [R2ZknsIde;R2ZknIde(R2ZknIde(:,1)==ZknsIde(ZknsNum,1),:)];
-                    R2ZknIde(R2ZknIde(:,1)==ZknsIde(ZknsNum,1),:) = [];
+            if ~isempty(ZknsIde_ID)
+                for ZknsNum = 1:size(ZknsIde_ID,1)
+                    R2ZknsIde = [R2ZknsIde;R2ZknIde(R2ZknIde(:,1)==ZknsIde_ID(ZknsNum,1),:)];
+                    R2ZknIde(R2ZknIde(:,1)==ZknsIde_ID(ZknsNum,1),:) = [];
+
+                    R2ZknIdeT(R2ZknIdeT(:,1)==ZknsIde_ID(ZknsNum,1),:) = [];
                 end
             end
 
@@ -303,7 +320,6 @@ for i = 1:3
                 R1nRn_ide = [];
                 R2nRn_ide = [];
 
-                % Ideal ekf
                 DeltaGV_ide = sparse(size(Xk10e_ide,1)+size(ZknIde,1),size(ZknIde,1));
 
                 R1Xfn_ide = [];
@@ -316,7 +332,7 @@ for i = 1:3
                     R1Xfn_ide(1:2:(end-1),2) = Xk10e_ide(1,3) + cos(Xk10e_ide(3,3))*R1ZknIde(1:2:(end-1),2) - sin(Xk10e_ide(3,3))*R1ZknIde(2:2:end,2);
                     R1Xfn_ide(2:2:end,2) = Xk10e_ide(2,3) + sin(Xk10e_ide(3,3))*R1ZknIde(1:2:(end-1),2) + cos(Xk10e_ide(3,3))*R1ZknIde(2:2:end,2);
 
-                    % Cov
+                    %% Cov
                     DeltaGX_ide(size(Xk10e_ide,1)+(1:2:(size(R1Xfn_ide,1)-1)),1:3) = [repmat([1, 0],size(R1Xfn_ide,1)/2,1), ...
                         -sin(Xk10e_ide(3,3))*R1ZknIde(1:2:(end-1),2)-cos(Xk10e_ide(3,3))*R1ZknIde(2:2:end,2)];
                     DeltaGX_ide(size(Xk10e_ide,1)+(2:2:size(R1Xfn_ide,1)),1:3) = [repmat([0, 1],size(R1Xfn_ide,1)/2,1), ...
@@ -324,8 +340,18 @@ for i = 1:3
 
                     for R1jn_ide = 1:(size(R1ZknIde,1)/2)
                         R1nRn_ide = blkdiag(R1nRn_ide, R1R);
-                        DeltaGV_ide(size(Xk10e_ide,1)+(R1jn_ide-1)*2+(1:2),(R1jn_ide-1)*2+(1:2)) = rotationMatrix(Xk10e_ide(3,3));
+                        DeltaGV_ide(size(Xk10e_ide,1)+(R1jn_ide-1)*2+(1:2),(R1jn_ide-1)*2+(1:2)) = Rot(Xk10e_ide(3,3));
                     end
+                    
+                    % DeltaGX_ide(size(Xk10e_ide,1)+(1:2:(size(R1Xfn_ide,1)-1)),1:3) = [repmat([1, 0],size(R1Xfn_ide,1)/2,1), ...
+                    %     -sin(Xrk10T(3,1))*R1ZknIdeT(1:2:(end-1),2)-cos(Xrk10T(3,1))*R1ZknIdeT(2:2:end,2)];
+                    % DeltaGX_ide(size(Xk10e_ide,1)+(2:2:size(R1Xfn_ide,1)),1:3) = [repmat([0, 1],size(R1Xfn_ide,1)/2,1), ...
+                    %     cos(Xrk10T(3,1))*R1ZknIdeT(1:2:(end-1),2)-sin(Xrk10T(3,1))*R1ZknIdeT(2:2:end,2)];
+                    % 
+                    % for R1jn_ide = 1:(size(R1ZknIde,1)/2)
+                    %     R1nRn_ide = blkdiag(R1nRn_ide, R1R);
+                    %     DeltaGV_ide(size(Xk10e_ide,1)+(R1jn_ide-1)*2+(1:2),(R1jn_ide-1)*2+(1:2)) = Rot(Xrk10T(3,1));
+                    % end
                 end
 
                 if ~isempty(R2ZknIde)
@@ -335,7 +361,7 @@ for i = 1:3
                     R2Xfn_ide(1:2:(end-1),2) = Xk10e_ide(4,3) + cos(Xk10e_ide(6,3))*R2ZknIde(1:2:(end-1),2) - sin(Xk10e_ide(6,3))*R2ZknIde(2:2:end,2);
                     R2Xfn_ide(2:2:end,2) = Xk10e_ide(5,3) + sin(Xk10e_ide(6,3))*R2ZknIde(1:2:(end-1),2) + cos(Xk10e_ide(6,3))*R2ZknIde(2:2:end,2);
 
-                    % Cov
+                    %% Cov
                     DeltaGX_ide(size(Xk10e_ide,1)+size(R1Xfn_ide,1)+(1:2:(size(R2Xfn_ide,1)-1)),4:6) = [repmat([1, 0],size(R2Xfn_ide,1)/2,1), ...
                         -sin(Xk10e_ide(6,3))*R2ZknIde(1:2:(end-1),2)-cos(Xk10e_ide(6,3))*R2ZknIde(2:2:end,2)];
                     DeltaGX_ide(size(Xk10e_ide,1)+size(R1Xfn_ide,1)+(2:2:size(R2Xfn_ide,1)),4:6) = [repmat([0, 1],size(R2Xfn_ide,1)/2,1), ...
@@ -344,8 +370,19 @@ for i = 1:3
                     for R2jn_ide = 1:(size(R2ZknIde,1)/2)
                         R2nRn_ide = blkdiag(R2nRn_ide, R2R);
                         % Ideal EKF
-                        DeltaGV_ide(size(Xk10e_ide,1)+size(R1ZknIde,1)+(R2jn_ide-1)*2+(1:2),size(R1ZknIde,1)+(R2jn_ide-1)*2+(1:2)) = rotationMatrix(Xk10e_ide(6,3));
+                        DeltaGV_ide(size(Xk10e_ide,1)+size(R1ZknIde,1)+(R2jn_ide-1)*2+(1:2),size(R1ZknIde,1)+(R2jn_ide-1)*2+(1:2)) = Rot(Xk10e_ide(6,3));
                     end
+
+                    % DeltaGX_ide(size(Xk10e_ide,1)+size(R1Xfn_ide,1)+(1:2:(size(R2Xfn_ide,1)-1)),4:6) = [repmat([1, 0],size(R2Xfn_ide,1)/2,1), ...
+                    %     -sin(Xrk10T(6,1))*R2ZknIdeT(1:2:(end-1),2)-cos(Xrk10T(6,1))*R2ZknIdeT(2:2:end,2)];
+                    % DeltaGX_ide(size(Xk10e_ide,1)+size(R1Xfn_ide,1)+(2:2:size(R2Xfn_ide,1)),4:6) = [repmat([0, 1],size(R2Xfn_ide,1)/2,1), ...
+                    %     cos(Xrk10T(6,1))*R2ZknIdeT(1:2:(end-1),2)-sin(Xrk10T(6,1))*R2ZknIdeT(2:2:end,2)];
+                    % 
+                    % for R2jn_ide = 1:(size(R2ZknIde,1)/2)
+                    %     R2nRn_ide = blkdiag(R2nRn_ide, R2R);
+                    %     % Ideal EKF
+                    %     DeltaGV_ide(size(Xk10e_ide,1)+size(R1ZknIde,1)+(R2jn_ide-1)*2+(1:2),size(R1ZknIde,1)+(R2jn_ide-1)*2+(1:2)) = Rot(Xrk10T(6,1));
+                    % end
                 end
 
                 nRn_ide = blkdiag(R1nRn_ide,R2nRn_ide);
@@ -458,7 +495,7 @@ for i = 1:3
                         R1DV = blkdiag(R1DV,R1R);
 
                         % Ideal EKF
-                        JHX10e_ide((R1kjIde-1)*2+(1:2), R1XfksIde_idx((R1kjIde-1)*2+(1:2),1)') = rotationMatrix(Xrk10Tfi(3,1))';
+                        JHX10e_ide((R1kjIde-1)*2+(1:2), R1XfksIde_idx((R1kjIde-1)*2+(1:2),1)') = Rot(Xrk10Tfi(3,1))';
                     end
                 end
 
@@ -480,7 +517,7 @@ for i = 1:3
                         R2DV = blkdiag(R2DV,R2R);
 
                         % Ideal EKF
-                        JHX10e_ide(size(R1Zks2Ide,1)+(R2kjIde-1)*2+(1:2), R2XfksIde_idx((R2kjIde-1)*2+(1:2),1)') = rotationMatrix(Xrk10Tfi(6,1))';
+                        JHX10e_ide(size(R1Zks2Ide,1)+(R2kjIde-1)*2+(1:2), R2XfksIde_idx((R2kjIde-1)*2+(1:2),1)') = Rot(Xrk10Tfi(6,1))';
                     end
                 end
 
@@ -521,7 +558,7 @@ for i = 1:3
         PfIdeFullSet = [PfIdeFullSet,Pk11_ide(7:end,7:end)];
     end
 
-    feaNum = size(Xk11e(7:end,1),1)/2;
+    feaNum = size(Xk11e_ide(7:end,1),1)/2;
 
     % Ideal EKF
     R1XpIdeFullSet = [R1XpIdeFull(:,1),R1XpIdeFullSet];

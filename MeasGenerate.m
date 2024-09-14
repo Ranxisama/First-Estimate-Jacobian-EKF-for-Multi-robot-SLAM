@@ -70,26 +70,26 @@ for k = 0:(PosNum-1)
     else
         R1Odok = R1Odo(R1Odo(:,2)==k,3);
         R1Xpk(:,1) = k;
-        R1Xpk(1:2,2) = R1Xpk(1:2,2) + rotationMatrix(R1Xpk(3,2))*R1Odok(1:2,1);
+        R1Xpk(1:2,2) = R1Xpk(1:2,2) + Rot(R1Xpk(3,2))*R1Odok(1:2,1);
         R1Xpk(3,2) = R1Xpk(3,2) + R1Odok(3,1);
         R1Xp = [R1Xp;R1Xpk];
 
         R2Odok = R2Odo(R2Odo(:,2)==k,3);
         R2Xpk(:,1) = k;
-        R2Xpk(1:2,2) = R2Xpk(1:2,2) + rotationMatrix(R2Xpk(3,2))*R2Odok(1:2,1);
+        R2Xpk(1:2,2) = R2Xpk(1:2,2) + Rot(R2Xpk(3,2))*R2Odok(1:2,1);
         R2Xpk(3,2) = R2Xpk(3,2) + R2Odok(3,1);
         R2Xp = [R2Xp;R2Xpk];
     end
 
     R1Zk = R1Obs(R1Obs(:,1)==k,2:3);
     for R1j = 1:(size(R1Zk,1)/2)
-        R1Xfk = R1Xp(k*3+(1:2),2) + rotationMatrix(R1Xp(k*3+3,2)) * R1Zk((R1j-1)*2+(1:2),2);
+        R1Xfk = R1Xp(k*3+(1:2),2) + Rot(R1Xp(k*3+3,2)) * R1Zk((R1j-1)*2+(1:2),2);
         R1Xf = [R1Xf;R1Zk((R1j-1)*2+(1:2),1),R1Xfk];
     end
 
     R2Zk = R2Obs(R2Obs(:,1)==k,2:3);
     for R2j = 1:(size(R2Zk,1)/2)
-        R2Xfk = R2Xp(k*3+(1:2),2) + rotationMatrix(R2Xp(k*3+3,2)) * R2Zk((R2j-1)*2+(1:2),2);
+        R2Xfk = R2Xp(k*3+(1:2),2) + Rot(R2Xp(k*3+3,2)) * R2Zk((R2j-1)*2+(1:2),2);
         R2Xf = [R2Xf;R2Zk((R2j-1)*2+(1:2),1),R2Xfk];
     end
 

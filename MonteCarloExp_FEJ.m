@@ -158,12 +158,12 @@ for i = 1:3
                 % first column: 1 -> robot posture; 2 -> feature position
                 % second column: posture id or position id
                 % third column: data
-                Xk00e = [X0;
+                Xk00e_fej = [X0;
                     ones(size(R1Xfkn,1),1),R1Xfkn;
                     2*ones(size(R2Xfkn,1),1),R2Xfkn];
 
                 % Jacobian of Xk
-                JFXk = sparse(size(Xk00e,1),size(X0,1));
+                JFXk = sparse(size(Xk00e_fej,1),size(X0,1));
                 JFXk(1:size(X0,1),1:size(X0,1)) = eye(size(X0,1));
                 JFXk(size(X0,1)+(1:2:(size(R1Xfkn,1)-1)),1:3) = [repmat([1,0],size(R1Xfkn,1)/2,1), -sin(X0(3,3))*R1Z0n(1:2:(end-1),2) - cos(X0(3,3))*R1Z0n(2:2:end,2)];
                 JFXk(size(X0,1)+(2:2:size(R1Xfkn,1)),1:3) = [repmat([0,1],size(R1Xfkn,1)/2,1), cos(X0(3,3))*R1Z0n(1:2:(end-1),2) - sin(X0(3,3))*R1Z0n(2:2:end,2)];
@@ -174,29 +174,29 @@ for i = 1:3
 
                 R1nRn_fej = [];
                 R2nRn_fej = [];
-                JFWk = sparse(size(Xk00e,1),size(R1Z0n,1)+size(R2Z0n,1));
+                JFWk = sparse(size(Xk00e_fej,1),size(R1Z0n,1)+size(R2Z0n,1));
                 for R1jn = 1:(size(R1Z0n,1)/2)
                     R1nRn_fej = blkdiag(R1nRn_fej, R1R);
-                    JFWk(size(X0,1)+(R1jn-1)*2+(1:2),(R1jn-1)*2+(1:2)) = rotationMatrix(X0(3,3));
+                    JFWk(size(X0,1)+(R1jn-1)*2+(1:2),(R1jn-1)*2+(1:2)) = Rot(X0(3,3));
                 end
                 for R2jn_fej = 1:(size(R2Z0n,1)/2)
                     R2nRn_fej = blkdiag(R2nRn_fej, R2R);
-                    JFWk(size(X0,1)+size(R1Z0n,1)+(R2jn_fej-1)*2+(1:2),size(R1Z0n,1)+(R2jn_fej-1)*2+(1:2)) = rotationMatrix(X0(6,3));
+                    JFWk(size(X0,1)+size(R1Z0n,1)+(R2jn_fej-1)*2+(1:2),size(R1Z0n,1)+(R2jn_fej-1)*2+(1:2)) = Rot(X0(6,3));
                 end
 
                 nRn_fej = blkdiag(R1nRn_fej,R2nRn_fej);
-                Pk00 = JFXk*P0*JFXk'+JFWk*nRn_fej*JFWk';
+                Pk00_fej = JFXk*P0*JFXk'+JFWk*nRn_fej*JFWk';
 
-                Pk00(abs(Pk00)<CovT) = 0;
+                Pk00_fej(abs(Pk00_fej)<CovT) = 0;
 
                 % FEJ EKF
-                R1XpFejFull = Xk00e(1:3,2:3); % save all robot postures of R1
-                R2XpFejFull = Xk00e(4:6,2:3); % save all robot postures of R2
+                R1XpFejFull = Xk00e_fej(1:3,2:3); % save all robot postures of R1
+                R2XpFejFull = Xk00e_fej(4:6,2:3); % save all robot postures of R2
 
-                R1PFejFull = Pk00(1:3,1:3);
-                R2PFejFull = Pk00(4:6,4:6);
+                R1PFejFull = Pk00_fej(1:3,1:3);
+                R2PFejFull = Pk00_fej(4:6,4:6);
 
-                XfFe = Xk00e(7:end,:); % First estimated feature position
+                XfFe = Xk00e_fej(7:end,:); % First estimated feature position
 
                 continue
             end
@@ -207,24 +207,41 @@ for i = 1:3
             R2Odo_k = R2Odo(R2Odo(:,2)==k,3);
 
             if k == 1
-                Xk10e_fej = Xk00e;
+                Xk10e_fej = Xk00e_fej;
                 % Pk10_fej = Pk00;
-
-                Xk00e_fej = Xk00e;
-                Pk00_fej = Pk00;
             end
             
             Xrk01e_fej = Xk10e_fej(1:6,:);
 
-            DeltaXfX_fej = sparse(size(Xk00e_fej,1),size(Xk00e_fej,1));
-            DeltaXfX_fej(1:6,1:6) = blkdiag([1,0,-sin(Xrk01e_fej(3,3))*R1Odo_k(1,1) - cos(Xrk01e_fej(3,3))*R1Odo_k(2,1); ...
-                0,1,cos(Xrk01e_fej(3,3))*R1Odo_k(1,1) - sin(Xrk01e_fej(3,3))*R1Odo_k(2,1); ...
-                0,0,1], ...
-                [1,0,-sin(Xrk01e_fej(6,3))*R2Odo_k(1,1) - cos(Xrk01e_fej(6,3))*R2Odo_k(2,1); ...
-                0,1,cos(Xrk01e_fej(6,3))*R2Odo_k(1,1) - sin(Xrk01e_fej(6,3))*R2Odo_k(2,1); ...
-                0,0,1]);
+            Xk10e_fej = Xk00e_fej;
+            Xk10e_fej(1:6,2) = Xk10e_fej(1:6,2)+1;
+            Xk10e_fej(1:3,3) = Xk00e_fej(1:3,3) + ...
+                [cos(Xk00e_fej(3,3))*R1Odo_k(1,1) - sin(Xk00e_fej(3,3))*R1Odo_k(2,1);
+                sin(Xk00e_fej(3,3))*R1Odo_k(1,1) + cos(Xk00e_fej(3,3))*R1Odo_k(2,1);
+                R1Odo_k(3,1)];
+            Xk10e_fej(4:6,3) = Xk00e_fej(4:6,3) + ...
+                [cos(Xk00e_fej(6,3))*R2Odo_k(1,1) - sin(Xk00e_fej(6,3))*R2Odo_k(2,1);
+                sin(Xk00e_fej(6,3))*R2Odo_k(1,1) + cos(Xk00e_fej(6,3))*R2Odo_k(2,1);
+                R2Odo_k(3,1)];
+
+            Xk10e_fej([3,6],3) = wrap(Xk10e_fej([3,6],3));
+
+            %%
+            DeltaXfX_fej = sparse(size(Xk10e_fej,1),size(Xk00e_fej,1));
+            DeltaXfX_fej(1:6,1:6) = blkdiag([eye(2),J*(Xk10e_fej(1:2,3)-Xrk01e_fej(1:2,3)); ...
+                zeros(1,2),1], ...
+                [eye(2),J*(Xk10e_fej(4:5,3)-Xrk01e_fej(4:5,3)); ...
+                zeros(1,2),1]);
             DeltaXfX_fej(7:end,7:end) = eye(size(DeltaXfX_fej(7:end,7:end)));
             
+            % DeltaXfX_fej = sparse(size(Xk00e_fej,1),size(Xk00e_fej,1));
+            % DeltaXfX_fej(1:6,1:6) = blkdiag([1,0,-sin(Xrk01e_fej(3,3))*R1Odo_k(1,1) - cos(Xrk01e_fej(3,3))*R1Odo_k(2,1); ...
+            %     0,1,cos(Xrk01e_fej(3,3))*R1Odo_k(1,1) - sin(Xrk01e_fej(3,3))*R1Odo_k(2,1); ...
+            %     0,0,1], ...
+            %     [1,0,-sin(Xrk01e_fej(6,3))*R2Odo_k(1,1) - cos(Xrk01e_fej(6,3))*R2Odo_k(2,1); ...
+            %     0,1,cos(Xrk01e_fej(6,3))*R2Odo_k(1,1) - sin(Xrk01e_fej(6,3))*R2Odo_k(2,1); ...
+            %     0,0,1]);
+            % DeltaXfX_fej(7:end,7:end) = eye(size(DeltaXfX_fej(7:end,7:end)));
             %%
             % DeltaXfW_fej = sparse(size(Xk00e_fej,1),6);
             % DeltaXfW_fej(1:6,1:6) = blkdiag([cos(Xrk01e_fej(3,3)),-sin(Xrk01e_fej(3,3)),0; ...
@@ -242,23 +259,6 @@ for i = 1:3
                 sin(Xk00e_fej(6,3)),cos(Xk00e_fej(6,3)),0; ...
                 0,0,1]);
             %%
-
-            % if k == 8
-            %     keyboard
-            % end
-
-            Xk10e_fej = Xk00e_fej;
-            Xk10e_fej(1:6,2) = Xk10e_fej(1:6,2)+1;
-            Xk10e_fej(1:3,3) = Xk00e_fej(1:3,3) + ...
-                [cos(Xk00e_fej(3,3))*R1Odo_k(1,1) - sin(Xk00e_fej(3,3))*R1Odo_k(2,1);
-                sin(Xk00e_fej(3,3))*R1Odo_k(1,1) + cos(Xk00e_fej(3,3))*R1Odo_k(2,1);
-                R1Odo_k(3,1)];
-            Xk10e_fej(4:6,3) = Xk00e_fej(4:6,3) + ...
-                [cos(Xk00e_fej(6,3))*R2Odo_k(1,1) - sin(Xk00e_fej(6,3))*R2Odo_k(2,1);
-                sin(Xk00e_fej(6,3))*R2Odo_k(1,1) + cos(Xk00e_fej(6,3))*R2Odo_k(2,1);
-                R2Odo_k(3,1)];
-
-            Xk10e_fej([3,6],3) = wrap(Xk10e_fej([3,6],3));
 
             DWk = blkdiag(R1Q,R2Q);
 
@@ -324,7 +324,7 @@ for i = 1:3
 
                     for R1jn_fej = 1:(size(R1ZknFej,1)/2)
                         R1nRn_fej = blkdiag(R1nRn_fej, R1R);
-                        DeltaGV_fej(size(Xk10e_fej,1)+(R1jn_fej-1)*2+(1:2),(R1jn_fej-1)*2+(1:2)) = rotationMatrix(Xk10e_fej(3,3));
+                        DeltaGV_fej(size(Xk10e_fej,1)+(R1jn_fej-1)*2+(1:2),(R1jn_fej-1)*2+(1:2)) = Rot(Xk10e_fej(3,3));
                     end
 
                 end
@@ -347,7 +347,7 @@ for i = 1:3
                     for R2jn_fej = 1:(size(R2ZknFej,1)/2)
                         R2nRn_fej = blkdiag(R2nRn_fej, R2R);
                         % FEJ EKF
-                        DeltaGV_fej(size(Xk10e_fej,1)+size(R1ZknFej,1)+(R2jn_fej-1)*2+(1:2),size(R1ZknFej,1)+(R2jn_fej-1)*2+(1:2)) = rotationMatrix(Xk10e_fej(6,3));
+                        DeltaGV_fej(size(Xk10e_fej,1)+size(R1ZknFej,1)+(R2jn_fej-1)*2+(1:2),size(R1ZknFej,1)+(R2jn_fej-1)*2+(1:2)) = Rot(Xk10e_fej(6,3));
                     end
                 end
 
@@ -450,7 +450,7 @@ for i = 1:3
                     % for R1kjFej = 1:size(R1Zks2Fej,1)/2
                     %     R1DV = blkdiag(R1DV,R1R);
                     % 
-                    %     JHX10e_fej((R1kjFej-1)*2+(1:2), R1XfksFej_idx((R1kjFej-1)*2+(1:2),1)') = rotationMatrix(Xrk01e_fej(3,3))';
+                    %     JHX10e_fej((R1kjFej-1)*2+(1:2), R1XfksFej_idx((R1kjFej-1)*2+(1:2),1)') = Rot(Xrk01e_fej(3,3))';
                     % end
 
                     JHX10e_fej(1:2:(size(R1Zks2Fej,1)-1),1:3) = [repmat([-cos(Xk10efi_fej(3,3)),-sin(Xk10efi_fej(3,3))],size(R1Zks2Fej,1)/2,1), ...
@@ -462,7 +462,7 @@ for i = 1:3
                     for R1kjFej = 1:size(R1Zks2Fej,1)/2
                         R1DV = blkdiag(R1DV,R1R);
 
-                        JHX10e_fej((R1kjFej-1)*2+(1:2), R1XfksFej_idx((R1kjFej-1)*2+(1:2),1)') = rotationMatrix(Xk10efi_fej(3,3))';
+                        JHX10e_fej((R1kjFej-1)*2+(1:2), R1XfksFej_idx((R1kjFej-1)*2+(1:2),1)') = Rot(Xk10efi_fej(3,3))';
                     end
                     %%
                 end
@@ -486,7 +486,7 @@ for i = 1:3
                     %     R2DV = blkdiag(R2DV,R2R);
                     % 
                     %     % FEJ EKF
-                    %     JHX10e_fej(size(R1Zks2Fej,1)+(R2kjFej-1)*2+(1:2),R2XfksFej_idx((R2kjFej-1)*2+(1:2),1)') = rotationMatrix(Xrk01e_fej(6,3))';
+                    %     JHX10e_fej(size(R1Zks2Fej,1)+(R2kjFej-1)*2+(1:2),R2XfksFej_idx((R2kjFej-1)*2+(1:2),1)') = Rot(Xrk01e_fej(6,3))';
                     % end
 
                     JHX10e_fej(size(R1Zks2Fej,1)+(1:2:size(R2Zks2Fej,1)-1),4:6) = [repmat([-cos(Xk10efi_fej(6,3)),-sin(Xk10efi_fej(6,3))],size(R2Zks2Fej,1)/2,1), ...
@@ -499,7 +499,7 @@ for i = 1:3
                         R2DV = blkdiag(R2DV,R2R);
 
                         % FEJ EKF
-                        JHX10e_fej(size(R1Zks2Fej,1)+(R2kjFej-1)*2+(1:2),R2XfksFej_idx((R2kjFej-1)*2+(1:2),1)') = rotationMatrix(Xk10efi_fej(6,3))';
+                        JHX10e_fej(size(R1Zks2Fej,1)+(R2kjFej-1)*2+(1:2),R2XfksFej_idx((R2kjFej-1)*2+(1:2),1)') = Rot(Xk10efi_fej(6,3))';
                     end
                     %%
                 end
@@ -542,7 +542,7 @@ for i = 1:3
 
     end
 
-    feaNum = size(Xk11e(7:end,1),1)/2;
+    feaNum = size(Xk11e_fej(7:end,1),1)/2;
 
     %% FEJ EKF
     R1XpFejFullSet = [R1XpFejFull(:,1),R1XpFejFullSet];

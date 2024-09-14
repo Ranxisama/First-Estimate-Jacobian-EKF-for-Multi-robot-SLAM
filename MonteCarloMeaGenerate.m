@@ -3,12 +3,15 @@
 clc
 close all
 
+Config;
+
 load('TrueState\RobotsWaypoints.mat')
+
+wp1 = repmat(wp1,1,cy);
+wp2 = repmat(wp2,1,cy);
 
 R1XrTrueAll = dataModify(wp1);
 R2XrTrueAll = dataModify(wp2);
-
-
 
 R1PosNum = size(R1XrTrueAll,1)/2;
 R2PosNum = size(R2XrTrueAll,1)/2;
@@ -17,9 +20,6 @@ PosNum = min(R1PosNum,R2PosNum);
 
 R1XrTrue = R1XrTrueAll(1:(2*PosNum),:);
 R2XrTrue = R2XrTrueAll(1:(2*PosNum),:);
-
-Config;
-
 
 %% Robot Orientation Generation
 R1XphiT = bearingGeneration(R1XrTrue,R1bearingRange);
@@ -54,6 +54,7 @@ R2OdoSet = [R2Odo(:,1:2),R2OdoSet];
 for i = 1:3
     R1ObsSet = [];
     R2ObsSet = [];
+    XfTrueAll = [];
     if i == 1
         load('TrueState\CheckedTrueState_20features.mat')
     elseif i == 2

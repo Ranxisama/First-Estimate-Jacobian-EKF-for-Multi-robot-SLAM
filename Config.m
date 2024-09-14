@@ -1,18 +1,41 @@
 %% Number of Monte Carlo experiments
-mcNum = 100;
+mcNum = 20;
 
 %% Number of robot running cycles
-cy = 10;
+cy = 5;
 
-%% Check Switch
-%% Measurements check
-measurementsCheck = 1; % if 1, check the measurements by running MeasurementsGeneration.m
+%% Robot bearing ranges
+% R1bearingRange = 0; % pi/60: 3°
+% R2bearingRange = 0; % pi/60: 3°
+R1bearingRange = pi/12; % pi/60: 3°
+R2bearingRange = pi/12; % pi/60: 3°
 
-%% Simulation check
-% real time check, use more computer performance by running EKF_SLAM_simulation.m
-% Cov check
-robPositionCovCheck =  0; % if 1, check the position Cov of R1 and R2
-feaCovCheck = 0; % if 1, check the features Cov
+%% Gaussian noise level settings
+% R1
+% standard deviation of 1th robot position at time 0 (equals to 0 as the origin of the 1D coordinate system)
+R1sigma_0r = 1; % 0.01: 0.01 m
+R1sigma_0phi = pi/90; % pi/180: 1°
+
+
+% standard deviation of the zero mean Gaussian process noise w(k) of 1th robot
+R1sigma_uv = 5; % 0.025 m/time_step
+R1sigma_uw = pi/180; % 0.5°/time_step
+
+% standard deviation of the zero mean Gaussian observation noise v(k) of 1th robot
+R1sigma_zv = 5; % m/time_step
+
+% R2
+% standard deviation of robot position at time 0 (equals to 0 as the origin of the 1D coordinate system)
+R2sigma_0r = 5; % m
+R2sigma_0phi = pi/90; % pi: 180°
+
+% standard deviation of the zero mean Gaussian process noise w(k) of 2nd robot
+R2sigma_uv = 5; % m/time_step
+R2sigma_uw = pi/180; % °/time_step
+
+
+% standard deviation of the zero mean Gaussian observation noise v(k) of 2nd robot
+R2sigma_zv = 5; % m/time_step
 
 %% Noise Switch
 R1addPose0Noise = 0; % if 0, R1 initial position is accurate
@@ -29,6 +52,16 @@ R2addObsNoise = 1; % if 0, R2 observation is perfect
 R1sensorRange = 10; % m/s, R1's observation range for the features
 R2sensorRange = 10; % m/s, R2's observation range for the features
 
+%% Check Switch
+% Measurements check
+measurementsCheck = 1; % if 1, check the measurements by running MeasurementsGeneration.m
+
+% Simulation check
+% real time check, use more computer performance by running EKF_SLAM_simulation.m
+% Cov check
+robPositionCovCheck =  0; % if 1, check the position Cov of R1 and R2
+feaCovCheck = 0; % if 1, check the features Cov
+
 %% Required number of shared feature observations at step 0 
 reqSharedObsNum = 8; % Required number of shared feature observations
 
@@ -40,41 +73,6 @@ al = 1;
 
 %% LineWidth
 LW = 2;
-
-%% Robot bearing ranges
-% R1bearingRange = 0; % pi/60: 3°
-% R2bearingRange = 0; % pi/60: 3°
-R1bearingRange = pi/12; % pi/60: 3°
-R2bearingRange = pi/12; % pi/60: 3°
-
-%% Gaussian noise level settings
-%% R1
-% standard deviation of 1th robot position at time 0 (equals to 0 as the origin of the 1D coordinate system)
-R1sigma_0r = 0.5; % 0.01: 0.01 m
-R1sigma_0phi = pi/180; % pi/180: 1°
-
-
-% standard deviation of the zero mean Gaussian process noise w(k) of 1th robot
-R1sigma_uv = 0.5; % 0.025 m/time_step
-R1sigma_uw = pi/180; % 0.5°/time_step
-
-% standard deviation of the zero mean Gaussian observation noise v(k) of 1th robot
-R1sigma_zv = 0.5; % m/time_step
-
-%% R2
-% standard deviation of robot position at time 0 (equals to 0 as the origin of the 1D coordinate system)
-R2sigma_0r = 0.5; % m
-R2sigma_0phi = pi/180; % pi: 180°
-
-% standard deviation of the zero mean Gaussian process noise w(k) of 2nd robot
-R2sigma_uv = 0.5; % m/time_step
-R2sigma_uw = pi/180; % °/time_step
-
-
-% standard deviation of the zero mean Gaussian observation noise v(k) of 2nd robot
-R2sigma_zv = 0.5; % m/time_step
-
-
 
 %% boundary of features
 fea_xlb = -50; % lower boundary of features in x axis
@@ -149,3 +147,5 @@ R2R = [R2sigma_zv^2,0;
 if robPositionCovCheck ==  0 && feaCovCheck == 1
     error('To check feature Cov, you must switch on robPositionCovCheck')
 end
+
+J = [0,-1;1,0];
