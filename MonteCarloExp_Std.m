@@ -1,5 +1,7 @@
 clc
-close all
+clear
+
+Config;
 
 for i = 1:3
     if i == 1
@@ -12,8 +14,6 @@ for i = 1:3
         load('MT_Parameters_100fea.mat','R1XrTrue','R1XphiT','R2XrTrue','R2XphiT','XfTrueAll','R1OdoT','R2OdoT','R1ObsT','R2ObsT')
         load('MT_Measurements_100fea.mat','R1Xp0Set','R1OdoSet','R1ObsSet','R2Xp0Set','R2OdoSet','R2ObsSet')
     end
-
-    Config;
 
     poseNum = size(R1OdoSet,1)/3;
 
@@ -128,7 +128,7 @@ for i = 1:3
                 R1Zkn_idx = find(R1Zkn_lv);
                 % R1Z0n: new feature observation of 1st robot
                 R1Z0n = R1Obs_k(R1Zkn_idx,:);
-
+                
                 R1Xfkn = R1Z0n;
                 R1Xfkn(1:2:(end-1),2) = X0(1,3) + cos(X0(3,3))*(R1Z0n(1:2:(end-1),2)) - sin(X0(3,3))*(R1Z0n(2:2:end,2));
                 R1Xfkn(2:2:end,2) = X0(2,3) + sin(X0(3,3))*(R1Z0n(1:2:(end-1),2)) + cos(X0(3,3))*(R1Z0n(2:2:end,2));
@@ -165,7 +165,6 @@ for i = 1:3
 
                 JFXk(size(X0,1)+size(R1Xfkn,1)+(1:2:(size(R2Xfkn,1)-1)),4:6) = [repmat([1,0],size(R2Xfkn,1)/2,1), -sin(X0(6,3))*R2Z0n(1:2:(end-1),2) - cos(X0(6,3))*R2Z0n(2:2:end,2)];
                 JFXk(size(X0,1)+size(R1Xfkn,1)+(2:2:size(R2Xfkn,1)),4:6) = [repmat([0,1],size(R2Xfkn,1)/2,1), cos(X0(6,3))*R2Z0n(1:2:(end-1),2) - sin(X0(6,3))*R2Z0n(2:2:end,2)];
-
 
                 R1nRn = [];
                 R2nRn = [];
@@ -546,3 +545,4 @@ for i = 1:3
             'DeltaXfFullSet','PfFullSet')
     end
 end
+disp('Std EKF Complete!')

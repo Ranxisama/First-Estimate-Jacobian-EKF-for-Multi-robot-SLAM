@@ -17,7 +17,7 @@ for k = 0:PosNum-1
         if FeaRobDist <= sensorRange
             ROT = Rot(XphikT);
             obs((end+1):(end+2),1:3) = [[k;k],XfTrueAll((j-1)*2+(1:2),1), ...
-                ROT'*DeltaDist+ROT*randn(2,1)]; 
+                ROT'*DeltaDist+sqrt(R)*randn(2,1)]; 
         end
     end
 end

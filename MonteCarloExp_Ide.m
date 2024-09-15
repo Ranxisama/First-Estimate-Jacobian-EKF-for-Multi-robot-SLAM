@@ -1,5 +1,7 @@
 clc
-close all
+clear
+
+Config;
 
 for i = 1:3
     if i == 1
@@ -13,7 +15,6 @@ for i = 1:3
         load('MT_Measurements_100fea.mat','R1Xp0Set','R1OdoSet','R1ObsSet','R2Xp0Set','R2OdoSet','R2ObsSet')
     end
 
-    Config;
 
     poseNum = size(R1OdoSet,1)/3;
 
@@ -77,10 +78,16 @@ for i = 1:3
                 R1Z0s_idx = find(R1Z0s_lv);
                 % R1Z0s: shared feature observation of 1st robot
                 R1Z0s = R1Obs_k(R1Z0s_idx,:);
+                R1Z0sT = R1ObsT_k(R1Z0s_idx,:);
+
                 R1Xf0s = R1Z0s;
                 R1Xf0s(1:2:(end-1),2) = R1Xp0(1,1) + cos(R1Xp0(3,1))*(R1Z0s(1:2:(end-1),2)) - sin(R1Xp0(3,1))*(R1Z0s(2:2:end,2));
                 R1Xf0s(2:2:end,2) = R1Xp0(2,1) + sin(R1Xp0(3,1))*(R1Z0s(1:2:(end-1),2)) + cos(R1Xp0(3,1))*(R1Z0s(2:2:end,2));
+                
 
+                R1Xf0sT_lv = ismember(XfTrueAll(:,1),R1Xf0s(:,1));
+                R1Xf0sT_idx = find(R1Xf0sT_lv);
+                R1Xf0sT = XfTrueAll(R1Xf0sT_idx,:);
                 % find the shared observed feature IDs in 2nd robot
                 % R2Z0s_lv: logical vector of shared feature observation of
                 % 2nd robot at step k
@@ -90,6 +97,7 @@ for i = 1:3
                 R2Z0s_idx = find(R2Z0s_lv);
                 % R2Z0s: shared feature observation of 2nd robot
                 R2Z0s = R2Obs_k(R2Z0s_idx,:);
+                R2Z0sT = R2ObsT_k(R2Z0s_idx,:);
 
 
 
@@ -97,6 +105,9 @@ for i = 1:3
                 % use R2Xp0 as the initial value of R2's pose in the GN iteration
                 Xs = [2*ones(3,1),zeros(3,1),R2Xp0;
                     zeros(size(R1Xf0s,1),1),R1Xf0s];
+
+                XsT = [2*ones(3,1),zeros(3,1),R2Xp0T(:,2);
+                    zeros(size(R1Xf0s,1),1),R1Xf0sT];
 
                 R1sRn = [];
                 R2sRn = [];
@@ -108,12 +119,18 @@ for i = 1:3
 
                 Z0s = [R1Z0s(:,2);R2Z0s(:,2)];
 
+                Z0sT = [R1Z0sT(:,2);R2Z0sT(:,2)];
+
                 Xs(3,1) = wrap(Xs(3,1));
                 XsGni = Xs;
 
                 % 显示GNI的结果是奇异矩阵是因为加噪声随机生成的R2Xp0落在feature的真值上了
-                [XsGni(:,3),PzGni] = GNI(R1Xp0T(:,2),Xs(:,3),Pz,Z0s,CC);
+
+                %%
                 % [XsGni(:,3),PzGni] = GNI(R1Xp0,Xs(:,3),Pz,Z0s,CC);
+
+                [XsGni(:,3),PzGni] = GNI_Ide(R1Xp0,R1Xp0T,Xs(:,3),XsT(:,3),Pz,Z0s,Z0sT,CC);
+                %%
                 XsGni(3,1) = wrap(XsGni(3,1));
 
                 % Set the elements that are less than CovT to zero. This can be useful for dealing with numerical errors or avoiding unnecessary imaginary parts in calculations.
@@ -333,21 +350,22 @@ for i = 1:3
                     R1Xfn_ide(2:2:end,2) = Xk10e_ide(2,3) + sin(Xk10e_ide(3,3))*R1ZknIde(1:2:(end-1),2) + cos(Xk10e_ide(3,3))*R1ZknIde(2:2:end,2);
 
                     %% Cov
+                    % DeltaGX_ide(size(Xk10e_ide,1)+(1:2:(size(R1Xfn_ide,1)-1)),1:3) = [repmat([1, 0],size(R1Xfn_ide,1)/2,1), ...
+                    %     -sin(Xk10e_ide(3,3))*R1ZknIde(1:2:(end-1),2)-cos(Xk10e_ide(3,3))*R1ZknIde(2:2:end,2)];
+                    % DeltaGX_ide(size(Xk10e_ide,1)+(2:2:size(R1Xfn_ide,1)),1:3) = [repmat([0, 1],size(R1Xfn_ide,1)/2,1), ...
+                    %     cos(Xk10e_ide(3,3))*R1ZknIde(1:2:(end-1),2)-sin(Xk10e_ide(3,3))*R1ZknIde(2:2:end,2)];
+                    
                     DeltaGX_ide(size(Xk10e_ide,1)+(1:2:(size(R1Xfn_ide,1)-1)),1:3) = [repmat([1, 0],size(R1Xfn_ide,1)/2,1), ...
-                        -sin(Xk10e_ide(3,3))*R1ZknIde(1:2:(end-1),2)-cos(Xk10e_ide(3,3))*R1ZknIde(2:2:end,2)];
+                        -sin(Xrk10T(3,1))*R1ZknIdeT(1:2:(end-1),2)-cos(Xrk10T(3,1))*R1ZknIdeT(2:2:end,2)];
                     DeltaGX_ide(size(Xk10e_ide,1)+(2:2:size(R1Xfn_ide,1)),1:3) = [repmat([0, 1],size(R1Xfn_ide,1)/2,1), ...
-                        cos(Xk10e_ide(3,3))*R1ZknIde(1:2:(end-1),2)-sin(Xk10e_ide(3,3))*R1ZknIde(2:2:end,2)];
-
+                        cos(Xrk10T(3,1))*R1ZknIdeT(1:2:(end-1),2)-sin(Xrk10T(3,1))*R1ZknIdeT(2:2:end,2)];
+                    
+                    %%
                     for R1jn_ide = 1:(size(R1ZknIde,1)/2)
                         R1nRn_ide = blkdiag(R1nRn_ide, R1R);
                         DeltaGV_ide(size(Xk10e_ide,1)+(R1jn_ide-1)*2+(1:2),(R1jn_ide-1)*2+(1:2)) = Rot(Xk10e_ide(3,3));
                     end
                     
-                    % DeltaGX_ide(size(Xk10e_ide,1)+(1:2:(size(R1Xfn_ide,1)-1)),1:3) = [repmat([1, 0],size(R1Xfn_ide,1)/2,1), ...
-                    %     -sin(Xrk10T(3,1))*R1ZknIdeT(1:2:(end-1),2)-cos(Xrk10T(3,1))*R1ZknIdeT(2:2:end,2)];
-                    % DeltaGX_ide(size(Xk10e_ide,1)+(2:2:size(R1Xfn_ide,1)),1:3) = [repmat([0, 1],size(R1Xfn_ide,1)/2,1), ...
-                    %     cos(Xrk10T(3,1))*R1ZknIdeT(1:2:(end-1),2)-sin(Xrk10T(3,1))*R1ZknIdeT(2:2:end,2)];
-                    % 
                     % for R1jn_ide = 1:(size(R1ZknIde,1)/2)
                     %     R1nRn_ide = blkdiag(R1nRn_ide, R1R);
                     %     DeltaGV_ide(size(Xk10e_ide,1)+(R1jn_ide-1)*2+(1:2),(R1jn_ide-1)*2+(1:2)) = Rot(Xrk10T(3,1));
@@ -362,22 +380,23 @@ for i = 1:3
                     R2Xfn_ide(2:2:end,2) = Xk10e_ide(5,3) + sin(Xk10e_ide(6,3))*R2ZknIde(1:2:(end-1),2) + cos(Xk10e_ide(6,3))*R2ZknIde(2:2:end,2);
 
                     %% Cov
+                    % DeltaGX_ide(size(Xk10e_ide,1)+size(R1Xfn_ide,1)+(1:2:(size(R2Xfn_ide,1)-1)),4:6) = [repmat([1, 0],size(R2Xfn_ide,1)/2,1), ...
+                    %     -sin(Xk10e_ide(6,3))*R2ZknIde(1:2:(end-1),2)-cos(Xk10e_ide(6,3))*R2ZknIde(2:2:end,2)];
+                    % DeltaGX_ide(size(Xk10e_ide,1)+size(R1Xfn_ide,1)+(2:2:size(R2Xfn_ide,1)),4:6) = [repmat([0, 1],size(R2Xfn_ide,1)/2,1), ...
+                    %     cos(Xk10e_ide(6,3))*R2ZknIde(1:2:(end-1),2)-sin(Xk10e_ide(6,3))*R2ZknIde(2:2:end,2)];
+                    
                     DeltaGX_ide(size(Xk10e_ide,1)+size(R1Xfn_ide,1)+(1:2:(size(R2Xfn_ide,1)-1)),4:6) = [repmat([1, 0],size(R2Xfn_ide,1)/2,1), ...
-                        -sin(Xk10e_ide(6,3))*R2ZknIde(1:2:(end-1),2)-cos(Xk10e_ide(6,3))*R2ZknIde(2:2:end,2)];
+                        -sin(Xrk10T(6,1))*R2ZknIdeT(1:2:(end-1),2)-cos(Xrk10T(6,1))*R2ZknIdeT(2:2:end,2)];
                     DeltaGX_ide(size(Xk10e_ide,1)+size(R1Xfn_ide,1)+(2:2:size(R2Xfn_ide,1)),4:6) = [repmat([0, 1],size(R2Xfn_ide,1)/2,1), ...
-                        cos(Xk10e_ide(6,3))*R2ZknIde(1:2:(end-1),2)-sin(Xk10e_ide(6,3))*R2ZknIde(2:2:end,2)];
+                        cos(Xrk10T(6,1))*R2ZknIdeT(1:2:(end-1),2)-sin(Xrk10T(6,1))*R2ZknIdeT(2:2:end,2)];
 
+                    %%
                     for R2jn_ide = 1:(size(R2ZknIde,1)/2)
                         R2nRn_ide = blkdiag(R2nRn_ide, R2R);
                         % Ideal EKF
                         DeltaGV_ide(size(Xk10e_ide,1)+size(R1ZknIde,1)+(R2jn_ide-1)*2+(1:2),size(R1ZknIde,1)+(R2jn_ide-1)*2+(1:2)) = Rot(Xk10e_ide(6,3));
                     end
 
-                    % DeltaGX_ide(size(Xk10e_ide,1)+size(R1Xfn_ide,1)+(1:2:(size(R2Xfn_ide,1)-1)),4:6) = [repmat([1, 0],size(R2Xfn_ide,1)/2,1), ...
-                    %     -sin(Xrk10T(6,1))*R2ZknIdeT(1:2:(end-1),2)-cos(Xrk10T(6,1))*R2ZknIdeT(2:2:end,2)];
-                    % DeltaGX_ide(size(Xk10e_ide,1)+size(R1Xfn_ide,1)+(2:2:size(R2Xfn_ide,1)),4:6) = [repmat([0, 1],size(R2Xfn_ide,1)/2,1), ...
-                    %     cos(Xrk10T(6,1))*R2ZknIdeT(1:2:(end-1),2)-sin(Xrk10T(6,1))*R2ZknIdeT(2:2:end,2)];
-                    % 
                     % for R2jn_ide = 1:(size(R2ZknIde,1)/2)
                     %     R2nRn_ide = blkdiag(R2nRn_ide, R2R);
                     %     % Ideal EKF
@@ -630,3 +649,5 @@ for i = 1:3
             'DeltaXfIdeFullSet','PfIdeFullSet')
     end
 end
+
+disp('Ide EKF Complete!')

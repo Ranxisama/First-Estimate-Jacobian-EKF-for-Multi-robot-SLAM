@@ -1,5 +1,8 @@
 clc
+clear
 close all
+
+Config;
 
 %% save output figures
 currentFolder = fileparts(mfilename('fullpath'));
@@ -9,7 +12,7 @@ if ~exist(figuresFolderPath, 'dir')
     mkdir(figuresFolderPath);
 end
 
-Config;
+
 
 %% load the Monte Carlo Experiments result
 for fc = 1:3 % feature choice
@@ -195,9 +198,9 @@ for fc = 1:3 % feature choice
     R1XpNEES = [R1NEES_k(:,1),mean(R1NEES_k(:,2:end),2)];
     R2XpNEES = [R2NEES_k(:,1),mean(R2NEES_k(:,2:end),2)];
 
-    R1XpNEES_mean = mean(R1XpNEES(:,2))/3;
+    R1XpNEES_mean = abs(mean(R1XpNEES(:,2))/3 - 1);
 
-    R2XpNEES_mean = mean(R2XpNEES(:,2))/3;
+    R2XpNEES_mean = abs(mean(R2XpNEES(:,2))/3 - 1);
 
     XfNEES_k = [DeltaXfFullSet(1:2:(end-1),1),zeros(feaNum,mcNum)];
 
@@ -210,7 +213,7 @@ for fc = 1:3 % feature choice
     end
 
     XfNEES = [XfNEES_k(:,1),mean(XfNEES_k(:,2:end),2)];
-    XfNEES_mean = mean(XfNEES(:,2))/2;
+    XfNEES_mean = abs(mean(XfNEES(:,2))/2 - 1);
 
 
 
@@ -237,9 +240,9 @@ for fc = 1:3 % feature choice
     R1XpIdeNEES = [R1IdeNEES_k(:,1),mean(R1IdeNEES_k(:,2:end),2)];
     R2XpIdeNEES = [R2IdeNEES_k(:,1),mean(R2IdeNEES_k(:,2:end),2)];
 
-    R1XpIdeNEES_mean = mean(R1XpIdeNEES(:,2))/3;
+    R1XpIdeNEES_mean = abs(mean(R1XpIdeNEES(:,2))/3 - 1);
 
-    R2XpIdeNEES_mean = mean(R2XpIdeNEES(:,2))/3;
+    R2XpIdeNEES_mean = abs(mean(R2XpIdeNEES(:,2))/3 - 1);
 
     XfIdeNEES_k = [DeltaXfIdeFullSet(1:2:(end-1),1),zeros(feaNum,mcNum)];
 
@@ -252,7 +255,7 @@ for fc = 1:3 % feature choice
     end
 
     XfIdeNEES = [XfIdeNEES_k(:,1),mean(XfIdeNEES_k(:,2:end),2)];
-    XfIdeNEES_mean = mean(XfIdeNEES(:,2))/2;
+    XfIdeNEES_mean = abs(mean(XfIdeNEES(:,2))/2 - 1);
 
 
 
@@ -285,8 +288,8 @@ for fc = 1:3 % feature choice
     R1XpFejNEES = [R1FejNEES_k(:,1),mean(R1FejNEES_k(:,2:end),2)];
     R2XpFejNEES = [R2FejNEES_k(:,1),mean(R2FejNEES_k(:,2:end),2)];
 
-    R1XpFejNEES_mean = mean(R1XpFejNEES(:,2))/3;
-    R2XpFejNEES_mean = mean(R2XpFejNEES(:,2))/3;
+    R1XpFejNEES_mean = abs(mean(R1XpFejNEES(:,2))/3 - 1);
+    R2XpFejNEES_mean = abs(mean(R2XpFejNEES(:,2))/3 - 1);
 
     XfFejNEES_k = [DeltaXfFejFullSet(1:2:(end-1),1),zeros(feaNum,mcNum)];
 
@@ -299,7 +302,7 @@ for fc = 1:3 % feature choice
     end
 
     XfFejNEES = [XfFejNEES_k(:,1),mean(XfFejNEES_k(:,2:end),2)];
-    XfFejNEES_mean = mean(XfFejNEES(:,2))/2;
+    XfFejNEES_mean = abs(mean(XfFejNEES(:,2))/2 - 1);
 
 
 

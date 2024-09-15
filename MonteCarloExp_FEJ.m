@@ -1,5 +1,7 @@
 clc
-close all
+clear
+    
+Config;
 
 for i = 1:3
     if i == 1
@@ -13,7 +15,6 @@ for i = 1:3
         load('MT_Measurements_100fea.mat','R1Xp0Set','R1OdoSet','R1ObsSet','R2Xp0Set','R2OdoSet','R2ObsSet')
     end
 
-    Config;
 
     poseNum = size(R1OdoSet,1)/3;
 
@@ -61,10 +62,6 @@ for i = 1:3
             R1Obs_k = R1Obs(R1Obs(:,1)==k,2:3);
             R2Obs_k = R2Obs(R2Obs(:,1)==k,2:3);
 
-            % Ideal EKF
-            R1ObsT_k = R1ObsT(R1ObsT(:,1)==k,2:3);
-            R2ObsT_k = R2ObsT(R2ObsT(:,1)==k,2:3);
-
             if k == 0
                 % find the shared observed feature IDs in 1st robot
                 % R1Z0s_lv: logical vector of shared feature observation of
@@ -110,8 +107,12 @@ for i = 1:3
                 XsGni = Xs;
 
                 % 显示GNI的结果是奇异矩阵是因为加噪声随机生成的R2Xp0落在feature的真值上了
+                
+                %%
+                % [XsGni(:,3),PzGni] = GNI(R1Xp0,Xs(:,3),Pz,Z0s,CC);
 
-                [XsGni(:,3),PzGni] = GNI(R1Xp0,Xs(:,3),Pz,Z0s,CC);
+                [XsGni(:,3),PzGni] = GNI_FEJ(R1Xp0,Xs(:,3),Pz,Z0s,CC);
+                %%
                 XsGni(3,1) = wrap(XsGni(3,1));
 
                 % Set the elements that are less than CovT to zero. This can be useful for dealing with numerical errors or avoiding unnecessary imaginary parts in calculations.
@@ -278,7 +279,7 @@ for i = 1:3
             R2ZknFej_idx = find(R2ZknFej_lv);
             R2ZknFej = R2Obs_k(R2ZknFej_idx,:);
 
-            %% R1和R2都看到同一个新feature怎么办
+            % R1和R2都看到同一个新feature怎么办
             ZknsFej = intersect(R1ZknFej(:,1),R2ZknFej(:,1));
             % 用R1的来initialization,R2的从R2Zkn中去掉，后面用来做update
             R2ZknsFej = [];
@@ -308,7 +309,7 @@ for i = 1:3
                 R2Xfn_fej = [];
 
                 if ~isempty(R1ZknFej)
-                    %% FEJ EKF
+                    % FEJ EKF
                     R1Xfn_fej = R1ZknFej;
 
                     R1Xfn_fej(1:2:(end-1),2) = Xk10e_fej(1,3) + cos(Xk10e_fej(3,3))*R1ZknFej(1:2:(end-1),2) - sin(Xk10e_fej(3,3))*R1ZknFej(2:2:end,2);
@@ -316,17 +317,22 @@ for i = 1:3
 
                     XfFe = [XfFe;ones(size(R1Xfn_fej,1),1),R1Xfn_fej]; % First estimated feature position of R1
 
-                    % Cov
+                    %% Cov
                     DeltaGX_fej(size(Xk10e_fej,1)+(1:2:(size(R1Xfn_fej,1)-1)),1:3) = [repmat([1, 0],size(R1Xfn_fej,1)/2,1), ...
                         -sin(Xk10e_fej(3,3))*R1ZknFej(1:2:(end-1),2)-cos(Xk10e_fej(3,3))*R1ZknFej(2:2:end,2)];
                     DeltaGX_fej(size(Xk10e_fej,1)+(2:2:size(R1Xfn_fej,1)),1:3) = [repmat([0, 1],size(R1Xfn_fej,1)/2,1), ...
                         cos(Xk10e_fej(3,3))*R1ZknFej(1:2:(end-1),2)-sin(Xk10e_fej(3,3))*R1ZknFej(2:2:end,2)];
+                   
+                    % DeltaGX_fej(size(Xk10e_fej,1)+(1:2:(size(R1Xfn_fej,1)-1)),1:3) = [repmat([1, 0],size(R1Xfn_fej,1)/2,1), ...
+                    %     -(R1Xfn_fej(2:2:end,2)-Xrk01e_fej(2,3))];
+                    % DeltaGX_fej(size(Xk10e_fej,1)+(2:2:size(R1Xfn_fej,1)),1:3) = [repmat([0, 1],size(R1Xfn_fej,1)/2,1), ...
+                    %     R1Xfn_fej(1:2:(end-1),2)-Xrk01e_fej(1,3)];
+                    %%
 
                     for R1jn_fej = 1:(size(R1ZknFej,1)/2)
                         R1nRn_fej = blkdiag(R1nRn_fej, R1R);
                         DeltaGV_fej(size(Xk10e_fej,1)+(R1jn_fej-1)*2+(1:2),(R1jn_fej-1)*2+(1:2)) = Rot(Xk10e_fej(3,3));
                     end
-
                 end
 
                 if ~isempty(R2ZknFej)
@@ -338,11 +344,17 @@ for i = 1:3
 
                     XfFe = [XfFe;2*ones(size(R2Xfn_fej,1),1),R2Xfn_fej]; % First estimated feature position of R2
 
-                    % Cov
+                    %% Cov
                     DeltaGX_fej(size(Xk10e_fej,1)+size(R1Xfn_fej,1)+(1:2:(size(R2Xfn_fej,1)-1)),4:6) = [repmat([1, 0],size(R2Xfn_fej,1)/2,1), ...
                         -sin(Xk10e_fej(6,3))*R2ZknFej(1:2:(end-1),2)-cos(Xk10e_fej(6,3))*R2ZknFej(2:2:end,2)];
                     DeltaGX_fej(size(Xk10e_fej,1)+size(R1Xfn_fej,1)+(2:2:size(R2Xfn_fej,1)),4:6) = [repmat([0, 1],size(R2Xfn_fej,1)/2,1), ...
                         cos(Xk10e_fej(6,3))*R2ZknFej(1:2:(end-1),2)-sin(Xk10e_fej(6,3))*R2ZknFej(2:2:end,2)];
+                    
+                    % DeltaGX_fej(size(Xk10e_fej,1)+size(R1Xfn_fej,1)+(1:2:(size(R2Xfn_fej,1)-1)),4:6) = [repmat([1, 0],size(R2Xfn_fej,1)/2,1), ...
+                    %     -(R2Xfn_fej(2:2:end,2)-Xrk01e_fej(5,3))];
+                    % DeltaGX_fej(size(Xk10e_fej,1)+size(R1Xfn_fej,1)+(2:2:size(R2Xfn_fej,1)),4:6) = [repmat([0, 1],size(R2Xfn_fej,1)/2,1), ...
+                    %     R2Xfn_fej(1:2:(end-1),2)-Xrk01e_fej(4,3)];
+                    %%
 
                     for R2jn_fej = 1:(size(R2ZknFej,1)/2)
                         R2nRn_fej = blkdiag(R2nRn_fej, R2R);
@@ -615,3 +627,4 @@ for i = 1:3
             'DeltaXfFejFullSet','PfFejFullSet')
     end
 end
+disp('FEJ EKF Complete!')

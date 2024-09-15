@@ -1,7 +1,6 @@
 % Monte Carlo Measurements Generation
-
 clc
-close all
+clear
 
 Config;
 

@@ -1,5 +1,5 @@
 %% Number of Monte Carlo experiments
-mcNum = 20;
+mcNum = 100;
 
 %% Number of robot running cycles
 cy = 5;
@@ -13,29 +13,29 @@ R2bearingRange = pi/12; % pi/60: 3°
 %% Gaussian noise level settings
 % R1
 % standard deviation of 1th robot position at time 0 (equals to 0 as the origin of the 1D coordinate system)
-R1sigma_0r = 1; % 0.01: 0.01 m
-R1sigma_0phi = pi/90; % pi/180: 1°
+R1sigma_0r = 2; % 0.01: 0.01 m
+R1sigma_0phi = pi/45; % pi/180: 1°
 
 
 % standard deviation of the zero mean Gaussian process noise w(k) of 1th robot
-R1sigma_uv = 5; % 0.025 m/time_step
-R1sigma_uw = pi/180; % 0.5°/time_step
+R1sigma_uv = 1; % 0.025 m/time_step
+R1sigma_uw = pi/90; % 0.5°/time_step
 
 % standard deviation of the zero mean Gaussian observation noise v(k) of 1th robot
-R1sigma_zv = 5; % m/time_step
+R1sigma_zv = 1; % m/time_step
 
 % R2
 % standard deviation of robot position at time 0 (equals to 0 as the origin of the 1D coordinate system)
-R2sigma_0r = 5; % m
-R2sigma_0phi = pi/90; % pi: 180°
+R2sigma_0r = 2; % m
+R2sigma_0phi = pi/45; % pi: 180°
 
 % standard deviation of the zero mean Gaussian process noise w(k) of 2nd robot
-R2sigma_uv = 5; % m/time_step
-R2sigma_uw = pi/180; % °/time_step
+R2sigma_uv = 1; % m/time_step
+R2sigma_uw = pi/90; % °/time_step
 
 
 % standard deviation of the zero mean Gaussian observation noise v(k) of 2nd robot
-R2sigma_zv = 5; % m/time_step
+R2sigma_zv = 1; % m/time_step
 
 %% Noise Switch
 R1addPose0Noise = 0; % if 0, R1 initial position is accurate

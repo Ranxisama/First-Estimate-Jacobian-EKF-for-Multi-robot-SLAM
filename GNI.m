@@ -22,4 +22,4 @@ while DD >= ConvergenceCondition
     DD = D'*D;
 end
 
-PsGni = inv(JFx'/Ps*JFx); % R2Pp0Gni: Cov of R2 posture
+PsGni = inv(JFx'/Ps*JFx);
