@@ -1,8 +1,19 @@
 %% Number of Monte Carlo experiments
-mcNum = 100;
+mcNum = 50;
 
 %% Number of robot running cycles
 cy = 5;
+
+%% Jacobian value switch
+% Ideal EKF
+step0GNI_ide = 1; % if 0, Jacobian of GNI at step 0 use optimized value; if 1, use true value
+step0FI_ide = 1; % if 0, Jacobian of feature initialization at step 0 use optimized value; if 1, use true value
+
+stepkFI_ide = 1; % if 0, Jacobian of feature initialization at step k (k~=0) use estimated value; if 1, use true value
+
+% FEJ EKF
+step0GNI_fej = 1; % if 0, Jacobian of GNI at step 0 use optimized value; if 1, use first estimated value
+step0FI_fej = 1; % if 0, Jacobian of feature initialization at step 0 use optimized value; if 1, use first estimated value
 
 %% Robot bearing ranges
 % R1bearingRange = 0; % pi/60: 3°
@@ -14,12 +25,12 @@ R2bearingRange = pi/12; % pi/60: 3°
 % R1
 % standard deviation of 1th robot position at time 0 (equals to 0 as the origin of the 1D coordinate system)
 R1sigma_0r = 2; % 0.01: 0.01 m
-R1sigma_0phi = pi/45; % pi/180: 1°
+R1sigma_0phi = pi/30; % pi/180: 1°
 
 
 % standard deviation of the zero mean Gaussian process noise w(k) of 1th robot
 R1sigma_uv = 1; % 0.025 m/time_step
-R1sigma_uw = pi/90; % 0.5°/time_step
+R1sigma_uw = pi/60; % 0.5°/time_step
 
 % standard deviation of the zero mean Gaussian observation noise v(k) of 1th robot
 R1sigma_zv = 1; % m/time_step
@@ -27,11 +38,11 @@ R1sigma_zv = 1; % m/time_step
 % R2
 % standard deviation of robot position at time 0 (equals to 0 as the origin of the 1D coordinate system)
 R2sigma_0r = 2; % m
-R2sigma_0phi = pi/45; % pi: 180°
+R2sigma_0phi = pi/30; % pi: 180°
 
 % standard deviation of the zero mean Gaussian process noise w(k) of 2nd robot
 R2sigma_uv = 1; % m/time_step
-R2sigma_uw = pi/90; % °/time_step
+R2sigma_uw = pi/60; % °/time_step
 
 
 % standard deviation of the zero mean Gaussian observation noise v(k) of 2nd robot
@@ -149,3 +160,20 @@ if robPositionCovCheck ==  0 && feaCovCheck == 1
 end
 
 J = [0,-1;1,0];
+
+if step0GNI_ide ~= 0 && step0GNI_ide ~= 1
+    error('step0GNI_ide only can be 0 or 1')
+end
+if step0FI_ide ~= 0 && step0FI_ide ~= 1
+    error('step0FI_ide only can be 0 or 1')
+end
+if stepkFI_ide ~= 0 && stepkFI_ide ~= 1
+    error('stepkFI_ide only can be 0 or 1')
+end
+
+if step0GNI_fej ~= 0 && step0GNI_fej ~= 1
+    error('step0GNI_fej only can be 0 or 1')
+end
+if step0FI_fej ~= 0 && step0FI_fej ~= 1
+    error('step0FI_fej only can be 0 or 1')
+end

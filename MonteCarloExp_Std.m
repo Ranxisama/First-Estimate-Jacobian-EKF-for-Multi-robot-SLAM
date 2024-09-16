@@ -104,7 +104,7 @@ for i = 1:3
                 Xs(3,1) = wrap(Xs(3,1));
                 XsGni = Xs;
 
-                %% 显示GNI的结果是奇异矩阵是因为加噪声随机生成的R2Xp0落在feature的真值上了
+                % 显示GNI的结果是奇异矩阵是因为加噪声随机生成的R2Xp0落在feature的真值上了
 
                 [XsGni(:,3),PzGni] = GNI(R1Xp0,Xs(:,3),Pz,Z0s,CC);
                 XsGni(3,1) = wrap(XsGni(3,1));
@@ -112,7 +112,7 @@ for i = 1:3
                 % Set the elements that are less than CovT to zero. This can be useful for dealing with numerical errors or avoiding unnecessary imaginary parts in calculations.
                 PzGni(abs(PzGni)<CovT) = 0;
 
-                %% Add the information of R1 into XsGni and PsGni
+                % Add the information of R1 into XsGni and PsGni
                 X0 = [ones(3,1),zeros(3,1),R1Xp0;XsGni];
                 P0 = blkdiag(R1O,PzGni);
 
@@ -128,7 +128,7 @@ for i = 1:3
                 R1Zkn_idx = find(R1Zkn_lv);
                 % R1Z0n: new feature observation of 1st robot
                 R1Z0n = R1Obs_k(R1Zkn_idx,:);
-                
+
                 R1Xfkn = R1Z0n;
                 R1Xfkn(1:2:(end-1),2) = X0(1,3) + cos(X0(3,3))*(R1Z0n(1:2:(end-1),2)) - sin(X0(3,3))*(R1Z0n(2:2:end,2));
                 R1Xfkn(2:2:end,2) = X0(2,3) + sin(X0(3,3))*(R1Z0n(1:2:(end-1),2)) + cos(X0(3,3))*(R1Z0n(2:2:end,2));
@@ -157,31 +157,36 @@ for i = 1:3
                     ones(size(R1Xfkn,1),1),R1Xfkn;
                     2*ones(size(R2Xfkn,1),1),R2Xfkn];
 
-                % Jacobian of Xk
-                JFXk = sparse(size(Xk00e,1),size(X0,1));
-                JFXk(1:size(X0,1),1:size(X0,1)) = eye(size(X0,1));
-                JFXk(size(X0,1)+(1:2:(size(R1Xfkn,1)-1)),1:3) = [repmat([1,0],size(R1Xfkn,1)/2,1), -sin(X0(3,3))*R1Z0n(1:2:(end-1),2) - cos(X0(3,3))*R1Z0n(2:2:end,2)];
-                JFXk(size(X0,1)+(2:2:size(R1Xfkn,1)),1:3) = [repmat([0,1],size(R1Xfkn,1)/2,1), cos(X0(3,3))*R1Z0n(1:2:(end-1),2) - sin(X0(3,3))*R1Z0n(2:2:end,2)];
+                if ~isempty(R1Xfkn) || ~isempty(R2Xfkn)
+                    % Jacobian of Xk
+                    JFXk = sparse(size(Xk00e,1),size(X0,1));
+                    JFXk(1:size(X0,1),1:size(X0,1)) = eye(size(X0,1));
+                    JFXk(size(X0,1)+(1:2:(size(R1Xfkn,1)-1)),1:3) = [repmat([1,0],size(R1Xfkn,1)/2,1), -sin(X0(3,3))*R1Z0n(1:2:(end-1),2) - cos(X0(3,3))*R1Z0n(2:2:end,2)];
+                    JFXk(size(X0,1)+(2:2:size(R1Xfkn,1)),1:3) = [repmat([0,1],size(R1Xfkn,1)/2,1), cos(X0(3,3))*R1Z0n(1:2:(end-1),2) - sin(X0(3,3))*R1Z0n(2:2:end,2)];
 
-                JFXk(size(X0,1)+size(R1Xfkn,1)+(1:2:(size(R2Xfkn,1)-1)),4:6) = [repmat([1,0],size(R2Xfkn,1)/2,1), -sin(X0(6,3))*R2Z0n(1:2:(end-1),2) - cos(X0(6,3))*R2Z0n(2:2:end,2)];
-                JFXk(size(X0,1)+size(R1Xfkn,1)+(2:2:size(R2Xfkn,1)),4:6) = [repmat([0,1],size(R2Xfkn,1)/2,1), cos(X0(6,3))*R2Z0n(1:2:(end-1),2) - sin(X0(6,3))*R2Z0n(2:2:end,2)];
+                    JFXk(size(X0,1)+size(R1Xfkn,1)+(1:2:(size(R2Xfkn,1)-1)),4:6) = [repmat([1,0],size(R2Xfkn,1)/2,1), -sin(X0(6,3))*R2Z0n(1:2:(end-1),2) - cos(X0(6,3))*R2Z0n(2:2:end,2)];
+                    JFXk(size(X0,1)+size(R1Xfkn,1)+(2:2:size(R2Xfkn,1)),4:6) = [repmat([0,1],size(R2Xfkn,1)/2,1), cos(X0(6,3))*R2Z0n(1:2:(end-1),2) - sin(X0(6,3))*R2Z0n(2:2:end,2)];
 
-                R1nRn = [];
-                R2nRn = [];
-                JFWk = sparse(size(Xk00e,1),size(R1Z0n,1)+size(R2Z0n,1));
-                for R1jn = 1:(size(R1Z0n,1)/2)
-                    R1nRn = blkdiag(R1nRn, R1R);
-                    JFWk(size(X0,1)+(R1jn-1)*2+(1:2),(R1jn-1)*2+(1:2)) = Rot(X0(3,3));
+                    R1nRn = [];
+                    R2nRn = [];
+                    JFWk = sparse(size(Xk00e,1),size(R1Z0n,1)+size(R2Z0n,1));
+                    for R1jn = 1:(size(R1Z0n,1)/2)
+                        R1nRn = blkdiag(R1nRn, R1R);
+                        JFWk(size(X0,1)+(R1jn-1)*2+(1:2),(R1jn-1)*2+(1:2)) = Rot(X0(3,3));
+                    end
+                    for R2jn = 1:(size(R2Z0n,1)/2)
+                        R2nRn = blkdiag(R2nRn, R2R);
+                        JFWk(size(X0,1)+size(R1Z0n,1)+(R2jn-1)*2+(1:2),size(R1Z0n,1)+(R2jn-1)*2+(1:2)) = Rot(X0(6,3));
+                    end
+
+                    nRn = blkdiag(R1nRn,R2nRn);
+                    Pk00 = JFXk*P0*JFXk'+JFWk*nRn*JFWk';
+
+                    Pk00(abs(Pk00)<CovT) = 0;
+
+                else
+                    Pk00 = P0;
                 end
-                for R2jn = 1:(size(R2Z0n,1)/2)
-                    R2nRn = blkdiag(R2nRn, R2R);
-                    JFWk(size(X0,1)+size(R1Z0n,1)+(R2jn-1)*2+(1:2),size(R1Z0n,1)+(R2jn-1)*2+(1:2)) = Rot(X0(6,3));
-                end
-
-                nRn = blkdiag(R1nRn,R2nRn);
-                Pk00 = JFXk*P0*JFXk'+JFWk*nRn*JFWk';
-
-                Pk00(abs(Pk00)<CovT) = 0;
 
                 % Standard EKF
                 R1XpFull = Xk00e(1:3,2:3); % save all robot postures of R1

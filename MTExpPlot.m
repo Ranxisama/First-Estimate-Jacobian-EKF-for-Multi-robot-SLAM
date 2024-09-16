@@ -89,20 +89,20 @@ for fc = 1:3 % feature choice
 
     [XfFejRMSE,XfFejRMSE_mean] = XFRMSE(feaNum,mcNum,DeltaXfFejFullSet);
 
-    poseNum_1round = size(DeltaR1XrIdeFullSet,1)/cy;
+    poseNum_1round = size(DeltaR1XrIdeFullSet,1)/cy/2;
 
     % Plot RMSE
     % R1 postion
     figure((fc-1)*6+1)
     hold on
     % standard EKF
-    R1XrRMSEP = plot(R1XrRMSE(:,1)',R1XrRMSE(:,2)','--b','DisplayName','R1 std EKF');
+    R1XrRMSEP = plot(R1XrRMSE(:,1)',R1XrRMSE(:,2)','-b.','DisplayName','R1 std EKF');
     % ideal EKF
     R1XrIdeRMSEP = plot(R1XrIdeRMSE(:,1)',R1XrIdeRMSE(:,2)','-k','DisplayName','R1 ideal EKF');
     % FEJ EKF
-    R1XrFejRMSEP = plot(R1XrFejRMSE(:,1)',R1XrFejRMSE(:,2)','-r.','DisplayName','R1 FEJ EKF');
+    R1XrFejRMSEP = plot(R1XrFejRMSE(:,1)',R1XrFejRMSE(:,2)','--r','DisplayName','R1 FEJ EKF');
 
-    xline(poseNum_1round,'--g',sprintf('x = %d', poseNum_1round))
+    xline(poseNum_1round,'--g',sprintf('step = %d', poseNum_1round))
 
     xlabel('Steps')
     ylabel('R1 Position RMSE (m)')
@@ -115,11 +115,11 @@ for fc = 1:3 % feature choice
     %% R2 postion
     figure((fc-1)*6+2)
     hold on
-    R2XrRMSEP = plot(R2XrRMSE(:,1)',R2XrRMSE(:,2)','--b','DisplayName','R2 std EKF');
+    R2XrRMSEP = plot(R2XrRMSE(:,1)',R2XrRMSE(:,2)','-b.','DisplayName','R2 std EKF');
     R2XrIdeRMSEP = plot(R2XrIdeRMSE(:,1)',R2XrIdeRMSE(:,2)','-k','DisplayName','R2 ideal EKF');
-    R2XrFejRMSEP = plot(R2XrFejRMSE(:,1)',R2XrFejRMSE(:,2)','-r.','DisplayName','R2 FEJ EKF');
+    R2XrFejRMSEP = plot(R2XrFejRMSE(:,1)',R2XrFejRMSE(:,2)','--r','DisplayName','R2 FEJ EKF');
 
-    xline(poseNum_1round,'--g',sprintf('x = %d', poseNum_1round))
+    xline(poseNum_1round,'--g',sprintf('step = %d', poseNum_1round))
 
     xlabel('Steps')
     ylabel('R2 Position RMSE (m)')
@@ -133,13 +133,13 @@ for fc = 1:3 % feature choice
     figure((fc-1)*6+3)
     hold on
     % standard EKF
-    R1XphiRMSEP = plot(R1XphiRMSE(:,1)',R1XphiRMSE(:,2)','--b','DisplayName','R1 std EKF');
+    R1XphiRMSEP = plot(R1XphiRMSE(:,1)',R1XphiRMSE(:,2)','-b.','DisplayName','R1 std EKF');
     % ideal EKF
     R1XphiIdeRMSEP = plot(R1XphiIdeRMSE(:,1)',R1XphiIdeRMSE(:,2)','-k','DisplayName','R1 ideal EKF');
     % FEJ EKF
-    R1XphiFejRMSEP = plot(R1XphiFejRMSE(:,1)',R1XphiFejRMSE(:,2)','-r.','DisplayName','R1 FEJ EKF');
+    R1XphiFejRMSEP = plot(R1XphiFejRMSE(:,1)',R1XphiFejRMSE(:,2)','--r','DisplayName','R1 FEJ EKF');
 
-    xline(poseNum_1round,'--g',sprintf('x = %d', poseNum_1round))
+    xline(poseNum_1round,'--g',sprintf('step = %d', poseNum_1round))
 
     xlabel('Steps')
     ylabel('R1 Heading RMSE (rad)')
@@ -152,11 +152,11 @@ for fc = 1:3 % feature choice
     %% R2 orientation
     figure((fc-1)*6+4)
     hold on
-    R2XphiRMSEP = plot(R2XphiRMSE(:,1)',R2XphiRMSE(:,2)','--b','DisplayName','R2 std EKF');
+    R2XphiRMSEP = plot(R2XphiRMSE(:,1)',R2XphiRMSE(:,2)','-b.','DisplayName','R2 std EKF');
     R2XphiIdeRMSEP = plot(R2XphiIdeRMSE(:,1)',R2XphiIdeRMSE(:,2)','-k','DisplayName','R2 ideal EKF');
-    R2XphiFejRMSEP = plot(R2XphiFejRMSE(:,1)',R2XphiFejRMSE(:,2)','-r.','DisplayName','R2 FEJ EKF');
+    R2XphiFejRMSEP = plot(R2XphiFejRMSE(:,1)',R2XphiFejRMSE(:,2)','--r','DisplayName','R2 FEJ EKF');
 
-    xline(poseNum_1round,'--g',sprintf('x = %d', poseNum_1round))
+    xline(poseNum_1round,'--g',sprintf('step = %d', poseNum_1round))
 
     xlabel('Steps')
     ylabel('R2 Heading RMSE (rad)')
@@ -172,13 +172,8 @@ for fc = 1:3 % feature choice
     % standard EKF
     R1NEES_k = [(1:poseNum)',zeros(poseNum,mcNum)];
     R2NEES_k = [(0:poseNum)',zeros(poseNum+1,mcNum)];
-    for k = 0:poseNum
 
-        %% Debug
-        % if k == 34 || k == 60
-        %     keyboard;
-        % end
-        %%
+    for k = 0:poseNum
 
         for mn = 1:mcNum
             R2xri_e = DeltaR2XpFullSet(k*3+(1:3),1+mn);
@@ -257,13 +252,6 @@ for fc = 1:3 % feature choice
     XfIdeNEES = [XfIdeNEES_k(:,1),mean(XfIdeNEES_k(:,2:end),2)];
     XfIdeNEES_mean = abs(mean(XfIdeNEES(:,2))/2 - 1);
 
-
-
-    %% Debug
-    % if feaNum == 20
-    %     keyboard
-    % end
-
     % FEJ EKF
     R1FejNEES_k = [(1:poseNum)',zeros(poseNum,mcNum)];
     R2FejNEES_k = [(0:poseNum)',zeros(poseNum+1,mcNum)];
@@ -310,13 +298,13 @@ for fc = 1:3 % feature choice
     figure((fc-1)*6+5)
     hold on
     % standard EKF
-    R1XpNEESP = plot(R1XpNEES(:,1)',R1XpNEES(:,2)','--b','DisplayName','R1 std EKF');
+    R1XpNEESP = plot(R1XpNEES(:,1)',R1XpNEES(:,2)','-b.','DisplayName','R1 std EKF');
     % ideal EKF
     R1XpIdeNEESP = plot(R1XpIdeNEES(:,1)',R1XpIdeNEES(:,2)','-k','DisplayName','R1 ideal EKF');
     % FEJ EKF
-    R1XpFejNEESP = plot(R1XpFejNEES(:,1)',R1XpFejNEES(:,2)','-r.','DisplayName','R1 FEJ EKF');   
+    R1XpFejNEESP = plot(R1XpFejNEES(:,1)',R1XpFejNEES(:,2)','--r','DisplayName','R1 FEJ EKF');   
     
-    xline(poseNum_1round,'--g',sprintf('x = %d', poseNum_1round))
+    xline(poseNum_1round,'--g',sprintf('step = %d', poseNum_1round))
 
     xlabel('Steps')
     ylabel('R1 Pose ANEES')
@@ -329,11 +317,11 @@ for fc = 1:3 % feature choice
     %% R2 pose
     figure((fc-1)*6+6)
     hold on
-    R2XpNEESP = plot(R2XpNEES(:,1)',R2XpNEES(:,2)','--b','DisplayName','R2 std EKF');
+    R2XpNEESP = plot(R2XpNEES(:,1)',R2XpNEES(:,2)','-b.','DisplayName','R2 std EKF');
     R2XpIdeNEESP = plot(R2XpIdeNEES(:,1)',R2XpIdeNEES(:,2)','-k','DisplayName','R2 ideal EKF');
-    R2XpFejNEESP = plot(R2XpFejNEES(:,1)',R2XpFejNEES(:,2)','-r.','DisplayName','R2 FEJ EKF');
+    R2XpFejNEESP = plot(R2XpFejNEES(:,1)',R2XpFejNEES(:,2)','--r','DisplayName','R2 FEJ EKF');
     
-    xline(poseNum_1round,'--g',sprintf('x = %d', poseNum_1round))
+    xline(poseNum_1round,'--g',sprintf('step = %d', poseNum_1round))
 
     xlabel('Steps')
     ylabel('R2 Pose ANEES')
@@ -352,6 +340,10 @@ for fc = 1:3 % feature choice
         IdeEKFColumn = [R1XrIdeRMSE_mean;R1XphiIdeRMSE_mean;R2XrIdeRMSE_mean;R2XphiIdeRMSE_mean;XfIdeRMSE_mean;R1XpIdeNEES_mean;R2XpIdeNEES_mean;XfIdeNEES_mean];
         StdEKFColumn = [R1XrRMSE_mean;R1XphiRMSE_mean;R2XrRMSE_mean;R2XphiRMSE_mean;XfStdRMSE_mean;R1XpNEES_mean;R2XpNEES_mean;XfNEES_mean];
         FejEKFColumn = [R1XrFejRMSE_mean;R1XphiFejRMSE_mean;R2XrFejRMSE_mean;R2XphiFejRMSE_mean;XfFejRMSE_mean;R1XpFejNEES_mean;R2XpFejNEES_mean;XfFejNEES_mean];
+        
+        IdeEKFColumn = arrayfun(@(x) sprintf('%.4f', x), IdeEKFColumn, 'UniformOutput', false);
+        StdEKFColumn = arrayfun(@(x) sprintf('%.4f', x), StdEKFColumn, 'UniformOutput', false);
+        FejEKFColumn = arrayfun(@(x) sprintf('%.4f', x), FejEKFColumn, 'UniformOutput', false);
 
         % 创建表格并插入动态列名称
         T = table(IdeEKFColumn, StdEKFColumn,FejEKFColumn,'VariableNames',{'Ideal EKF','Std EKF','FEJ EKF'});
@@ -369,6 +361,10 @@ for fc = 1:3 % feature choice
         IdeEKFColumn = [R1XrIdeRMSE_mean;R1XphiIdeRMSE_mean;R2XrIdeRMSE_mean;R2XphiIdeRMSE_mean;XfIdeRMSE_mean;R1XpIdeNEES_mean;R2XpIdeNEES_mean;XfIdeNEES_mean];
         StdEKFColumn = [R1XrRMSE_mean;R1XphiRMSE_mean;R2XrRMSE_mean;R2XphiRMSE_mean;XfStdRMSE_mean;R1XpNEES_mean;R2XpNEES_mean;XfNEES_mean];
         FejEKFColumn = [R1XrFejRMSE_mean;R1XphiFejRMSE_mean;R2XrFejRMSE_mean;R2XphiFejRMSE_mean;XfFejRMSE_mean;R1XpFejNEES_mean;R2XpFejNEES_mean;XfFejNEES_mean];
+        
+        IdeEKFColumn = arrayfun(@(x) sprintf('%.4f', x), IdeEKFColumn, 'UniformOutput', false);
+        StdEKFColumn = arrayfun(@(x) sprintf('%.4f', x), StdEKFColumn, 'UniformOutput', false);
+        FejEKFColumn = arrayfun(@(x) sprintf('%.4f', x), FejEKFColumn, 'UniformOutput', false);
 
         % 创建表格并插入动态列名称
         T = table(IdeEKFColumn, StdEKFColumn,FejEKFColumn,'VariableNames',{'Ideal EKF','Std EKF','FEJ EKF'});
@@ -386,6 +382,10 @@ for fc = 1:3 % feature choice
         IdeEKFColumn = [R1XrIdeRMSE_mean;R1XphiIdeRMSE_mean;R2XrIdeRMSE_mean;R2XphiIdeRMSE_mean;XfIdeRMSE_mean;R1XpIdeNEES_mean;R2XpIdeNEES_mean;XfIdeNEES_mean];
         StdEKFColumn = [R1XrRMSE_mean;R1XphiRMSE_mean;R2XrRMSE_mean;R2XphiRMSE_mean;XfStdRMSE_mean;R1XpNEES_mean;R2XpNEES_mean;XfNEES_mean];
         FejEKFColumn = [R1XrFejRMSE_mean;R1XphiFejRMSE_mean;R2XrFejRMSE_mean;R2XphiFejRMSE_mean;XfFejRMSE_mean;R1XpFejNEES_mean;R2XpFejNEES_mean;XfFejNEES_mean];
+        
+        IdeEKFColumn = arrayfun(@(x) sprintf('%.4f', x), IdeEKFColumn, 'UniformOutput', false);
+        StdEKFColumn = arrayfun(@(x) sprintf('%.4f', x), StdEKFColumn, 'UniformOutput', false);
+        FejEKFColumn = arrayfun(@(x) sprintf('%.4f', x), FejEKFColumn, 'UniformOutput', false);
 
         % 创建表格并插入动态列名称
         T = table(IdeEKFColumn, StdEKFColumn,FejEKFColumn,'VariableNames',{'Ideal EKF','Std EKF','FEJ EKF'});
@@ -401,23 +401,45 @@ for fc = 1:3 % feature choice
 
 end
 
-exportgraphics(figure(1),fullfile(figuresFolderPath, 'R1Postion_RMSE_20feas.jpg'), 'Resolution', 300)
-exportgraphics(figure(2),fullfile(figuresFolderPath, 'R2Postion_RMSE_20feas.jpg'), 'Resolution', 300)
-exportgraphics(figure(3),fullfile(figuresFolderPath, 'R1Orientation_RMSE_20feas.jpg'), 'Resolution', 300)
-exportgraphics(figure(4),fullfile(figuresFolderPath, 'R2Orientation_RMSE_20feas.jpg'), 'Resolution', 300)
-exportgraphics(figure(5),fullfile(figuresFolderPath, 'R1Pose_ANEES_20feas.jpg'), 'Resolution', 300)
-exportgraphics(figure(6),fullfile(figuresFolderPath, 'R2Pose_ANEES_20feas.jpg'), 'Resolution', 300)
+% exportgraphics(figure(1),fullfile(figuresFolderPath, 'R1Postion_RMSE_20feas.jpg'), 'Resolution', 300)
+% exportgraphics(figure(2),fullfile(figuresFolderPath, 'R2Postion_RMSE_20feas.jpg'), 'Resolution', 300)
+% exportgraphics(figure(3),fullfile(figuresFolderPath, 'R1Orientation_RMSE_20feas.jpg'), 'Resolution', 300)
+% exportgraphics(figure(4),fullfile(figuresFolderPath, 'R2Orientation_RMSE_20feas.jpg'), 'Resolution', 300)
+% exportgraphics(figure(5),fullfile(figuresFolderPath, 'R1Pose_ANEES_20feas.jpg'), 'Resolution', 300)
+% exportgraphics(figure(6),fullfile(figuresFolderPath, 'R2Pose_ANEES_20feas.jpg'), 'Resolution', 300)
+% 
+% exportgraphics(figure(7),fullfile(figuresFolderPath, 'R1Postion_RMSE_60feas.jpg'), 'Resolution', 300)
+% exportgraphics(figure(8),fullfile(figuresFolderPath, 'R2Postion_RMSE_60feas.jpg'), 'Resolution', 300)
+% exportgraphics(figure(9),fullfile(figuresFolderPath, 'R1Orientation_RMSE_60feas.jpg'), 'Resolution', 300)
+% exportgraphics(figure(10),fullfile(figuresFolderPath, 'R2Orientation_RMSE_60feas.jpg'), 'Resolution', 300)
+% exportgraphics(figure(11),fullfile(figuresFolderPath, 'R1Pose_ANEES_60feas.jpg'), 'Resolution', 300)
+% exportgraphics(figure(12),fullfile(figuresFolderPath, 'R2Pose_ANEES_60feas.jpg'), 'Resolution', 300)
+% 
+% exportgraphics(figure(13),fullfile(figuresFolderPath, 'R1Postion_RMSE_100feas.jpg'), 'Resolution', 300)
+% exportgraphics(figure(14),fullfile(figuresFolderPath, 'R2Postion_RMSE_100feas.jpg'), 'Resolution', 300)
+% exportgraphics(figure(15),fullfile(figuresFolderPath, 'R1Orientation_RMSE_100feas.jpg'), 'Resolution', 300)
+% exportgraphics(figure(16),fullfile(figuresFolderPath, 'R2Orientation_RMSE_100feas.jpg'), 'Resolution', 300)
+% exportgraphics(figure(17),fullfile(figuresFolderPath, 'R1Pose_ANEES_100feas.jpg'), 'Resolution', 300)
+% exportgraphics(figure(18),fullfile(figuresFolderPath, 'R2Pose_ANEES_100feas.jpg'), 'Resolution', 300)
 
-exportgraphics(figure(7),fullfile(figuresFolderPath, 'R1Postion_RMSE_60feas.jpg'), 'Resolution', 300)
-exportgraphics(figure(8),fullfile(figuresFolderPath, 'R2Postion_RMSE_60feas.jpg'), 'Resolution', 300)
-exportgraphics(figure(9),fullfile(figuresFolderPath, 'R1Orientation_RMSE_60feas.jpg'), 'Resolution', 300)
-exportgraphics(figure(10),fullfile(figuresFolderPath, 'R2Orientation_RMSE_60feas.jpg'), 'Resolution', 300)
-exportgraphics(figure(11),fullfile(figuresFolderPath, 'R1Pose_ANEES_60feas.jpg'), 'Resolution', 300)
-exportgraphics(figure(12),fullfile(figuresFolderPath, 'R2Pose_ANEES_60feas.jpg'), 'Resolution', 300)
+% 使用export_fig代替exportgraphics来导出高质量的图像
+export_fig(fullfile(figuresFolderPath, 'R1Postion_RMSE_20feas.jpg'), '-jpg', '-r300', figure(1));
+export_fig(fullfile(figuresFolderPath, 'R2Postion_RMSE_20feas.jpg'), '-jpg', '-r300', figure(2));
+export_fig(fullfile(figuresFolderPath, 'R1Orientation_RMSE_20feas.jpg'), '-jpg', '-r300', figure(3));
+export_fig(fullfile(figuresFolderPath, 'R2Orientation_RMSE_20feas.jpg'), '-jpg', '-r300', figure(4));
+export_fig(fullfile(figuresFolderPath, 'R1Pose_ANEES_20feas.jpg'), '-jpg', '-r300', figure(5));
+export_fig(fullfile(figuresFolderPath, 'R2Pose_ANEES_20feas.jpg'), '-jpg', '-r300', figure(6));
 
-exportgraphics(figure(13),fullfile(figuresFolderPath, 'R1Postion_RMSE_100feas.jpg'), 'Resolution', 300)
-exportgraphics(figure(14),fullfile(figuresFolderPath, 'R2Postion_RMSE_100feas.jpg'), 'Resolution', 300)
-exportgraphics(figure(15),fullfile(figuresFolderPath, 'R1Orientation_RMSE_100feas.jpg'), 'Resolution', 300)
-exportgraphics(figure(16),fullfile(figuresFolderPath, 'R2Orientation_RMSE_100feas.jpg'), 'Resolution', 300)
-exportgraphics(figure(17),fullfile(figuresFolderPath, 'R1Pose_ANEES_100feas.jpg'), 'Resolution', 300)
-exportgraphics(figure(18),fullfile(figuresFolderPath, 'R2Pose_ANEES_100feas.jpg'), 'Resolution', 300)
+export_fig(fullfile(figuresFolderPath, 'R1Postion_RMSE_60feas.jpg'), '-jpg', '-r300', figure(7));
+export_fig(fullfile(figuresFolderPath, 'R2Postion_RMSE_60feas.jpg'), '-jpg', '-r300', figure(8));
+export_fig(fullfile(figuresFolderPath, 'R1Orientation_RMSE_60feas.jpg'), '-jpg', '-r300', figure(9));
+export_fig(fullfile(figuresFolderPath, 'R2Orientation_RMSE_60feas.jpg'), '-jpg', '-r300', figure(10));
+export_fig(fullfile(figuresFolderPath, 'R1Pose_ANEES_60feas.jpg'), '-jpg', '-r300', figure(11));
+export_fig(fullfile(figuresFolderPath, 'R2Pose_ANEES_60feas.jpg'), '-jpg', '-r300', figure(12));
+
+export_fig(fullfile(figuresFolderPath, 'R1Postion_RMSE_100feas.jpg'), '-jpg', '-r300', figure(13));
+export_fig(fullfile(figuresFolderPath, 'R2Postion_RMSE_100feas.jpg'), '-jpg', '-r300', figure(14));
+export_fig(fullfile(figuresFolderPath, 'R1Orientation_RMSE_100feas.jpg'), '-jpg', '-r300', figure(15));
+export_fig(fullfile(figuresFolderPath, 'R2Orientation_RMSE_100feas.jpg'), '-jpg', '-r300', figure(16));
+export_fig(fullfile(figuresFolderPath, 'R1Pose_ANEES_100feas.jpg'), '-jpg', '-r300', figure(17));
+export_fig(fullfile(figuresFolderPath, 'R2Pose_ANEES_100feas.jpg'), '-jpg', '-r300', figure(18));
