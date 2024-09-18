@@ -222,11 +222,11 @@ for i = 1:3
                     JFWk = sparse(size(Xk00e_ide,1),size(R1Z0n,1)+size(R2Z0n,1));
                     for R1jn = 1:(size(R1Z0n,1)/2)
                         R1nRn_ide = blkdiag(R1nRn_ide, R1R);
-                        JFWk(size(X0,1)+(R1jn-1)*2+(1:2),(R1jn-1)*2+(1:2)) = Rot(X0(3,3));
+                        JFWk(size(X0,1)+(R1jn-1)*2+(1:2),(R1jn-1)*2+(1:2)) = -Rot(X0(3,3));
                     end
                     for R2jn_ide = 1:(size(R2Z0n,1)/2)
                         R2nRn_ide = blkdiag(R2nRn_ide, R2R);
-                        JFWk(size(X0,1)+size(R1Z0n,1)+(R2jn_ide-1)*2+(1:2),size(R1Z0n,1)+(R2jn_ide-1)*2+(1:2)) = Rot(X0(6,3));
+                        JFWk(size(X0,1)+size(R1Z0n,1)+(R2jn_ide-1)*2+(1:2),size(R1Z0n,1)+(R2jn_ide-1)*2+(1:2)) = -Rot(X0(6,3));
                     end
 
                     nRn_ide = blkdiag(R1nRn_ide,R2nRn_ide);
@@ -390,7 +390,7 @@ for i = 1:3
                     %%
                     for R1jn_ide = 1:(size(R1ZknIde,1)/2)
                         R1nRn_ide = blkdiag(R1nRn_ide, R1R);
-                        DeltaGV_ide(size(Xk10e_ide,1)+(R1jn_ide-1)*2+(1:2),(R1jn_ide-1)*2+(1:2)) = Rot(Xk10e_ide(3,3));
+                        DeltaGV_ide(size(Xk10e_ide,1)+(R1jn_ide-1)*2+(1:2),(R1jn_ide-1)*2+(1:2)) = -Rot(Xk10e_ide(3,3));
                     end
                     
                     % for R1jn_ide = 1:(size(R1ZknIde,1)/2)
@@ -422,7 +422,7 @@ for i = 1:3
                     for R2jn_ide = 1:(size(R2ZknIde,1)/2)
                         R2nRn_ide = blkdiag(R2nRn_ide, R2R);
                         % Ideal EKF
-                        DeltaGV_ide(size(Xk10e_ide,1)+size(R1ZknIde,1)+(R2jn_ide-1)*2+(1:2),size(R1ZknIde,1)+(R2jn_ide-1)*2+(1:2)) = Rot(Xk10e_ide(6,3));
+                        DeltaGV_ide(size(Xk10e_ide,1)+size(R1ZknIde,1)+(R2jn_ide-1)*2+(1:2),size(R1ZknIde,1)+(R2jn_ide-1)*2+(1:2)) = -Rot(Xk10e_ide(6,3));
                     end
 
                     % for R2jn_ide = 1:(size(R2ZknIde,1)/2)

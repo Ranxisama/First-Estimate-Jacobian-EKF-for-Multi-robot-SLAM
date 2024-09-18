@@ -106,9 +106,10 @@ for fc = 1:3 % feature choice
 
     xlabel('Steps')
     ylabel('R1 Position RMSE (m)')
-    xlim([0,poseNum])
+    xlim([0,250])
     legend([R1XrRMSEP,R1XrIdeRMSEP,R1XrFejRMSEP])
-    title(sprintf('%d features',feaNum))
+    set(gcf, 'Color', 'w');  % 将整个图背景设置为白色
+    set(gca, 'Box', 'on', 'LineWidth', 1);  % 使边框显示，并增加边框宽度
 
     hold off
 
@@ -123,9 +124,10 @@ for fc = 1:3 % feature choice
 
     xlabel('Steps')
     ylabel('R2 Position RMSE (m)')
-    xlim([0,poseNum])
+    xlim([0,250])
     legend([R2XrRMSEP,R2XrIdeRMSEP,R2XrFejRMSEP])
-    title(sprintf('%d features',feaNum))
+    set(gcf, 'Color', 'w');  % 将整个图背景设置为白色
+    set(gca, 'Box', 'on', 'LineWidth', 1);  % 使边框显示，并增加边框宽度
 
     hold off
 
@@ -143,9 +145,10 @@ for fc = 1:3 % feature choice
 
     xlabel('Steps')
     ylabel('R1 Heading RMSE (rad)')
-    xlim([0,poseNum])
+    xlim([0,250])
     legend([R1XphiRMSEP,R1XphiIdeRMSEP,R1XphiFejRMSEP])
-    title(sprintf('%d features',feaNum))
+    set(gcf, 'Color', 'w');  % 将整个图背景设置为白色
+    set(gca, 'Box', 'on', 'LineWidth', 1);  % 使边框显示，并增加边框宽度
 
     hold off
 
@@ -160,9 +163,10 @@ for fc = 1:3 % feature choice
 
     xlabel('Steps')
     ylabel('R2 Heading RMSE (rad)')
-    xlim([0,poseNum])
+    xlim([0,250])
     legend([R2XphiRMSEP,R2XphiIdeRMSEP,R2XphiFejRMSEP])
-    title(sprintf('%d features',feaNum))
+    set(gcf, 'Color', 'w');  % 将整个图背景设置为白色
+    set(gca, 'Box', 'on', 'LineWidth', 1);  % 使边框显示，并增加边框宽度
 
     hold off
 
@@ -308,9 +312,10 @@ for fc = 1:3 % feature choice
 
     xlabel('Steps')
     ylabel('R1 Pose ANEES')
-    xlim([0,poseNum])
+    xlim([0,250])
     legend([R1XpNEESP,R1XpIdeNEESP,R1XpFejNEESP])
-    title(sprintf('%d features',feaNum))
+    set(gcf, 'Color', 'w');  % 将整个图背景设置为白色
+    set(gca, 'Box', 'on', 'LineWidth', 1);  % 使边框显示，并增加边框宽度
 
     hold off
 
@@ -325,9 +330,10 @@ for fc = 1:3 % feature choice
 
     xlabel('Steps')
     ylabel('R2 Pose ANEES')
-    xlim([0,poseNum])
+    xlim([0,250])
     legend([R2XpNEESP,R2XpIdeNEESP,R2XpFejNEESP])
-    title(sprintf('%d features',feaNum))
+    set(gcf, 'Color', 'w');  % 将整个图背景设置为白色
+    set(gca, 'Box', 'on', 'LineWidth', 1);  % 使边框显示，并增加边框宽度
 
     hold off
 
