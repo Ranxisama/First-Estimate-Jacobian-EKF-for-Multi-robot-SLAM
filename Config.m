@@ -85,6 +85,9 @@ al = 1;
 %% LineWidth
 LW = 2;
 
+%% FontSize
+FontSize = 3;
+
 %% boundary of features
 fea_xlb = -50; % lower boundary of features in x axis
 fea_xub = 50; % upper boundary of features in x axis

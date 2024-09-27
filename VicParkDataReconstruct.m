@@ -19,6 +19,9 @@ for k = 0:(poseNum-2)
         K = [K,k];
     end
 end
+%% 
+% R1 可以从3490开始反向跑，R2可以从3491开始正向跑
+%%
 
 %% robot pose and feature position computation
 Waypoints = zeros(3,2);

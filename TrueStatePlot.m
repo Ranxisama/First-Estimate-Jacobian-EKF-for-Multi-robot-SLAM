@@ -10,7 +10,8 @@ load('MT_Parameters_20fea.mat', ...
 figure(1)
 hold on
 grid on
-axis([fea_xlb,fea_xub,fea_ylb,fea_yub])
+% axis([fea_xlb,fea_xub,fea_ylb,fea_yub])
+axis([-40,40,fea_ylb,fea_yub])
 R1WaypointsT = plot(R1XrTrue(1:2:(end-1),2),R1XrTrue(2:2:end,2),'bo','MarkerSize',2);
 R2WaypointsT = plot(R2XrTrue(1:2:(end-1),2),R2XrTrue(2:2:end,2),'rs','MarkerSize',2.5);
 
@@ -31,10 +32,11 @@ quiver(R2XrTrue(1:2:(end-1),2),R2XrTrue(2:2:end,2),R2dx,R2dy,0,'-.r','LineWidth'
 % quiver(R1XrTrue(1:2:(end-1),2),R1XrTrue(2:2:end,2),R1dx,R1dy,0,'b', 'LineWidth', 2)
 % quiver(R2XrTrue(1:2:(end-1),2),R2XrTrue(2:2:end,2),R2dx,R2dy,0,'r', 'LineWidth', 2)
 
-plot(XfTrueAll(1:2:(end-1),2),XfTrueAll(2:2:end,2),'g*','MarkerSize',2)
+plot(XfTrueAll(1:2:(end-1),2),XfTrueAll(2:2:end,2),'k^','MarkerSize',2)
 
 % 创建自定义图例
-hLegend = legend('R_1 true position', 'R_2 true position', 'R_1 true heading', 'R_2 true heading', 'True feature', 'Location', 'northeast','FontSize', 3);
+% hLegend = legend('R_1 true position', 'R_2 true position', 'R_1 true heading', 'R_2 true heading', 'True feature', 'Location', 'northeast','FontSize', FS);
+hLegend = legend('R_1 position', 'R_2 position', 'R_1 heading', 'R_2 heading', 'Feature position', 'Location', 'northeast');
 xlabel('x (m)')
 ylabel('y (m)')
 
