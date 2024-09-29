@@ -1,6 +1,4 @@
-clc
 clear
-close all
 
 Config;
 
@@ -15,7 +13,9 @@ elseif ec == 3
     load('MT_Parameters_100fea.mat','R1XrTrue','R1XphiT','R2XrTrue','R2XphiT','XfTrueAll','R1OdoT','R2OdoT','R1ObsT','R2ObsT')
     load('MT_Measurements_100fea.mat','R1Xp0Set','R1OdoSet','R1ObsSet','R2Xp0Set','R2OdoSet','R2ObsSet')
 elseif ec == 4
-    load Zstate_VicPark_6898_loops
+    load('VicP_Parameters.mat','R1XrTrue','R1XphiT','R2XrTrue','R2XphiT','XfTrueAll','R1OdoT','R2OdoT','R1ObsT','R2ObsT')
+    load('VicP_Measurements.mat','R1Xp0Set','R1OdoSet','R1ObsSet','R2Xp0Set','R2OdoSet','R2ObsSet')
+    mcNum = 1;
 end
 
 poseNum = size(R1OdoSet,1)/3;
@@ -502,7 +502,7 @@ DeltaR2XrFullSet = [];
 DeltaR1XphiFullSet = [];
 DeltaR2XphiFullSet = [];
 
-for pn = 0:poseNum
+for pn = 0:(poseNum-1)
 
     %% debug
     % if pn == 34 || pn == 60
@@ -548,6 +548,11 @@ elseif ec == 2
         'DeltaXfFullSet','PfFullSet')
 elseif ec == 3
     save('MTE_results_StdEKF_100fea.mat','poseNum','feaNum', ...
+        'DeltaR1XrFullSet','DeltaR2XrFullSet','DeltaR1XphiFullSet','DeltaR2XphiFullSet', ...
+        'DeltaR2XpFullSet','R2PFullSet','DeltaR1XpFullSet','R1PFullSet', ...
+        'DeltaXfFullSet','PfFullSet')
+elseif ec == 4
+    save('VicP_results_StdEKF.mat','poseNum','feaNum', ...
         'DeltaR1XrFullSet','DeltaR2XrFullSet','DeltaR1XphiFullSet','DeltaR2XphiFullSet', ...
         'DeltaR2XpFullSet','R2PFullSet','DeltaR1XpFullSet','R1PFullSet', ...
         'DeltaXfFullSet','PfFullSet')

@@ -1,3 +1,4 @@
+clc
 clear
 % close all
 
@@ -189,7 +190,7 @@ hold off
 R1NEES_k = [(1:poseNum)',zeros(poseNum,mcNum)];
 R2NEES_k = [(0:poseNum)',zeros(poseNum+1,mcNum)];
 
-for k = 0:(poseNum-1)
+for k = 0:poseNum
 
     for mn = 1:mcNum
         R2xri_e = DeltaR2XpFullSet(k*3+(1:3),1+mn);
@@ -231,7 +232,7 @@ XfNEES_mean = mean(XfNEES(:,2))/2;
 % ideal EKF
 R1IdeNEES_k = [(1:poseNum)',zeros(poseNum,mcNum)];
 R2IdeNEES_k = [(0:poseNum)',zeros(poseNum+1,mcNum)];
-for k = 0:(poseNum-1)
+for k = 0:poseNum
 
     for mn = 1:mcNum
         R2Idexri_e = DeltaR2XpIdeFullSet(k*3+(1:3),1+mn);
@@ -272,7 +273,7 @@ XfIdeNEES_mean = mean(XfIdeNEES(:,2))/2;
 R1FejNEES_k = [(1:poseNum)',zeros(poseNum,mcNum)];
 R2FejNEES_k = [(0:poseNum)',zeros(poseNum+1,mcNum)];
 
-for k = 0:(poseNum-1)
+for k = 0:poseNum
 
     for mn = 1:mcNum
         R2Fejxri_e = DeltaR2XpFejFullSet(k*3+(1:3),1+mn);
@@ -491,6 +492,6 @@ elseif ec == 3
     export_fig(fullfile(figuresFolderPath, 'R2Postion_RMSE__VicP.jpg'), '-jpg', '-r300', figure(20));
     export_fig(fullfile(figuresFolderPath, 'R1Orientation_RMSE__VicP.jpg'), '-jpg', '-r300', figure(21));
     export_fig(fullfile(figuresFolderPath, 'R2Orientation_RMSE__VicP.jpg'), '-jpg', '-r300', figure(22));
-    export_fig(fullfile(figuresFolderPath, 'R1Pose_ANEES__VicP.jpg'), '-jpg', '-r300', figure(23));
-    export_fig(fullfile(figuresFolderPath, 'R2Pose_ANEES__VicP.jpg'), '-jpg', '-r300', figure(24));
+    export_fig(fullfile(figuresFolderPath, 'R1Pose_ANEES_100feas.jpg'), '-jpg', '-r300', figure(23));
+    export_fig(fullfile(figuresFolderPath, 'R2Pose_ANEES_100feas.jpg'), '-jpg', '-r300', figure(24));
 end

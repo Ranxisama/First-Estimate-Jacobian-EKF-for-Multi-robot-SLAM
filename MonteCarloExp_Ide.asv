@@ -1,4 +1,6 @@
+clc
 clear
+close all
 
 Config;
 
@@ -14,7 +16,6 @@ elseif ec == 3
 elseif ec == 4
     load('VicP_Parameters.mat','R1XrTrue','R1XphiT','R2XrTrue','R2XphiT','XfTrueAll','R1OdoT','R2OdoT','R1ObsT','R2ObsT')
     load('VicP_Measurements.mat','R1Xp0Set','R1OdoSet','R1ObsSet','R2Xp0Set','R2OdoSet','R2ObsSet')
-    mcNum = 1;
 end
 
 
@@ -520,7 +521,8 @@ for mc = 1:mcNum
             HX10e_ide = sparse(size(ZksIde,1), 1);
             JHX10e_ide = sparse(size(ZksIde,1), size(Xk10efi_ide,1));
 
-            Xrk10Tfi = Xrk10T; % for Ideal EKF only
+            Xrk10Tfi = [R1XrTrue(R1XrTrue(:,1)==k,2);R1XphiT(R1XphiT(:,1)==k,2); ...
+                R2XrTrue(R2XrTrue(:,1)==k,2);R2XphiT(R2XphiT(:,1)==k,2)]; % for Ideal EKF only
 
             R1DV = [];
             R2DV = [];
@@ -627,7 +629,7 @@ DeltaR2XrIdeFullSet = [];
 DeltaR1XphiIdeFullSet = [];
 DeltaR2XphiIdeFullSet = [];
 
-for pn = 0:(poseNum-1)
+for pn = 0:poseNum
 
     % debug
     % if pn == 34 || pn == 60
@@ -676,8 +678,8 @@ elseif ec == 3
         'DeltaR1XrIdeFullSet','DeltaR2XrIdeFullSet','DeltaR1XphiIdeFullSet','DeltaR2XphiIdeFullSet', ...
         'DeltaR2XpIdeFullSet','R2PIdeFullSet','DeltaR1XpIdeFullSet','R1PIdeFullSet', ...
         'DeltaXfIdeFullSet','PfIdeFullSet')
-elseif ec == 4
-    save('VicP_results_IdeEKF.mat','poseNum','feaNum', ...
+elseif ec == 
+    save('MTE_results_IdeEKF_100fea.mat','poseNum','feaNum', ...
         'DeltaR1XrIdeFullSet','DeltaR2XrIdeFullSet','DeltaR1XphiIdeFullSet','DeltaR2XphiIdeFullSet', ...
         'DeltaR2XpIdeFullSet','R2PIdeFullSet','DeltaR1XpIdeFullSet','R1PIdeFullSet', ...
         'DeltaXfIdeFullSet','PfIdeFullSet')

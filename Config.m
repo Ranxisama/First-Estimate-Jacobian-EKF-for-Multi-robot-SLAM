@@ -4,7 +4,7 @@
 % 2, Simulating data with 60 features
 % 3, Simulating data with 100 features
 % 4, Victoria Park dataset
-ec = 1; 
+ec = 4; 
 
 %% Number of Monte Carlo experiments
 mcNum = 50;
