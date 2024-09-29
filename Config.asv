@@ -1,10 +1,10 @@
 %% choose different experiment
-% ec =
+% i =
 % 1, Simulating data with 20 features
 % 2, Simulating data with 60 features
 % 3, Simulating data with 100 features
-% 4, Victoria Park dataset
-ec = 1; 
+% 4, Victo data with 20 features
+i = 1; 
 
 %% Number of Monte Carlo experiments
 mcNum = 50;
