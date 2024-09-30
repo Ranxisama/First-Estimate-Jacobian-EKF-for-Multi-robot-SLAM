@@ -488,6 +488,17 @@ R1XpFullSet = [R1XpFull(:,1),R1XpFullSet];
 R2XpFullSet = [R2XpFull(:,1),R2XpFullSet];
 XfFullSet = [Xk11e(7:end,2),XfFullSet];
 
+if ec == 4 && TrajP == 1
+    figure((ec-1)*6+7)
+    hold on 
+    R1PosiVPP = plot(R1XpFullSet(1:3:(end-2),2),R1XpFullSet(2:3:(end-1),2),'bo','DisplayName','R1 Position');
+    R2PosiVPP = plot(R2XpFullSet(1:3:(end-2),2),R2XpFullSet(2:3:(end-1),2),'ro','DisplayName','R2 Position');
+    FeaPosiVPP = plot(XfFullSet(1:2:(end-1),2),XfFullSet(2:2:end,2),'g^','DisplayName','Feature Position');
+    legend([R1PosiVPP,R2PosiVPP,FeaPosiVPP])
+    title('VictoriaPark Trajectory for standard EKF')
+    hold off 
+end
+
 R1XrFullSet = [];
 R2XrFullSet = [];
 R1XphiFullSet = [];
@@ -502,7 +513,7 @@ DeltaR2XrFullSet = [];
 DeltaR1XphiFullSet = [];
 DeltaR2XphiFullSet = [];
 
-for pn = 0:(poseNum-1)
+for pn = 0:poseNum
 
     %% debug
     % if pn == 34 || pn == 60

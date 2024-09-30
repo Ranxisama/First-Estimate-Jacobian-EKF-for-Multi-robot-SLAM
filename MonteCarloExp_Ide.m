@@ -12,9 +12,10 @@ elseif ec == 3
     load('MT_Parameters_100fea.mat','R1XrTrue','R1XphiT','R2XrTrue','R2XphiT','XfTrueAll','R1OdoT','R2OdoT','R1ObsT','R2ObsT')
     load('MT_Measurements_100fea.mat','R1Xp0Set','R1OdoSet','R1ObsSet','R2Xp0Set','R2OdoSet','R2ObsSet')
 elseif ec == 4
-    load('VicP_Parameters.mat','R1XrTrue','R1XphiT','R2XrTrue','R2XphiT','XfTrueAll','R1OdoT','R2OdoT','R1ObsT','R2ObsT')
-    load('VicP_Measurements.mat','R1Xp0Set','R1OdoSet','R1ObsSet','R2Xp0Set','R2OdoSet','R2ObsSet')
-    mcNum = 1;
+    error('No real-world experiment uses truth!')
+    % load('VicP_Parameters.mat','R1XrTrue','R1XphiT','R2XrTrue','R2XphiT','XfTrueAll','R1OdoT','R2OdoT','R1ObsT','R2ObsT')
+    % load('VicP_Measurements.mat','R1Xp0Set','R1OdoSet','R1ObsSet','R2Xp0Set','R2OdoSet','R2ObsSet')
+    % mcNum = 1;
 end
 
 
@@ -250,14 +251,18 @@ for mc = 1:mcNum
             continue
         end
 
+        % if k == 482
+        %     keyboard
+        % end
+
         %% Prediction using the motion model
 
         R1Odo_k = R1Odo(R1Odo(:,2)==k,3);
         R2Odo_k = R2Odo(R2Odo(:,2)==k,3);
 
         % Ideal EKF
-        R1OdoT_k = R1OdoT(R1OdoT(:,2)==k,3);
-        R2OdoT_k = R2OdoT(R2OdoT(:,2)==k,3);
+        % R1OdoT_k = R1OdoT(R1OdoT(:,2)==k,3);
+        % R2OdoT_k = R2OdoT(R2OdoT(:,2)==k,3);
 
         % if k == 1
         %     Xk00e_ide = Xk00e_ide;
@@ -613,6 +618,17 @@ R1XpIdeFullSet = [R1XpIdeFull(:,1),R1XpIdeFullSet];
 R2XpIdeFullSet = [R2XpIdeFull(:,1),R2XpIdeFullSet];
 XfIdeFullSet = [Xk11e_ide(7:end,2),XfIdeFullSet];
 
+% if ec == 4 && TrajP == 1
+%     figure((ec-1)*6+8)
+%     hold on 
+%     R1PosiVPP = plot(R1XpIdeFullSet(1:3:(end-2),2),R1XpIdeFullSet(2:3:(end-1),2),'bo','DisplayName','R1 Position');
+%     R2PosiVPP = plot(R2XpIdeFullSet(1:3:(end-2),2),R2XpIdeFullSet(2:3:(end-1),2),'ro','DisplayName','R2 Position');
+%     FeaPosiVPP = plot(XfIdeFullSet(1:2:(end-1),2),XfIdeFullSet(2:2:end,2),'g^','DisplayName','Feature Position');
+%     legend([R1PosiVPP,R2PosiVPP,FeaPosiVPP])
+%     title('VictoriaPark Trajectory for ideal EKF')
+%     hold off 
+% end
+
 R1XrIdeFullSet = [];
 R2XrIdeFullSet = [];
 R1XphiIdeFullSet = [];
@@ -627,7 +643,7 @@ DeltaR2XrIdeFullSet = [];
 DeltaR1XphiIdeFullSet = [];
 DeltaR2XphiIdeFullSet = [];
 
-for pn = 0:(poseNum-1)
+for pn = 0:poseNum
 
     % debug
     % if pn == 34 || pn == 60
@@ -676,11 +692,11 @@ elseif ec == 3
         'DeltaR1XrIdeFullSet','DeltaR2XrIdeFullSet','DeltaR1XphiIdeFullSet','DeltaR2XphiIdeFullSet', ...
         'DeltaR2XpIdeFullSet','R2PIdeFullSet','DeltaR1XpIdeFullSet','R1PIdeFullSet', ...
         'DeltaXfIdeFullSet','PfIdeFullSet')
-elseif ec == 4
-    save('VicP_results_IdeEKF.mat','poseNum','feaNum', ...
-        'DeltaR1XrIdeFullSet','DeltaR2XrIdeFullSet','DeltaR1XphiIdeFullSet','DeltaR2XphiIdeFullSet', ...
-        'DeltaR2XpIdeFullSet','R2PIdeFullSet','DeltaR1XpIdeFullSet','R1PIdeFullSet', ...
-        'DeltaXfIdeFullSet','PfIdeFullSet')
+% elseif ec == 4
+%     save('VicP_results_IdeEKF.mat','poseNum','feaNum', ...
+%         'DeltaR1XrIdeFullSet','DeltaR2XrIdeFullSet','DeltaR1XphiIdeFullSet','DeltaR2XphiIdeFullSet', ...
+%         'DeltaR2XpIdeFullSet','R2PIdeFullSet','DeltaR1XpIdeFullSet','R1PIdeFullSet', ...
+%         'DeltaXfIdeFullSet','PfIdeFullSet')
 end
 
 disp('Ide EKF Complete!')

@@ -31,7 +31,9 @@ PfFejFullSet = [];
 for mc = 1:mcNum
 
     R1Xp0 = R1Xp0Set(:,mc);
+    R1Xp0(3,1) = wrap(R1Xp0(3,1));
     R2Xp0 = R2Xp0Set(:,mc);
+    R2Xp0(3,1) = wrap(R2Xp0(3,1));
 
     R1Odo = R1OdoSet(:,[1,2,2+mc]);
     R2Odo = R2OdoSet(:,[1,2,2+mc]);
@@ -540,6 +542,17 @@ R1XpFejFullSet = [R1XpFejFull(:,1),R1XpFejFullSet];
 R2XpFejFullSet = [R2XpFejFull(:,1),R2XpFejFullSet];
 XfFejFullSet = [Xk11e_fej(7:end,2),XfFejFullSet];
 
+if ec == 4 && TrajP == 1
+    figure((ec-1)*6+9)
+    hold on 
+    R1PosiVPP = plot(R1XpFejFullSet(1:3:(end-2),2),R1XpFejFullSet(2:3:(end-1),2),'bo','DisplayName','R1 Position');
+    R2PosiVPP = plot(R2XpFejFullSet(1:3:(end-2),2),R2XpFejFullSet(2:3:(end-1),2),'ro','DisplayName','R2 Position');
+    FeaPosiVPP = plot(XfFejFullSet(1:2:(end-1),2),XfFejFullSet(2:2:end,2),'g^','DisplayName','Feature Position');
+    legend([R1PosiVPP,R2PosiVPP,FeaPosiVPP])
+    title('VictoriaPark Trajectory for FEJ EKF')
+    hold off 
+end
+
 R1XrFejFullSet = [];
 R2XrFejFullSet = [];
 R1XphiFejFullSet = [];
@@ -554,7 +567,7 @@ DeltaR2XrFejFullSet = [];
 DeltaR1XphiFejFullSet = [];
 DeltaR2XphiFejFullSet = [];
 
-for pn = 0:(poseNum-1)
+for pn = 0:poseNum
 
     %% debug
     % if pn == 34 || pn == 60

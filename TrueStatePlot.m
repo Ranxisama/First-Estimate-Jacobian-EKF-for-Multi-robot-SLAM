@@ -12,8 +12,8 @@ hold on
 grid on
 % axis([fea_xlb,fea_xub,fea_ylb,fea_yub])
 axis([-40,40,fea_ylb,fea_yub])
-R1WaypointsT = plot(R1XrTrue(1:2:(end-1),2),R1XrTrue(2:2:end,2),'bo','MarkerSize',2);
-R2WaypointsT = plot(R2XrTrue(1:2:(end-1),2),R2XrTrue(2:2:end,2),'rs','MarkerSize',2.5);
+R1WaypointsT = plot(R1XrTrue(1:2:(end-1),2),R1XrTrue(2:2:end,2),'co','MarkerSize',2);
+R2WaypointsT = plot(R2XrTrue(1:2:(end-1),2),R2XrTrue(2:2:end,2),'ms','MarkerSize',2.5);
 
 % arrow length
 R1AL = 0.5*sqrt((R1XrTrue(3:2:(end-1),2) - R1XrTrue(1:2:(end-3),2)).^2 + (R1XrTrue(4:2:end,2) - R1XrTrue(2:2:(end-2),2)).^2);
@@ -27,8 +27,8 @@ R1dy = R1AL.* sin(R1XphiT(:,2));
 R2dx = R2AL.* cos(R2XphiT(:,2));
 R2dy = R2AL.* sin(R2XphiT(:,2));
 
-quiver(R1XrTrue(1:2:(end-1),2),R1XrTrue(2:2:end,2),R1dx,R1dy,0,'b','LineWidth',0.5)
-quiver(R2XrTrue(1:2:(end-1),2),R2XrTrue(2:2:end,2),R2dx,R2dy,0,'-.r','LineWidth',0.5)
+quiver(R1XrTrue(1:2:(end-1),2),R1XrTrue(2:2:end,2),R1dx,R1dy,0,'c','LineWidth',0.5)
+quiver(R2XrTrue(1:2:(end-1),2),R2XrTrue(2:2:end,2),R2dx,R2dy,0,'-.m','LineWidth',0.5)
 % quiver(R1XrTrue(1:2:(end-1),2),R1XrTrue(2:2:end,2),R1dx,R1dy,0,'b', 'LineWidth', 2)
 % quiver(R2XrTrue(1:2:(end-1),2),R2XrTrue(2:2:end,2),R2dx,R2dy,0,'r', 'LineWidth', 2)
 

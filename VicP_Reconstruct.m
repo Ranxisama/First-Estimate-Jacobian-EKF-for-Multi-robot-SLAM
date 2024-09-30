@@ -229,19 +229,26 @@ R2XphiTrue = R2XTrue(3:3:end,:);
 R2XphiTrue(:,2) = wrap(R2XphiTrue(:,2));
 
 % Measurements
-R1Xp0Set = [zeros(3,1),[65.0492;7.7931;3.3150]];
-R2Xp0Set = [zeros(3,1),[40.1386;-64.1211;-0.8182]];
+R1Xp0Set = [65.0492;7.7931;3.3150];
+R1Xp0Set(3,1) = wrap(R1Xp0Set(3,1));
 
-R1PoseIDs = unique(R1XrT(:,1));
-[~,R1Odo_idx] = ismember(Odo(:,1),R1PoseIDs);
+R2Xp0Set = [40.1386;-64.1211;-0.8182];
+R2Xp0Set(3,1) = wrap(R2Xp0Set(3,1));
+
+R1ObsIDs = unique(R1XrT(:,1));
+R1OdoIDs = R1ObsIDs;
+R1OdoIDs(end,:) = [];
+[~,R1Odo_idx] = ismember(Odo(:,1),R1OdoIDs);
 R1Odoset = Odo(find(R1Odo_idx),:);
-[~,R1Obs_idx] = ismember(Obs(:,1),R1PoseIDs);
+[~,R1Obs_idx] = ismember(Obs(:,1),R1ObsIDs);
 R1ObsSet = Obs(find(R1Obs_idx),:);
 
-R2PoseIDs = unique(R2XrT(:,1));
-[~,R2Odo_idx] = ismember(Odo(:,1),R2PoseIDs);
+R2ObsIDs = unique(R2XrT(:,1));
+R2OdoIDs = R2ObsIDs;
+R2OdoIDs(end,:) = [];
+[~,R2Odo_idx] = ismember(Odo(:,1),R2OdoIDs);
 R2Odoset = Odo(find(R2Odo_idx),:);
-[~,R2Obs_idx] = ismember(Obs(:,1),R2PoseIDs);
+[~,R2Obs_idx] = ismember(Obs(:,1),R2ObsIDs);
 R2ObsSet = Obs(find(R2Obs_idx),:);
 
 mfeaIDs = unique([R1ObsSet(:,2);R2ObsSet(:,2)]); % measurement feature ID
@@ -252,7 +259,7 @@ XfTrueAll = XfTrue(find(XfTrue_idx),:);
 
 PoseIDs1 = (0:(2545))'; % 3264 - 719 = 2545
 PoseIDs2 = reshape(repmat(PoseIDs1', 2, 1), [], 1);
-PoseIDs3 = reshape(repmat(PoseIDs1', 3, 1), [], 1);
+OdoIDs3 = reshape(repmat(0:(2544), 3, 1), [], 1);
 
 R1XrTrue = [PoseIDs2,R1XrT(:,2)];
 R2XrTrue = [PoseIDs2,R2XrT(:,2)];
@@ -261,8 +268,8 @@ R1XphiT = [PoseIDs1,R1XphiTrue(:,2)];
 R2XphiT = [PoseIDs1,R2XphiTrue(:,2)];
 
 % Measurements
-R1OdoSet = [PoseIDs3,PoseIDs3+1,R1Odoset(:,3)];
-R2OdoSet = [PoseIDs3,PoseIDs3+1,R2Odoset(:,3)];
+R1OdoSet = [OdoIDs3,OdoIDs3+1,R1Odoset(:,3)];
+R2OdoSet = [OdoIDs3,OdoIDs3+1,R2Odoset(:,3)];
 
 for k =0:(3264-719)
     R1ObsSet(R1ObsSet(:,1)==719+k,1)=k;
