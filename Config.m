@@ -4,7 +4,7 @@
 % 2, Simulating data with 60 features
 % 3, Simulating data with 100 features
 % 4, Victoria Park dataset
-ec = 4;
+ec = 1;
 
 %% Simulation noise choice
 snc = 0; % if 0 (for test), set noise level as 0.02/0.1°; if 1 (for display), set noise level as bigger; 
