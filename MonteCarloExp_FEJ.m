@@ -214,10 +214,10 @@ for mc = 1:mcNum
             end
 
             % FEJ EKF
-            R1XpFejFull = Xk00e_fej(1:3,2:3); % save all robot postures of R1
+            % R1XpFejFull = Xk00e_fej(1:3,2:3); % save all robot postures of R1
             R2XpFejFull = Xk00e_fej(4:6,2:3); % save all robot postures of R2
 
-            R1PFejFull = Pk00_fej(1:3,1:3);
+            % R1PFejFull = Pk00_fej(1:3,1:3);
             R2PFejFull = Pk00_fej(4:6,4:6);
 
             XfFe = Xk00e_fej(7:end,:); % First estimated feature position
@@ -502,7 +502,7 @@ for mc = 1:mcNum
             %% Innovation Covariance S and Kalman Gain K
             % FEJ EKF
             Ssf = JHX10e_fej * Pk10fi_fej * JHX10e_fej' + DV;
-            Ksf = Pk10fi_fej * JHX10e_fej' /Ssf;
+             Ksf = Pk10fi_fej * JHX10e_fej' /Ssf;
 
             %% Updating process using observation model
             % FEJ EKF
@@ -545,12 +545,37 @@ XfFejFullSet = [Xk11e_fej(7:end,2),XfFejFullSet];
 if ec == 4 && TrajP == 1
     figure((ec-1)*6+9)
     hold on 
-    R1PosiVPP = plot(R1XpFejFullSet(1:3:(end-2),2),R1XpFejFullSet(2:3:(end-1),2),'bo','DisplayName','R1 Position');
-    R2PosiVPP = plot(R2XpFejFullSet(1:3:(end-2),2),R2XpFejFullSet(2:3:(end-1),2),'ro','DisplayName','R2 Position');
-    FeaPosiVPP = plot(XfFejFullSet(1:2:(end-1),2),XfFejFullSet(2:2:end,2),'g^','DisplayName','Feature Position');
-    legend([R1PosiVPP,R2PosiVPP,FeaPosiVPP])
-    title('VictoriaPark Trajectory for FEJ EKF')
-    hold off 
+    grid on
+    R1PosiVPP = plot(R1XpFejFullSet(1:3:(end-2),2),R1XpFejFullSet(2:3:(end-1),2),'c-','DisplayName','R1 trajectory','MarkerSize',2);
+    R2PosiVPP = plot(R2XpFejFullSet(1:3:(end-2),2),R2XpFejFullSet(2:3:(end-1),2),'m--','DisplayName','R2 trajectory','MarkerSize',2);
+    FeaPosiVPP = plot(XfFejFullSet(1:2:(end-1),2),XfFejFullSet(2:2:end,2),'k^','DisplayName','Feature position','MarkerSize',3);
+
+    % 为 legend 创建正常尺寸的标记（不显示在图中）
+    R1PosiVPPHandle = plot(NaN, NaN, 'c-','DisplayName','R1 trajectory', 'MarkerSize', 8);  % 正常尺寸标记
+    R2PosiVPPHandle = plot(NaN, NaN, 'm--','DisplayName','R2 trajectory', 'MarkerSize', 8);  % 正常尺寸标记
+    FeaPosiVPPHandle = plot(NaN, NaN, 'k^','DisplayName','Feature position', 'MarkerSize', 8);  % 正常尺寸标记
+
+    legend([R1PosiVPPHandle,R2PosiVPPHandle,FeaPosiVPPHandle])
+    % title('VictoriaPark Trajectory for standard EKF')
+
+    xlabel('x (m)')
+    ylabel('y (m)')
+
+    set(gcf, 'Color', 'w');  % 将整个图背景设置为白色
+    set(gca, 'Box', 'on', 'LineWidth', 1, 'GridLineStyle', '--', 'GridAlpha', 0.1);  % 使边框显示，并增加边框宽度
+
+    % title('VictoriaPark Trajectory for FEJ EKF')
+    hold off
+
+    %% save output figures
+    currentFolder = fileparts(mfilename('fullpath'));
+    subFolder = 'saved_figures';
+    figuresFolderPath = fullfile(currentFolder, subFolder);
+    if ~exist(figuresFolderPath, 'dir')
+        mkdir(figuresFolderPath);
+    end
+
+    export_fig(fullfile(figuresFolderPath, 'VicP_Xposi_FejEKF.jpg'), '-jpg', '-r300', figure((ec-1)*6+9));
 end
 
 R1XrFejFullSet = [];
@@ -569,27 +594,27 @@ DeltaR2XphiFejFullSet = [];
 
 for pn = 0:poseNum
 
-    %% debug
-    % if pn == 34 || pn == 60
-    %     keyboard
-    % end
-    %%
+    if pn ~= 0
+        R1XpTrue = [R1XrTrue(pn*2+(1:2),:);R1XphiT(pn+1,:)];
 
-    R1XpTrue = [R1XrTrue(pn*2+(1:2),:);R1XphiT(pn+1,:)];
+        DeltaR1XpFejFullSet((end+1):(end+3),:) = [R1XpTrue(:,1),R1XpFejFullSet((pn-1)*3+(1:3),2:end)-R1XpTrue(:,2)];
+
+        % wrap the delta angle
+        DeltaR1XpFejFullSet(end,2:end) = wrap(DeltaR1XpFejFullSet(end,2:end));
+
+        DeltaR1XrFejFullSet((end+1):(end+2),:) = DeltaR1XpFejFullSet((end-2):(end-1),:);
+
+        DeltaR1XphiFejFullSet(end+1,:) = DeltaR1XpFejFullSet(end,:);
+    end
+
     R2XpTrue = [R2XrTrue(pn*2+(1:2),:);R2XphiT(pn+1,:)];
 
-    %% FEJ EKF
-    DeltaR1XpFejFullSet((end+1):(end+3),:) = [R1XpTrue(:,1),R1XpFejFullSet(pn*3+(1:3),2:end)-R1XpTrue(:,2)];
     DeltaR2XpFejFullSet((end+1):(end+3),:) = [R2XpTrue(:,1),R2XpFejFullSet(pn*3+(1:3),2:end)-R2XpTrue(:,2)];
 
-    % wrap the delta angle
-    DeltaR1XpFejFullSet(end,2:end) = wrap(DeltaR1XpFejFullSet(end,2:end));
     DeltaR2XpFejFullSet(end,2:end) = wrap(DeltaR2XpFejFullSet(end,2:end));
 
-    DeltaR1XrFejFullSet((end+1):(end+2),:) = DeltaR1XpFejFullSet((end-2):(end-1),:);
     DeltaR2XrFejFullSet((end+1):(end+2),:) = DeltaR2XpFejFullSet((end-2):(end-1),:);
 
-    DeltaR1XphiFejFullSet(end+1,:) = DeltaR1XpFejFullSet(end,:);
     DeltaR2XphiFejFullSet(end+1,:) = DeltaR2XpFejFullSet(end,:);
 
 end

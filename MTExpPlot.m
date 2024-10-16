@@ -73,10 +73,10 @@ end
 
 %% Root Mean Square Error (RMSE)
 % standard EKF
-[R1XrRMSE,R1XrRMSE_mean] = XrRMSE(poseNum,mcNum,DeltaR1XrFullSet);
+[R1XrRMSE,R1XrRMSE_mean] = XrRMSE(poseNum-1,mcNum,DeltaR1XrFullSet);
 [R2XrRMSE,R2XrRMSE_mean] = XrRMSE(poseNum,mcNum,DeltaR2XrFullSet);
 
-[R1XphiRMSE,R1XphiRMSE_mean] = XphiRMSE(poseNum,mcNum,DeltaR1XphiFullSet);
+[R1XphiRMSE,R1XphiRMSE_mean] = XphiRMSE(poseNum-1,mcNum,DeltaR1XphiFullSet);
 [R2XphiRMSE,R2XphiRMSE_mean] = XphiRMSE(poseNum,mcNum,DeltaR2XphiFullSet);
 
 [XfStdRMSE,XfStdRMSE_mean] = XFRMSE(feaNum,mcNum,DeltaXfFullSet);
@@ -85,10 +85,10 @@ end
 
 % ideal EKF
 if ec ~= 4
-[R1XrIdeRMSE,R1XrIdeRMSE_mean] = XrRMSE(poseNum,mcNum,DeltaR1XrIdeFullSet);
+[R1XrIdeRMSE,R1XrIdeRMSE_mean] = XrRMSE(poseNum-1,mcNum,DeltaR1XrIdeFullSet);
 [R2XrIdeRMSE,R2XrIdeRMSE_mean] = XrRMSE(poseNum,mcNum,DeltaR2XrIdeFullSet);
 
-[R1XphiIdeRMSE,R1XphiIdeRMSE_mean] = XphiRMSE(poseNum,mcNum,DeltaR1XphiIdeFullSet);
+[R1XphiIdeRMSE,R1XphiIdeRMSE_mean] = XphiRMSE(poseNum-1,mcNum,DeltaR1XphiIdeFullSet);
 [R2XphiIdeRMSE,R2XphiIdeRMSE_mean] = XphiRMSE(poseNum,mcNum,DeltaR2XphiIdeFullSet);
 
 [XfIdeRMSE,XfIdeRMSE_mean] = XFRMSE(feaNum,mcNum,DeltaXfIdeFullSet);
@@ -96,10 +96,10 @@ end
 
 
 % FEJ EKF
-[R1XrFejRMSE,R1XrFejRMSE_mean] = XrRMSE(poseNum,mcNum,DeltaR1XrFejFullSet);
+[R1XrFejRMSE,R1XrFejRMSE_mean] = XrRMSE(poseNum-1,mcNum,DeltaR1XrFejFullSet);
 [R2XrFejRMSE,R2XrFejRMSE_mean] = XrRMSE(poseNum,mcNum,DeltaR2XrFejFullSet);
 
-[R1XphiFejRMSE,R1XphiFejRMSE_mean] = XphiRMSE(poseNum,mcNum,DeltaR1XphiFejFullSet);
+[R1XphiFejRMSE,R1XphiFejRMSE_mean] = XphiRMSE(poseNum-1,mcNum,DeltaR1XphiFejFullSet);
 [R2XphiFejRMSE,R2XphiFejRMSE_mean] = XphiRMSE(poseNum,mcNum,DeltaR2XphiFejFullSet);
 
 [XfFejRMSE,XfFejRMSE_mean] = XFRMSE(feaNum,mcNum,DeltaXfFejFullSet);
@@ -111,13 +111,13 @@ poseNum_1round = size(DeltaR1XrFullSet,1)/cy/2;
 figure((ec-1)*6+1)
 hold on
 % standard EKF
-R1XrRMSEP = plot(R1XrRMSE(:,1)',R1XrRMSE(:,2)','-b.','DisplayName','R1 std EKF');
+R1XrRMSEP = plot(R1XrRMSE(:,1)',R1XrRMSE(:,2)','-b.','DisplayName','Standard EKF');
 % ideal EKF
 if ec ~= 4
-R1XrIdeRMSEP = plot(R1XrIdeRMSE(:,1)',R1XrIdeRMSE(:,2)','-k','DisplayName','R1 ideal EKF');
+R1XrIdeRMSEP = plot(R1XrIdeRMSE(:,1)',R1XrIdeRMSE(:,2)','-k','DisplayName','Ideal EKF');
 end
 % FEJ EKF
-R1XrFejRMSEP = plot(R1XrFejRMSE(:,1)',R1XrFejRMSE(:,2)','--r','DisplayName','R1 FEJ EKF');
+R1XrFejRMSEP = plot(R1XrFejRMSE(:,1)',R1XrFejRMSE(:,2)','--r','DisplayName','FEJ-EKF');
 
 if ec ~= 4
 xline(poseNum_1round,'--g',sprintf('step = %d', poseNum_1round))
@@ -139,13 +139,13 @@ hold off
 %% R2 postion
 figure((ec-1)*6+2)
 hold on
-R2XrRMSEP = plot(R2XrRMSE(:,1)',R2XrRMSE(:,2)','-b.','DisplayName','R2 std EKF');
+R2XrRMSEP = plot(R2XrRMSE(:,1)',R2XrRMSE(:,2)','-b.','DisplayName','Standard EKF');
 
 if ec ~= 4
-R2XrIdeRMSEP = plot(R2XrIdeRMSE(:,1)',R2XrIdeRMSE(:,2)','-k','DisplayName','R2 ideal EKF');
+R2XrIdeRMSEP = plot(R2XrIdeRMSE(:,1)',R2XrIdeRMSE(:,2)','-k','DisplayName','Ideal EKF');
 end
 
-R2XrFejRMSEP = plot(R2XrFejRMSE(:,1)',R2XrFejRMSE(:,2)','--r','DisplayName','R2 FEJ EKF');
+R2XrFejRMSEP = plot(R2XrFejRMSE(:,1)',R2XrFejRMSE(:,2)','--r','DisplayName','FEJ-EKF');
 
 if ec ~= 4
 xline(poseNum_1round,'--g',sprintf('step = %d', poseNum_1round))
@@ -168,13 +168,13 @@ hold off
 figure((ec-1)*6+3)
 hold on
 % standard EKF
-R1XphiRMSEP = plot(R1XphiRMSE(:,1)',R1XphiRMSE(:,2)','-b.','DisplayName','R1 std EKF');
+R1XphiRMSEP = plot(R1XphiRMSE(:,1)',R1XphiRMSE(:,2)','-b.','DisplayName','Standard EKF');
 % ideal EKF
 if ec ~= 4
-R1XphiIdeRMSEP = plot(R1XphiIdeRMSE(:,1)',R1XphiIdeRMSE(:,2)','-k','DisplayName','R1 ideal EKF');
+R1XphiIdeRMSEP = plot(R1XphiIdeRMSE(:,1)',R1XphiIdeRMSE(:,2)','-k','DisplayName','Ideal EKF');
 end
 % FEJ EKF
-R1XphiFejRMSEP = plot(R1XphiFejRMSE(:,1)',R1XphiFejRMSE(:,2)','--r','DisplayName','R1 FEJ EKF');
+R1XphiFejRMSEP = plot(R1XphiFejRMSE(:,1)',R1XphiFejRMSE(:,2)','--r','DisplayName','FEJ-EKF');
 
 if ec ~= 4
 xline(poseNum_1round,'--g',sprintf('step = %d', poseNum_1round))
@@ -196,11 +196,11 @@ hold off
 %% R2 orientation
 figure((ec-1)*6+4)
 hold on
-R2XphiRMSEP = plot(R2XphiRMSE(:,1)',R2XphiRMSE(:,2)','-b.','DisplayName','R2 std EKF');
+R2XphiRMSEP = plot(R2XphiRMSE(:,1)',R2XphiRMSE(:,2)','-b.','DisplayName','Standard EKF');
 if ec ~= 4
-R2XphiIdeRMSEP = plot(R2XphiIdeRMSE(:,1)',R2XphiIdeRMSE(:,2)','-k','DisplayName','R2 ideal EKF');
+R2XphiIdeRMSEP = plot(R2XphiIdeRMSE(:,1)',R2XphiIdeRMSE(:,2)','-k','DisplayName','Ideal EKF');
 end
-R2XphiFejRMSEP = plot(R2XphiFejRMSE(:,1)',R2XphiFejRMSE(:,2)','--r','DisplayName','R2 FEJ EKF');
+R2XphiFejRMSEP = plot(R2XphiFejRMSE(:,1)',R2XphiFejRMSE(:,2)','--r','DisplayName','FEJ-EKF');
 
 if ec ~= 4
     xline(poseNum_1round,'--g',sprintf('step = %d', poseNum_1round))
@@ -233,22 +233,20 @@ for k = 0:poseNum
         R2C_xrie = R2PFullSet(k*3+(1:3),(mn-1)*3+(1:3));
         R2NEES_k(k+1,1+mn) = R2xri_e'/R2C_xrie*R2xri_e;
 
-        if k == 0
-            continue
-        else
-            R1xri_e = DeltaR1XpFullSet(k*3+(1:3),1+mn);
-            R1C_xrie = R1PFullSet(k*3+(1:3),(mn-1)*3+(1:3));
+        if k ~= 0
+            R1xri_e = DeltaR1XpFullSet((k-1)*3+(1:3),1+mn);
+            R1C_xrie = R1PFullSet((k-1)*3+(1:3),(mn-1)*3+(1:3));
             R1NEES_k(k,1+mn) = R1xri_e'/R1C_xrie*R1xri_e;
         end
     end
 end
 
-R1XpNEES = [R1NEES_k(:,1),mean(R1NEES_k(:,2:end),2)];
-R2XpNEES = [R2NEES_k(:,1),mean(R2NEES_k(:,2:end),2)];
+R1XpNEES = [R1NEES_k(:,1),mean(R1NEES_k(:,2:end),2)/3];
+R2XpNEES = [R2NEES_k(:,1),mean(R2NEES_k(:,2:end),2)/3];
 
-R1XpNEES_mean = mean(R1XpNEES(:,2))/3;
+R1XpNEES_mean = mean(R1XpNEES(:,2));
 
-R2XpNEES_mean = mean(R2XpNEES(:,2))/3;
+R2XpNEES_mean = mean(R2XpNEES(:,2));
 
 XfNEES_k = [DeltaXfFullSet(1:2:(end-1),1),zeros(feaNum,mcNum)];
 
@@ -260,8 +258,8 @@ for j = 1:feaNum
     end
 end
 
-XfNEES = [XfNEES_k(:,1),mean(XfNEES_k(:,2:end),2)];
-XfNEES_mean = mean(XfNEES(:,2))/2;
+XfNEES = [XfNEES_k(:,1),mean(XfNEES_k(:,2:end),2)/2];
+XfNEES_mean = mean(XfNEES(:,2));
 
 
 
@@ -277,22 +275,20 @@ if ec ~= 4
             R2IdeC_xrie = R2PIdeFullSet(k*3+(1:3),(mn-1)*3+(1:3));
             R2IdeNEES_k(k+1,1+mn) = R2Idexri_e'/R2IdeC_xrie*R2Idexri_e;
 
-            if k == 0
-                continue
-            else
-                R1Idexri_e = DeltaR1XpIdeFullSet(k*3+(1:3),1+mn);
-                R1IdeC_xrie = R1PIdeFullSet(k*3+(1:3),(mn-1)*3+(1:3));
+            if k ~= 0
+                R1Idexri_e = DeltaR1XpIdeFullSet((k-1)*3+(1:3),1+mn);
+                R1IdeC_xrie = R1PIdeFullSet((k-1)*3+(1:3),(mn-1)*3+(1:3));
                 R1IdeNEES_k(k,1+mn) = R1Idexri_e'/R1IdeC_xrie*R1Idexri_e;
             end
         end
     end
 
-    R1XpIdeNEES = [R1IdeNEES_k(:,1),mean(R1IdeNEES_k(:,2:end),2)];
-    R2XpIdeNEES = [R2IdeNEES_k(:,1),mean(R2IdeNEES_k(:,2:end),2)];
+    R1XpIdeNEES = [R1IdeNEES_k(:,1),mean(R1IdeNEES_k(:,2:end),2)/3];
+    R2XpIdeNEES = [R2IdeNEES_k(:,1),mean(R2IdeNEES_k(:,2:end),2)/3];
 
-    R1XpIdeNEES_mean = mean(R1XpIdeNEES(:,2))/3;
+    R1XpIdeNEES_mean = mean(R1XpIdeNEES(:,2));
 
-    R2XpIdeNEES_mean = mean(R2XpIdeNEES(:,2))/3;
+    R2XpIdeNEES_mean = mean(R2XpIdeNEES(:,2));
 
     XfIdeNEES_k = [DeltaXfIdeFullSet(1:2:(end-1),1),zeros(feaNum,mcNum)];
 
@@ -304,8 +300,8 @@ if ec ~= 4
         end
     end
 
-    XfIdeNEES = [XfIdeNEES_k(:,1),mean(XfIdeNEES_k(:,2:end),2)];
-    XfIdeNEES_mean = mean(XfIdeNEES(:,2))/2;
+    XfIdeNEES = [XfIdeNEES_k(:,1),mean(XfIdeNEES_k(:,2:end),2)/2];
+    XfIdeNEES_mean = mean(XfIdeNEES(:,2));
 end
 
 %% FEJ EKF
@@ -319,21 +315,19 @@ for k = 0:poseNum
         R2FejC_xrie = R2PFejFullSet(k*3+(1:3),(mn-1)*3+(1:3));
         R2FejNEES_k(k+1,1+mn) = R2Fejxri_e'/R2FejC_xrie*R2Fejxri_e;
 
-        if k == 0
-            continue
-        else
-            R1Fejxri_e = DeltaR1XpFejFullSet(k*3+(1:3),1+mn);
-            R1FejC_xrie = R1PFejFullSet(k*3+(1:3),(mn-1)*3+(1:3));
+        if k ~= 0
+            R1Fejxri_e = DeltaR1XpFejFullSet((k-1)*3+(1:3),1+mn);
+            R1FejC_xrie = R1PFejFullSet((k-1)*3+(1:3),(mn-1)*3+(1:3));
             R1FejNEES_k(k,1+mn) = R1Fejxri_e'/R1FejC_xrie*R1Fejxri_e;
         end
     end
 end
 
-R1XpFejNEES = [R1FejNEES_k(:,1),mean(R1FejNEES_k(:,2:end),2)];
-R2XpFejNEES = [R2FejNEES_k(:,1),mean(R2FejNEES_k(:,2:end),2)];
+R1XpFejNEES = [R1FejNEES_k(:,1),mean(R1FejNEES_k(:,2:end),2)/3];
+R2XpFejNEES = [R2FejNEES_k(:,1),mean(R2FejNEES_k(:,2:end),2)/3];
 
-R1XpFejNEES_mean = mean(R1XpFejNEES(:,2))/3;
-R2XpFejNEES_mean = mean(R2XpFejNEES(:,2))/3;
+R1XpFejNEES_mean = mean(R1XpFejNEES(:,2));
+R2XpFejNEES_mean = mean(R2XpFejNEES(:,2));
 
 XfFejNEES_k = [DeltaXfFejFullSet(1:2:(end-1),1),zeros(feaNum,mcNum)];
 
@@ -345,8 +339,8 @@ for j = 1:feaNum
     end
 end
 
-XfFejNEES = [XfFejNEES_k(:,1),mean(XfFejNEES_k(:,2:end),2)];
-XfFejNEES_mean = mean(XfFejNEES(:,2))/2;
+XfFejNEES = [XfFejNEES_k(:,1),mean(XfFejNEES_k(:,2:end),2)/2];
+XfFejNEES_mean = mean(XfFejNEES(:,2));
 
 
 
@@ -354,20 +348,20 @@ XfFejNEES_mean = mean(XfFejNEES(:,2))/2;
 figure((ec-1)*6+5)
 hold on
 % standard EKF
-R1XpNEESP = plot(R1XpNEES(:,1)',R1XpNEES(:,2)','-b.','DisplayName','R1 std EKF');
+R1XpNEESP = plot(R1XpNEES(:,1)',R1XpNEES(:,2)','-b.','DisplayName','Standard EKF');
 % ideal EKF
 if ec ~= 4
-R1XpIdeNEESP = plot(R1XpIdeNEES(:,1)',R1XpIdeNEES(:,2)','-k','DisplayName','R1 ideal EKF');
+R1XpIdeNEESP = plot(R1XpIdeNEES(:,1)',R1XpIdeNEES(:,2)','-k','DisplayName','Ideal EKF');
 end
 % FEJ EKF
-R1XpFejNEESP = plot(R1XpFejNEES(:,1)',R1XpFejNEES(:,2)','--r','DisplayName','R1 FEJ EKF');
+R1XpFejNEESP = plot(R1XpFejNEES(:,1)',R1XpFejNEES(:,2)','--r','DisplayName','FEJ-EKF');
 
 if ec ~= 4
 xline(poseNum_1round,'--g',sprintf('step = %d', poseNum_1round))
 end
 
 xlabel('Steps')
-ylabel('R1 Pose ANEES')
+ylabel('R1 Pose NEES')
 xlim([0,xplot_ub])
 if ec ~= 4
 legend([R1XpNEESP,R1XpIdeNEESP,R1XpFejNEESP])
@@ -382,18 +376,18 @@ hold off
 %% R2 pose
 figure((ec-1)*6+6)
 hold on
-R2XpNEESP = plot(R2XpNEES(:,1)',R2XpNEES(:,2)','-b.','DisplayName','R2 std EKF');
+R2XpNEESP = plot(R2XpNEES(:,1)',R2XpNEES(:,2)','-b.','DisplayName','Standard EKF');
 if ec ~= 4
-R2XpIdeNEESP = plot(R2XpIdeNEES(:,1)',R2XpIdeNEES(:,2)','-k','DisplayName','R2 ideal EKF');
+R2XpIdeNEESP = plot(R2XpIdeNEES(:,1)',R2XpIdeNEES(:,2)','-k','DisplayName','Ideal EKF');
 end
-R2XpFejNEESP = plot(R2XpFejNEES(:,1)',R2XpFejNEES(:,2)','--r','DisplayName','R2 FEJ EKF');
+R2XpFejNEESP = plot(R2XpFejNEES(:,1)',R2XpFejNEES(:,2)','--r','DisplayName','FEJ-EKF');
 
 if ec ~= 4
 xline(poseNum_1round,'--g',sprintf('step = %d', poseNum_1round))
 end
 
 xlabel('Steps')
-ylabel('R2 Pose ANEES')
+ylabel('R2 Pose NEES')
 xlim([0,xplot_ub])
 if ec ~= 4
 legend([R2XpNEESP,R2XpIdeNEESP,R2XpFejNEESP])
@@ -405,15 +399,21 @@ set(gca, 'Box', 'on', 'LineWidth', 1);  % 使边框显示，并增加边框宽�
 
 hold off
 
-
+%% Display noise levels
+disp('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Noise levels %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
+fprintf(['R1sigma_0r = %f, R1sigma_0phi = %f, R2sigma_0r = %f, R2sigma_0phi = %f\n' ...
+    'R1sigma_uv = %f, R1sigma_uw = %f, R2sigma_uv = %f, R2sigma_uw = %f\n' ...
+    'R1sigma_zv = %f, R2sigma_zv = %f\n'], ...
+    R1sigma_0r,R1sigma_0phi,R2sigma_0r,R2sigma_0phi,R1sigma_uv,R1sigma_uw,R2sigma_uv,R2sigma_uw,R1sigma_zv,R2sigma_zv)
+disp('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
 
 %% Display the mean
 if ec == 1
 
     disp('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 20 features %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
-    IdeEKFColumn = [R1XrIdeRMSE_mean;R1XphiIdeRMSE_mean;R2XrIdeRMSE_mean;R2XphiIdeRMSE_mean;XfIdeRMSE_mean;R1XpIdeNEES_mean;R2XpIdeNEES_mean;XfIdeNEES_mean];
-    StdEKFColumn = [R1XrRMSE_mean;R1XphiRMSE_mean;R2XrRMSE_mean;R2XphiRMSE_mean;XfStdRMSE_mean;R1XpNEES_mean;R2XpNEES_mean;XfNEES_mean];
-    FejEKFColumn = [R1XrFejRMSE_mean;R1XphiFejRMSE_mean;R2XrFejRMSE_mean;R2XphiFejRMSE_mean;XfFejRMSE_mean;R1XpFejNEES_mean;R2XpFejNEES_mean;XfFejNEES_mean];
+    IdeEKFColumn = [R1XpIdeNEES_mean;R1XrIdeRMSE_mean;R1XphiIdeRMSE_mean;R2XpIdeNEES_mean;R2XrIdeRMSE_mean;R2XphiIdeRMSE_mean;XfIdeNEES_mean;XfIdeRMSE_mean];
+    StdEKFColumn = [R1XpNEES_mean;R1XrRMSE_mean;R1XphiRMSE_mean;R2XpNEES_mean;R2XrRMSE_mean;R2XphiRMSE_mean;XfNEES_mean;XfStdRMSE_mean];
+    FejEKFColumn = [R1XpFejNEES_mean;R1XrFejRMSE_mean;R1XphiFejRMSE_mean;R2XpFejNEES_mean;R2XrFejRMSE_mean;R2XphiFejRMSE_mean;XfFejNEES_mean;XfFejRMSE_mean];
 
     IdeEKFColumn = arrayfun(@(x) sprintf('%.4f', x), IdeEKFColumn, 'UniformOutput', false);
     StdEKFColumn = arrayfun(@(x) sprintf('%.4f', x), StdEKFColumn, 'UniformOutput', false);
@@ -423,7 +423,7 @@ if ec == 1
     T = table(IdeEKFColumn, StdEKFColumn,FejEKFColumn,'VariableNames',{'Ideal EKF','Std EKF','FEJ EKF'});
 
     % 设置行名称
-    T.Properties.RowNames = {'R1 Position Err.RMS (m)','R1 Heading Err.RMS (rad)','R2 Position Err.RMS (m)','R2 Heading Err.RMS (rad)','Landmark Position Err.RMS (m)','R1 Pose ANEES','R2 Pose ANEES','Feature ANEES'};
+    T.Properties.RowNames = {'R1 Pose NEES','R1 Position Err.RMS (m)','R1 Heading Err.RMS (rad)','R2 Pose NEES','R2 Position Err.RMS (m)','R2 Heading Err.RMS (rad)','Feature Position NEES','Feature Position Err.RMS (m)'};
 
     % 显示表格
     disp(T);
@@ -432,9 +432,9 @@ if ec == 1
 elseif ec == 2
 
     disp('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 60 features %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
-    IdeEKFColumn = [R1XrIdeRMSE_mean;R1XphiIdeRMSE_mean;R2XrIdeRMSE_mean;R2XphiIdeRMSE_mean;XfIdeRMSE_mean;R1XpIdeNEES_mean;R2XpIdeNEES_mean;XfIdeNEES_mean];
-    StdEKFColumn = [R1XrRMSE_mean;R1XphiRMSE_mean;R2XrRMSE_mean;R2XphiRMSE_mean;XfStdRMSE_mean;R1XpNEES_mean;R2XpNEES_mean;XfNEES_mean];
-    FejEKFColumn = [R1XrFejRMSE_mean;R1XphiFejRMSE_mean;R2XrFejRMSE_mean;R2XphiFejRMSE_mean;XfFejRMSE_mean;R1XpFejNEES_mean;R2XpFejNEES_mean;XfFejNEES_mean];
+    IdeEKFColumn = [R1XpIdeNEES_mean;R1XrIdeRMSE_mean;R1XphiIdeRMSE_mean;R2XpIdeNEES_mean;R2XrIdeRMSE_mean;R2XphiIdeRMSE_mean;XfIdeNEES_mean;XfIdeRMSE_mean];
+    StdEKFColumn = [R1XpNEES_mean;R1XrRMSE_mean;R1XphiRMSE_mean;R2XpNEES_mean;R2XrRMSE_mean;R2XphiRMSE_mean;XfNEES_mean;XfStdRMSE_mean];
+    FejEKFColumn = [R1XpFejNEES_mean;R1XrFejRMSE_mean;R1XphiFejRMSE_mean;R2XpFejNEES_mean;R2XrFejRMSE_mean;R2XphiFejRMSE_mean;XfFejNEES_mean;XfFejRMSE_mean];
 
     IdeEKFColumn = arrayfun(@(x) sprintf('%.4f', x), IdeEKFColumn, 'UniformOutput', false);
     StdEKFColumn = arrayfun(@(x) sprintf('%.4f', x), StdEKFColumn, 'UniformOutput', false);
@@ -444,7 +444,7 @@ elseif ec == 2
     T = table(IdeEKFColumn, StdEKFColumn,FejEKFColumn,'VariableNames',{'Ideal EKF','Std EKF','FEJ EKF'});
 
     % 设置行名称
-    T.Properties.RowNames = {'R1 Position Err.RMS (m)','R1 Heading Err.RMS (rad)','R2 Position Err.RMS (m)','R2 Heading Err.RMS (rad)','Landmark Position Err.RMS (m)','R1 Pose ANEES','R2 Pose ANEES','Feature ANEES'};
+    T.Properties.RowNames = {'R1 Pose NEES','R1 Position Err.RMS (m)','R1 Heading Err.RMS (rad)','R2 Pose NEES','R2 Position Err.RMS (m)','R2 Heading Err.RMS (rad)','Feature Position NEES','Feature Position Err.RMS (m)'};
 
     % 显示表格
     disp(T);
@@ -453,9 +453,9 @@ elseif ec == 2
 elseif ec == 3
 
     disp('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 100 features %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
-    IdeEKFColumn = [R1XrIdeRMSE_mean;R1XphiIdeRMSE_mean;R2XrIdeRMSE_mean;R2XphiIdeRMSE_mean;XfIdeRMSE_mean;R1XpIdeNEES_mean;R2XpIdeNEES_mean;XfIdeNEES_mean];
-    StdEKFColumn = [R1XrRMSE_mean;R1XphiRMSE_mean;R2XrRMSE_mean;R2XphiRMSE_mean;XfStdRMSE_mean;R1XpNEES_mean;R2XpNEES_mean;XfNEES_mean];
-    FejEKFColumn = [R1XrFejRMSE_mean;R1XphiFejRMSE_mean;R2XrFejRMSE_mean;R2XphiFejRMSE_mean;XfFejRMSE_mean;R1XpFejNEES_mean;R2XpFejNEES_mean;XfFejNEES_mean];
+    IdeEKFColumn = [R1XpIdeNEES_mean;R1XrIdeRMSE_mean;R1XphiIdeRMSE_mean;R2XpIdeNEES_mean;R2XrIdeRMSE_mean;R2XphiIdeRMSE_mean;XfIdeNEES_mean;XfIdeRMSE_mean];
+    StdEKFColumn = [R1XpNEES_mean;R1XrRMSE_mean;R1XphiRMSE_mean;R2XpNEES_mean;R2XrRMSE_mean;R2XphiRMSE_mean;XfNEES_mean;XfStdRMSE_mean];
+    FejEKFColumn = [R1XpFejNEES_mean;R1XrFejRMSE_mean;R1XphiFejRMSE_mean;R2XpFejNEES_mean;R2XrFejRMSE_mean;R2XphiFejRMSE_mean;XfFejNEES_mean;XfFejRMSE_mean];
 
     IdeEKFColumn = arrayfun(@(x) sprintf('%.4f', x), IdeEKFColumn, 'UniformOutput', false);
     StdEKFColumn = arrayfun(@(x) sprintf('%.4f', x), StdEKFColumn, 'UniformOutput', false);
@@ -465,7 +465,7 @@ elseif ec == 3
     T = table(IdeEKFColumn, StdEKFColumn,FejEKFColumn,'VariableNames',{'Ideal EKF','Std EKF','FEJ EKF'});
 
     % 设置行名称
-    T.Properties.RowNames = {'R1 Position Err.RMS (m)','R1 Heading Err.RMS (rad)','R2 Position Err.RMS (m)','R2 Heading Err.RMS (rad)','Landmark Position Err.RMS (m)','R1 Pose ANEES','R2 Pose ANEES','Feature ANEES'};
+    T.Properties.RowNames = {'R1 Pose NEES','R1 Position Err.RMS (m)','R1 Heading Err.RMS (rad)','R2 Pose NEES','R2 Position Err.RMS (m)','R2 Heading Err.RMS (rad)','Feature Position NEES','Feature Position Err.RMS (m)'};
 
     % 显示表格
     disp(T);
@@ -474,9 +474,9 @@ elseif ec == 3
 elseif ec == 4
 
     disp('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% VictoriaParkDataset %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
-    % IdeEKFColumn = [R1XrIdeRMSE_mean;R1XphiIdeRMSE_mean;R2XrIdeRMSE_mean;R2XphiIdeRMSE_mean;XfIdeRMSE_mean;R1XpIdeNEES_mean;R2XpIdeNEES_mean;XfIdeNEES_mean];
-    StdEKFColumn = [R1XrRMSE_mean;R1XphiRMSE_mean;R2XrRMSE_mean;R2XphiRMSE_mean;XfStdRMSE_mean;R1XpNEES_mean;R2XpNEES_mean;XfNEES_mean];
-    FejEKFColumn = [R1XrFejRMSE_mean;R1XphiFejRMSE_mean;R2XrFejRMSE_mean;R2XphiFejRMSE_mean;XfFejRMSE_mean;R1XpFejNEES_mean;R2XpFejNEES_mean;XfFejNEES_mean];
+    % IdeEKFColumn = [R1XpIdeNEES_mean;R1XrIdeRMSE_mean;R1XphiIdeRMSE_mean;R2XpIdeNEES_mean;R2XrIdeRMSE_mean;R2XphiIdeRMSE_mean;XfIdeNEES_mean;XfIdeRMSE_mean];
+    StdEKFColumn = [R1XpNEES_mean;R1XrRMSE_mean;R1XphiRMSE_mean;R2XpNEES_mean;R2XrRMSE_mean;R2XphiRMSE_mean;XfNEES_mean;XfStdRMSE_mean];
+    FejEKFColumn = [R1XpFejNEES_mean;R1XrFejRMSE_mean;R1XphiFejRMSE_mean;R2XpFejNEES_mean;R2XrFejRMSE_mean;R2XphiFejRMSE_mean;XfFejNEES_mean;XfFejRMSE_mean];
 
     % IdeEKFColumn = arrayfun(@(x) sprintf('%.4f', x), IdeEKFColumn, 'UniformOutput', false);
     StdEKFColumn = arrayfun(@(x) sprintf('%.4f', x), StdEKFColumn, 'UniformOutput', false);
@@ -488,36 +488,13 @@ elseif ec == 4
 
 
     % 设置行名称
-    T.Properties.RowNames = {'R1 Position Err.RMS (m)','R1 Heading Err.RMS (rad)','R2 Position Err.RMS (m)','R2 Heading Err.RMS (rad)','Landmark Position Err.RMS (m)','R1 Pose ANEES','R2 Pose ANEES','Feature ANEES'};
+    T.Properties.RowNames = {'R1 Pose NEES','R1 Position Err.RMS (m)','R1 Heading Err.RMS (rad)','R2 Pose NEES','R2 Position Err.RMS (m)','R2 Heading Err.RMS (rad)','Feature Position NEES','Feature Position Err.RMS (m)'};
 
     % 显示表格
     disp(T);
     disp('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
 
 end
-
-
-
-% exportgraphics(figure(1),fullfile(figuresFolderPath, 'R1Postion_RMSE_20feas.jpg'), 'Resolution', 300)
-% exportgraphics(figure(2),fullfile(figuresFolderPath, 'R2Postion_RMSE_20feas.jpg'), 'Resolution', 300)
-% exportgraphics(figure(3),fullfile(figuresFolderPath, 'R1Orientation_RMSE_20feas.jpg'), 'Resolution', 300)
-% exportgraphics(figure(4),fullfile(figuresFolderPath, 'R2Orientation_RMSE_20feas.jpg'), 'Resolution', 300)
-% exportgraphics(figure(5),fullfile(figuresFolderPath, 'R1Pose_ANEES_20feas.jpg'), 'Resolution', 300)
-% exportgraphics(figure(6),fullfile(figuresFolderPath, 'R2Pose_ANEES_20feas.jpg'), 'Resolution', 300)
-%
-% exportgraphics(figure(7),fullfile(figuresFolderPath, 'R1Postion_RMSE_60feas.jpg'), 'Resolution', 300)
-% exportgraphics(figure(8),fullfile(figuresFolderPath, 'R2Postion_RMSE_60feas.jpg'), 'Resolution', 300)
-% exportgraphics(figure(9),fullfile(figuresFolderPath, 'R1Orientation_RMSE_60feas.jpg'), 'Resolution', 300)
-% exportgraphics(figure(10),fullfile(figuresFolderPath, 'R2Orientation_RMSE_60feas.jpg'), 'Resolution', 300)
-% exportgraphics(figure(11),fullfile(figuresFolderPath, 'R1Pose_ANEES_60feas.jpg'), 'Resolution', 300)
-% exportgraphics(figure(12),fullfile(figuresFolderPath, 'R2Pose_ANEES_60feas.jpg'), 'Resolution', 300)
-%
-% exportgraphics(figure(13),fullfile(figuresFolderPath, 'R1Postion_RMSE_100feas.jpg'), 'Resolution', 300)
-% exportgraphics(figure(14),fullfile(figuresFolderPath, 'R2Postion_RMSE_100feas.jpg'), 'Resolution', 300)
-% exportgraphics(figure(15),fullfile(figuresFolderPath, 'R1Orientation_RMSE_100feas.jpg'), 'Resolution', 300)
-% exportgraphics(figure(16),fullfile(figuresFolderPath, 'R2Orientation_RMSE_100feas.jpg'), 'Resolution', 300)
-% exportgraphics(figure(17),fullfile(figuresFolderPath, 'R1Pose_ANEES_100feas.jpg'), 'Resolution', 300)
-% exportgraphics(figure(18),fullfile(figuresFolderPath, 'R2Pose_ANEES_100feas.jpg'), 'Resolution', 300)
 
 % 使用export_fig代替exportgraphics来导出高质量的图像
 if ec == 1

@@ -166,21 +166,21 @@ end
 % % for k = 1:poseNum
 % %     text(X((k-1)*3+1,3),X((k-1)*3+2,3),num2str(X((k-1)*3+1,2)),'Color','b')
 % % end
-%
+% 
 % feaPosiP = plot(X(poseNum*3+(1:2:(feaNum*2-1)),3),X(poseNum*3+(2:2:(feaNum*2)),3),'r^');
 % hold off
-%
+
 % %% find pose with more than 8 shared features
 % K = [];
 % for k = 1:poseNum
 %     Obs_k = Obs(Obs(:,1)==k,:);
-%
+% 
 %     ObskNum = size(Obs_k,1)/2;
-%
+% 
 %     %% 选第几步？
 %     if ObskNum >= 8
 %         K = [K;k];
-%
+% 
 %         if k > 3000 && k < 4000
 %             figure(3)
 %             hold on
@@ -189,7 +189,7 @@ end
 %             hold off
 %         end
 %     end
-%
+% 
 %     %% 可以选3265步(65, 8)左右，现在找出方向
 %     dist = sqrt((X((k-1)*3+1,3)-65)^2+(X((k-1)*3+2,3)-8)^2);
 %     if dist < 5
@@ -347,3 +347,34 @@ end
 
 save('VicP_Parameters.mat','R1XrTrue','R1XphiT','R2XrTrue','R2XphiT','XfTrueAll','R1OdoT','R2OdoT','R1ObsT','R2ObsT')
 save('VicP_Measurements.mat','R1Xp0Set','R1OdoSet','R1ObsSet','R2Xp0Set','R2OdoSet','R2ObsSet')
+
+figure(4)
+hold on
+grid on
+R1XrTrueP = plot(R1XrTrue(1:2:(end-1),2),R1XrTrue(2:2:end,2),'c-','DisplayName','R1 trajectory','MarkerSize',2);
+R2XrTrueP = plot(R2XrTrue(1:2:(end-1),2),R2XrTrue(2:2:end,2),'m--','DisplayName','R2 trajectory','MarkerSize',2);
+FeaTrueP = plot(XfTrueAll(1:2:(end-1),2),XfTrueAll(2:2:end,2),'k^','DisplayName','Feature position','MarkerSize',3);
+
+% 为 legend 创建正常尺寸的标记（不显示在图中）
+R1XrTruePHandle = plot(NaN, NaN, 'c-','DisplayName','R1 trajectory', 'MarkerSize', 8);  % 正常尺寸标记
+R2XrTruePHandle = plot(NaN, NaN, 'm--','DisplayName','R2 trajectory', 'MarkerSize', 8);  % 正常尺寸标记
+FeaTruePHandle = plot(NaN, NaN, 'k^','DisplayName','Feature position', 'MarkerSize', 8);  % 正常尺寸标记
+
+legend([R1XrTruePHandle,R2XrTruePHandle,FeaTruePHandle])
+
+xlabel('x (m)')
+ylabel('y (m)')
+
+set(gcf, 'Color', 'w');  % 将整个图背景设置为白色
+set(gca, 'Box', 'on', 'LineWidth', 1, 'GridLineStyle', '--', 'GridAlpha', 0.1);  % 使边框显示，并增加边框宽度
+hold off
+
+%% save output figures
+currentFolder = fileparts(mfilename('fullpath'));
+subFolder = 'saved_figures';
+figuresFolderPath = fullfile(currentFolder, subFolder);
+if ~exist(figuresFolderPath, 'dir')
+    mkdir(figuresFolderPath);
+end
+
+export_fig(fullfile(figuresFolderPath, 'VicP_Xposi_GNI.jpg'), '-jpg', '-r300', figure(4));

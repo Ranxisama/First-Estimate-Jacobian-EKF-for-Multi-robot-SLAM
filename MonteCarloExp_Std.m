@@ -1,7 +1,7 @@
 clear
+close all
 
 Config;
-
 
 if ec == 1
     load('MT_Parameters_20fea.mat','R1XrTrue','R1XphiT','R2XrTrue','R2XphiT','XfTrueAll','R1OdoT','R2OdoT','R1ObsT','R2ObsT')
@@ -192,10 +192,10 @@ for mc = 1:mcNum
             end
 
             % Standard EKF
-            R1XpFull = Xk00e(1:3,2:3); % save all robot postures of R1
+            % R1XpFull = Xk00e(1:3,2:3); % save all robot postures of R1
             R2XpFull = Xk00e(4:6,2:3); % save all robot postures of R2
 
-            R1PFull = Pk00(1:3,1:3);
+            % R1PFull = Pk00(1:3,1:3);
             R2PFull = Pk00(4:6,4:6);
 
             continue
@@ -490,13 +490,37 @@ XfFullSet = [Xk11e(7:end,2),XfFullSet];
 
 if ec == 4 && TrajP == 1
     figure((ec-1)*6+7)
-    hold on 
-    R1PosiVPP = plot(R1XpFullSet(1:3:(end-2),2),R1XpFullSet(2:3:(end-1),2),'bo','DisplayName','R1 Position');
-    R2PosiVPP = plot(R2XpFullSet(1:3:(end-2),2),R2XpFullSet(2:3:(end-1),2),'ro','DisplayName','R2 Position');
-    FeaPosiVPP = plot(XfFullSet(1:2:(end-1),2),XfFullSet(2:2:end,2),'g^','DisplayName','Feature Position');
-    legend([R1PosiVPP,R2PosiVPP,FeaPosiVPP])
-    title('VictoriaPark Trajectory for standard EKF')
-    hold off 
+    hold on
+    grid on
+    R1PosiVPP = plot(R1XpFullSet(1:3:(end-2),2),R1XpFullSet(2:3:(end-1),2),'c-','DisplayName','R1 trajectory','MarkerSize',2);
+    R2PosiVPP = plot(R2XpFullSet(1:3:(end-2),2),R2XpFullSet(2:3:(end-1),2),'m--','DisplayName','R2 trajectory','MarkerSize',2);
+    FeaPosiVPP = plot(XfFullSet(1:2:(end-1),2),XfFullSet(2:2:end,2),'k^','DisplayName','Feature position','MarkerSize',3);
+
+    % 为 legend 创建正常尺寸的标记（不显示在图中）
+    R1PosiVPPHandle = plot(NaN, NaN, 'c-','DisplayName','R1 trajectory', 'MarkerSize', 8);  % 正常尺寸标记
+    R2PosiVPPHandle = plot(NaN, NaN, 'm--','DisplayName','R2 trajectory', 'MarkerSize', 8);  % 正常尺寸标记
+    FeaPosiVPPHandle = plot(NaN, NaN, 'k^','DisplayName','Feature position', 'MarkerSize', 8);  % 正常尺寸标记
+
+    legend([R1PosiVPPHandle,R2PosiVPPHandle,FeaPosiVPPHandle])
+    % title('VictoriaPark Trajectory for standard EKF')
+
+    xlabel('x (m)')
+    ylabel('y (m)')
+
+    set(gcf, 'Color', 'w');  % 将整个图背景设置为白色
+    set(gca, 'Box', 'on', 'LineWidth', 1, 'GridLineStyle', '--', 'GridAlpha', 0.1);  % 使边框显示，并增加边框宽度
+
+    hold off
+
+    %% save output figures
+    currentFolder = fileparts(mfilename('fullpath'));
+    subFolder = 'saved_figures';
+    figuresFolderPath = fullfile(currentFolder, subFolder);
+    if ~exist(figuresFolderPath, 'dir')
+        mkdir(figuresFolderPath);
+    end
+
+    export_fig(fullfile(figuresFolderPath, 'VicP_Xposi_StdEKF.jpg'), '-jpg', '-r300', figure((ec-1)*6+7));
 end
 
 R1XrFullSet = [];
@@ -515,27 +539,28 @@ DeltaR2XphiFullSet = [];
 
 for pn = 0:poseNum
 
-    %% debug
-    % if pn == 34 || pn == 60
-    %     keyboard
-    % end
-    %%
+    %% Standard EKF
+    if pn ~= 0
+        R1XpTrue = [R1XrTrue(pn*2+(1:2),:);R1XphiT(pn+1,:)];
 
-    R1XpTrue = [R1XrTrue(pn*2+(1:2),:);R1XphiT(pn+1,:)];
+        DeltaR1XpFullSet((end+1):(end+3),:) = [R1XpTrue(:,1),R1XpFullSet((pn-1)*3+(1:3),2:end)-R1XpTrue(:,2)];
+
+        % wrap the delta angle
+        DeltaR1XpFullSet(end,2:end) = wrap(DeltaR1XpFullSet(end,2:end));
+
+        DeltaR1XrFullSet((end+1):(end+2),:) = DeltaR1XpFullSet((end-2):(end-1),:);
+
+        DeltaR1XphiFullSet(end+1,:) = DeltaR1XpFullSet(end,:);
+    end
+
     R2XpTrue = [R2XrTrue(pn*2+(1:2),:);R2XphiT(pn+1,:)];
 
-    %% Standard EKF
-    DeltaR1XpFullSet((end+1):(end+3),:) = [R1XpTrue(:,1),R1XpFullSet(pn*3+(1:3),2:end)-R1XpTrue(:,2)];
     DeltaR2XpFullSet((end+1):(end+3),:) = [R2XpTrue(:,1),R2XpFullSet(pn*3+(1:3),2:end)-R2XpTrue(:,2)];
 
-    % wrap the delta angle
-    DeltaR1XpFullSet(end,2:end) = wrap(DeltaR1XpFullSet(end,2:end));
     DeltaR2XpFullSet(end,2:end) = wrap(DeltaR2XpFullSet(end,2:end));
 
-    DeltaR1XrFullSet((end+1):(end+2),:) = DeltaR1XpFullSet((end-2):(end-1),:);
     DeltaR2XrFullSet((end+1):(end+2),:) = DeltaR2XpFullSet((end-2):(end-1),:);
 
-    DeltaR1XphiFullSet(end+1,:) = DeltaR1XpFullSet(end,:);
     DeltaR2XphiFullSet(end+1,:) = DeltaR2XpFullSet(end,:);
 end
 

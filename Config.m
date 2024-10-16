@@ -6,54 +6,30 @@
 % 4, Victoria Park dataset
 ec = 4;
 
+%% Simulation noise choice
+snc = 0; % if 0 (for test), set noise level as 0.02/0.1°; if 1 (for display), set noise level as bigger; 
+
 %% Number of Monte Carlo experiments
-mcNum = 50;
+mcNum = 100;
 
 %% Number of robot running cycles
 cy = 5;
 
 %% Trajectory plot
-TrajP = 0; % if 1, plot the trajectory
+TrajP = 1; % if 1, plot the trajectory
+
+%% Jacobian value switch
+% Ideal EKF
+step0GNI_ide = 1; % if 0, Jacobian of GNI at step 0 use optimized value; if 1 (good), use true value
+step0FI_ide = 1; % (does not make difference) % if 0, Jacobian of feature initialization at step 0 use optimized value; if 1, use true value
+
+stepkFI_ide = 1; % if 0, Jacobian of feature initialization at step k (k~=0) use estimated value; if 1 (good), use true value
+
+% FEJ EKF
+step0GNI_fej = 0; % if 0, Jacobian of GNI at step 0 use optimized value; if 1, use first estimated value
+step0FI_fej = 0; % (does not make difference) % if 0, Jacobian of feature initialization at step 0 use optimized value; if 1, use first estimated value
 
 if ec ~= 4 % For Simulation
-    %% Jacobian value switch
-    % Ideal EKF
-    step0GNI_ide = 1; % if 0, Jacobian of GNI at step 0 use optimized value; if 1, use true value
-    step0FI_ide = 1; % if 0, Jacobian of feature initialization at step 0 use optimized value; if 1, use true value
-
-    stepkFI_ide = 1; % if 0, Jacobian of feature initialization at step k (k~=0) use estimated value; if 1, use true value
-
-    % FEJ EKF
-    step0GNI_fej = 1; % if 0, Jacobian of GNI at step 0 use optimized value; if 1, use first estimated value
-    step0FI_fej = 1; % if 0, Jacobian of feature initialization at step 0 use optimized value; if 1, use first estimated value
-
-    %% Gaussian noise level settings
-    % R1
-    % standard deviation of 1th robot position at time 0 (equals to 0 as the origin of the 1D coordinate system)
-    R1sigma_0r = 2; % 0.01: 0.01 m
-    R1sigma_0phi = pi/30; % pi/180: 1°
-
-
-    % standard deviation of the zero mean Gaussian process noise w(k) of 1th robot
-    R1sigma_uv = 1; % 0.025 m/time_step
-    R1sigma_uw = pi/60; % 0.5°/time_step
-
-    % standard deviation of the zero mean Gaussian observation noise v(k) of 1th robot
-    R1sigma_zv = 1; % m/time_step
-
-    % R2
-    % standard deviation of robot position at time 0 (equals to 0 as the origin of the 1D coordinate system)
-    R2sigma_0r = 2; % m
-    R2sigma_0phi = pi/30; % pi: 180°
-
-    % standard deviation of the zero mean Gaussian process noise w(k) of 2nd robot
-    R2sigma_uv = 1; % m/time_step
-    R2sigma_uw = pi/60; % °/time_step
-
-
-    % standard deviation of the zero mean Gaussian observation noise v(k) of 2nd robot
-    R2sigma_zv = 1; % m/time_step
-
     %% Noise Switch
     R1addPose0Noise = 0; % if 0, R1 initial position is accurate
     R2addPose0Noise = 1; % if 0, R2 initial position is accurate
@@ -64,46 +40,64 @@ if ec ~= 4 % For Simulation
     R1addObsNoise = 1; % if 0, R1 observation is perfect
     R2addObsNoise = 1; % if 0, R2 observation is perfect
 
-elseif ec == 4 % For Victoria Park Dataset experiment
-
-    %% Jacobian value switch
-    % Ideal EKF
-    step0GNI_ide = 1; % if 0, Jacobian of GNI at step 0 use optimized value; if 1, use true value
-    step0FI_ide = 1; % if 0, Jacobian of feature initialization at step 0 use optimized value; if 1, use true value
-
-    stepkFI_ide = 1; % if 0, Jacobian of feature initialization at step k (k~=0) use estimated value; if 1, use true value
-
-    % FEJ EKF
-    step0GNI_fej = 1; % if 0, Jacobian of GNI at step 0 use optimized value; if 1, use first estimated value
-    step0FI_fej = 1; % if 0, Jacobian of feature initialization at step 0 use optimized value; if 1, use first estimated value
-
     %% Gaussian noise level settings
-    % R1
-    % standard deviation of 1th robot position at time 0 (equals to 0 as the origin of the 1D coordinate system)
-    R1sigma_0r = 0.1; % 0.01: 0.01 m
-    R1sigma_0phi = pi/180; % pi/180: 1°
+    if snc == 0 % for test
+        % R1
+        % standard deviation of 1th robot position at time 0 (equals to 0 as the origin of the 1D coordinate system)
+        R1sigma_0r = 0.2; % 0.01: 0.01 m
+        R1sigma_0phi = 0.02; % pi/180: 1°/time_step
+
+        % R2
+        % standard deviation of robot position at time 0 (equals to 0 as the origin of the 1D coordinate system)
+        R2sigma_0r = 1; % m
+        R2sigma_0phi = 0.1; % pi: 180°
 
 
-    % standard deviation of the zero mean Gaussian process noise w(k) of 1th robot
-    R1sigma_uv = 0.1; % 0.025 m/time_step
-    R1sigma_uw = pi/180; % 0.5°/time_step
+        % standard deviation of the zero mean Gaussian process noise w(k) of 1th robot
+        R1sigma_uv = 0.2; % 0.025 m/time_step
+        R1sigma_uw = pi/60; % pi: 180°/time_step
 
-    % standard deviation of the zero mean Gaussian observation noise v(k) of 1th robot
-    R1sigma_zv = 0.1; % m/time_step
+        % standard deviation of the zero mean Gaussian process noise w(k) of 2nd robot
+        R2sigma_uv = 0.2; % m/time_step
+        R2sigma_uw = pi/60; % °/time_step
 
-    % R2
-    % standard deviation of robot position at time 0 (equals to 0 as the origin of the 1D coordinate system)
-    R2sigma_0r = 100; % m
-    R2sigma_0phi = pi; % pi: 180°
+        % standard deviation of the zero mean Gaussian observation noise v(k) of 1th robot
+        R1sigma_zv = 0.6; % m/time_step
 
-    % standard deviation of the zero mean Gaussian process noise w(k) of 2nd robot
-    R2sigma_uv = 0.1; % m/time_step
-    R2sigma_uw = pi/180; % °/time_step
+        % standard deviation of the zero mean Gaussian observation noise v(k) of 2nd robot
+        R2sigma_zv = 0.6; % m/time_step
+
+    elseif snc == 1 % for display (best)
+        % R1
+        % standard deviation of 1th robot position at time 0 (equals to 0 as the origin of the 1D coordinate system)
+        R1sigma_0r = 0.2; % 0.01: 0.01 m
+        R1sigma_0phi = 0.02; % pi/180: 1°/time_step
+
+        % R2
+        % standard deviation of robot position at time 0 (equals to 0 as the origin of the 1D coordinate system)
+        R2sigma_0r = 2; % m
+        R2sigma_0phi = 0.2; % pi: 180°
 
 
-    % standard deviation of the zero mean Gaussian observation noise v(k) of 2nd robot
-    R2sigma_zv = 0.1; % m/time_step
+        % standard deviation of the zero mean Gaussian process noise w(k) of 1th robot
+        R1sigma_uv = 1; % 0.025 m/time_step
+        R1sigma_uw = 0.05; % pi: 180°/time_step
 
+        % standard deviation of the zero mean Gaussian process noise w(k) of 2nd robot
+        R2sigma_uv = 0.8; % m/time_step
+        R2sigma_uw = 0.04; % °/time_step
+
+        % standard deviation of the zero mean Gaussian observation noise v(k) of 1th robot
+        R1sigma_zv = 1; % m/time_step
+
+        % standard deviation of the zero mean Gaussian observation noise v(k) of 2nd robot
+        R2sigma_zv = 0.8; % m/time_step
+
+    else
+        error('Simulation Noise Choice (snc) can onlt be 0 or 1')
+    end
+
+else % For Victoria Park Dataset experiment
     %% Noise Switch
     R1addPose0Noise = 1; % if 0, R1 initial position is accurate
     R2addPose0Noise = 1; % if 0, R2 initial position is accurate
@@ -113,17 +107,45 @@ elseif ec == 4 % For Victoria Park Dataset experiment
 
     R1addObsNoise = 1; % if 0, R1 observation is perfect
     R2addObsNoise = 1; % if 0, R2 observation is perfect
+
+    %% Gaussian noise level settings
+    % R1
+    % standard deviation of 1th robot position at time 0 (equals to 0 as the origin of the 1D coordinate system)
+    R1sigma_0r = 0.005; % 0.01: 0.01 m
+    R1sigma_0phi = 0.005*pi; % pi/180: 1°
+
+
+    % standard deviation of the zero mean Gaussian process noise w(k) of 1th robot
+    R1sigma_uv = 0.075; % 0.025 m/time_step
+    R1sigma_uw = 0.015*pi; % 0.5°/time_step
+
+    % standard deviation of the zero mean Gaussian observation noise v(k) of 1th robot
+    R1sigma_zv = 0.075; % m/time_step
+
+    % R2
+    % standard deviation of robot position at time 0 (equals to 0 as the origin of the 1D coordinate system)
+    R2sigma_0r = 100; % m
+    R2sigma_0phi = pi; % pi: 180°
+
+    % standard deviation of the zero mean Gaussian process noise w(k) of 2nd robot
+    R2sigma_uv = 0.075; % m/time_step
+    R2sigma_uw = 0.015*pi; % °/time_step
+
+
+    % standard deviation of the zero mean Gaussian observation noise v(k) of 2nd robot
+    R2sigma_zv = 0.075; % m/time_step
+
 end
 
 %% Robot bearing ranges
 % R1bearingRange = 0; % pi/60: 3°
 % R2bearingRange = 0; % pi/60: 3°
-R1bearingRange = pi/12; % pi/60: 3°
-R2bearingRange = pi/12; % pi/60: 3°
+R1bearingRange = pi/12; % pi/12: 15°
+R2bearingRange = pi/12; % pi/12: 15°
 
 %% Sensor Range
-R1sensorRange = 10; % m/s, R1's observation range for the features
-R2sensorRange = 10; % m/s, R2's observation range for the features
+R1sensorRange = 15; % m/s, R1's observation range for the features
+R2sensorRange = 15; % m/s, R2's observation range for the features
 
 %% Check Switch
 % Measurements check

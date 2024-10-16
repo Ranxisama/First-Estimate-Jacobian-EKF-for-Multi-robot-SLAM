@@ -5,7 +5,7 @@ if addObsNoise == 0
 end
 
 obs = [];
-for k = 0:PosNum-1
+for k = 0:PosNum
     XrkT = XrTrue(XrTrue(:,1)==k,2);
     XphikT = XphiTrue(XphiTrue(:,1)==k,2);
     for j = 1:size(XfTrueAll,1)/2

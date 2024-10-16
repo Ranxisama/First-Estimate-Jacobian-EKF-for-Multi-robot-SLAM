@@ -242,10 +242,10 @@ for mc = 1:mcNum
             end
 
             % Ideal EKF
-            R1XpIdeFull = Xk00e_ide(1:3,2:3); % save all robot postures of R1
+            % R1XpIdeFull = Xk00e_ide(1:3,2:3); % save all robot postures of R1
             R2XpIdeFull = Xk00e_ide(4:6,2:3); % save all robot postures of R2
 
-            R1PIdeFull = Pk00_ide(1:3,1:3);
+            % R1PIdeFull = Pk00_ide(1:3,1:3);
             R2PIdeFull = Pk00_ide(4:6,4:6);
 
             continue
@@ -645,27 +645,27 @@ DeltaR2XphiIdeFullSet = [];
 
 for pn = 0:poseNum
 
-    % debug
-    % if pn == 34 || pn == 60
-    %     keyboard
-    % end
-    %
+    if pn ~= 0
+        R1XpTrue = [R1XrTrue(pn*2+(1:2),:);R1XphiT(pn+1,:)];
 
-    R1XpTrue = [R1XrTrue(pn*2+(1:2),:);R1XphiT(pn+1,:)];
+        DeltaR1XpIdeFullSet((end+1):(end+3),:) = [R1XpTrue(:,1),R1XpIdeFullSet((pn-1)*3+(1:3),2:end)-R1XpTrue(:,2)];
+
+        % wrap the delta angle
+        DeltaR1XpIdeFullSet(end,2:end) = wrap(DeltaR1XpIdeFullSet(end,2:end));
+
+        DeltaR1XrIdeFullSet((end+1):(end+2),:) = DeltaR1XpIdeFullSet((end-2):(end-1),:);
+
+        DeltaR1XphiIdeFullSet(end+1,:) = DeltaR1XpIdeFullSet(end,:);
+    end
+
     R2XpTrue = [R2XrTrue(pn*2+(1:2),:);R2XphiT(pn+1,:)];
 
-    % Ideal EKF
-    DeltaR1XpIdeFullSet((end+1):(end+3),:) = [R1XpTrue(:,1),R1XpIdeFullSet(pn*3+(1:3),2:end)-R1XpTrue(:,2)];
     DeltaR2XpIdeFullSet((end+1):(end+3),:) = [R2XpTrue(:,1),R2XpIdeFullSet(pn*3+(1:3),2:end)-R2XpTrue(:,2)];
 
-    % wrap the delta angle
-    DeltaR1XpIdeFullSet(end,2:end) = wrap(DeltaR1XpIdeFullSet(end,2:end));
     DeltaR2XpIdeFullSet(end,2:end) = wrap(DeltaR2XpIdeFullSet(end,2:end));
 
-    DeltaR1XrIdeFullSet((end+1):(end+2),:) = DeltaR1XpIdeFullSet((end-2):(end-1),:);
     DeltaR2XrIdeFullSet((end+1):(end+2),:) = DeltaR2XpIdeFullSet((end-2):(end-1),:);
 
-    DeltaR1XphiIdeFullSet(end+1,:) = DeltaR1XpIdeFullSet(end,:);
     DeltaR2XphiIdeFullSet(end+1,:) = DeltaR2XpIdeFullSet(end,:);
 end
 
