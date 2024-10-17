@@ -3,14 +3,29 @@ clear
 Config;
 
 if ec == 1
-    load('MT_Parameters_20fea.mat','R1XrTrue','R1XphiT','R2XrTrue','R2XphiT','XfTrueAll','R1OdoT','R2OdoT','R1ObsT','R2ObsT')
-    load('MT_Measurements_20fea.mat','R1Xp0Set','R1OdoSet','R1ObsSet','R2Xp0Set','R2OdoSet','R2ObsSet')
+    if env == 1
+        load('MT_Parameters_20fea_1.mat','R1XrTrue','R1XphiT','R2XrTrue','R2XphiT','XfTrueAll','R1OdoT','R2OdoT','R1ObsT','R2ObsT')
+        load('MT_Measurements_20fea_1.mat','R1Xp0Set','R1OdoSet','R1ObsSet','R2Xp0Set','R2OdoSet','R2ObsSet')
+    else
+        load('MT_Parameters_20fea_2.mat','R1XrTrue','R1XphiT','R2XrTrue','R2XphiT','XfTrueAll','R1OdoT','R2OdoT','R1ObsT','R2ObsT')
+        load('MT_Measurements_20fea_2.mat','R1Xp0Set','R1OdoSet','R1ObsSet','R2Xp0Set','R2OdoSet','R2ObsSet')
+    end
 elseif ec == 2
-    load('MT_Parameters_60fea.mat','R1XrTrue','R1XphiT','R2XrTrue','R2XphiT','XfTrueAll','R1OdoT','R2OdoT','R1ObsT','R2ObsT')
-    load('MT_Measurements_60fea.mat','R1Xp0Set','R1OdoSet','R1ObsSet','R2Xp0Set','R2OdoSet','R2ObsSet')
+    if env == 1
+        load('MT_Parameters_60fea_1.mat','R1XrTrue','R1XphiT','R2XrTrue','R2XphiT','XfTrueAll','R1OdoT','R2OdoT','R1ObsT','R2ObsT')
+        load('MT_Measurements_60fea_1.mat','R1Xp0Set','R1OdoSet','R1ObsSet','R2Xp0Set','R2OdoSet','R2ObsSet')
+    else
+        load('MT_Parameters_60fea_2.mat','R1XrTrue','R1XphiT','R2XrTrue','R2XphiT','XfTrueAll','R1OdoT','R2OdoT','R1ObsT','R2ObsT')
+        load('MT_Measurements_60fea_2.mat','R1Xp0Set','R1OdoSet','R1ObsSet','R2Xp0Set','R2OdoSet','R2ObsSet')
+    end
 elseif ec == 3
-    load('MT_Parameters_100fea.mat','R1XrTrue','R1XphiT','R2XrTrue','R2XphiT','XfTrueAll','R1OdoT','R2OdoT','R1ObsT','R2ObsT')
-    load('MT_Measurements_100fea.mat','R1Xp0Set','R1OdoSet','R1ObsSet','R2Xp0Set','R2OdoSet','R2ObsSet')
+    if env == 1
+        load('MT_Parameters_100fea_1.mat','R1XrTrue','R1XphiT','R2XrTrue','R2XphiT','XfTrueAll','R1OdoT','R2OdoT','R1ObsT','R2ObsT')
+        load('MT_Measurements_100fea_1.mat','R1Xp0Set','R1OdoSet','R1ObsSet','R2Xp0Set','R2OdoSet','R2ObsSet')
+    else
+        load('MT_Parameters_100fea_2.mat','R1XrTrue','R1XphiT','R2XrTrue','R2XphiT','XfTrueAll','R1OdoT','R2OdoT','R1ObsT','R2ObsT')
+        load('MT_Measurements_100fea_2.mat','R1Xp0Set','R1OdoSet','R1ObsSet','R2Xp0Set','R2OdoSet','R2ObsSet')
+    end
 elseif ec == 4
     error('No real-world experiment uses truth!')
     % load('VicP_Parameters.mat','R1XrTrue','R1XphiT','R2XrTrue','R2XphiT','XfTrueAll','R1OdoT','R2OdoT','R1ObsT','R2ObsT')
@@ -620,13 +635,13 @@ XfIdeFullSet = [Xk11e_ide(7:end,2),XfIdeFullSet];
 
 % if ec == 4 && TrajP == 1
 %     figure((ec-1)*6+8)
-%     hold on 
+%     hold on
 %     R1PosiVPP = plot(R1XpIdeFullSet(1:3:(end-2),2),R1XpIdeFullSet(2:3:(end-1),2),'bo','DisplayName','R1 Position');
 %     R2PosiVPP = plot(R2XpIdeFullSet(1:3:(end-2),2),R2XpIdeFullSet(2:3:(end-1),2),'ro','DisplayName','R2 Position');
 %     FeaPosiVPP = plot(XfIdeFullSet(1:2:(end-1),2),XfIdeFullSet(2:2:end,2),'g^','DisplayName','Feature Position');
 %     legend([R1PosiVPP,R2PosiVPP,FeaPosiVPP])
 %     title('VictoriaPark Trajectory for ideal EKF')
-%     hold off 
+%     hold off
 % end
 
 R1XrIdeFullSet = [];
@@ -678,25 +693,46 @@ DeltaXfIdeFullSet = [XfIdeFullSet(:,1),XfIdeFullSet(:,2:end)-XfTrueIde(:,2)];
 
 %% save the Monte Carlo Experiments result
 if ec == 1
-    save('MTE_results_IdeEKF_20fea.mat','poseNum','feaNum', ...
-        'DeltaR1XrIdeFullSet','DeltaR2XrIdeFullSet','DeltaR1XphiIdeFullSet','DeltaR2XphiIdeFullSet', ...
-        'DeltaR2XpIdeFullSet','R2PIdeFullSet','DeltaR1XpIdeFullSet','R1PIdeFullSet', ...
-        'DeltaXfIdeFullSet','PfIdeFullSet')
+    if env == 1
+        save('MTE_results_IdeEKF_20fea_1.mat','poseNum','feaNum', ...
+            'DeltaR1XrIdeFullSet','DeltaR2XrIdeFullSet','DeltaR1XphiIdeFullSet','DeltaR2XphiIdeFullSet', ...
+            'DeltaR2XpIdeFullSet','R2PIdeFullSet','DeltaR1XpIdeFullSet','R1PIdeFullSet', ...
+            'DeltaXfIdeFullSet','PfIdeFullSet')
+    else
+        save('MTE_results_IdeEKF_20fea_2.mat','poseNum','feaNum', ...
+            'DeltaR1XrIdeFullSet','DeltaR2XrIdeFullSet','DeltaR1XphiIdeFullSet','DeltaR2XphiIdeFullSet', ...
+            'DeltaR2XpIdeFullSet','R2PIdeFullSet','DeltaR1XpIdeFullSet','R1PIdeFullSet', ...
+            'DeltaXfIdeFullSet','PfIdeFullSet')
+    end
 elseif ec == 2
-    save('MTE_results_IdeEKF_60fea.mat','poseNum','feaNum', ...
-        'DeltaR1XrIdeFullSet','DeltaR2XrIdeFullSet','DeltaR1XphiIdeFullSet','DeltaR2XphiIdeFullSet', ...
-        'DeltaR2XpIdeFullSet','R2PIdeFullSet','DeltaR1XpIdeFullSet','R1PIdeFullSet', ...
-        'DeltaXfIdeFullSet','PfIdeFullSet')
+    if env == 1
+        save('MTE_results_IdeEKF_60fea_1.mat','poseNum','feaNum', ...
+            'DeltaR1XrIdeFullSet','DeltaR2XrIdeFullSet','DeltaR1XphiIdeFullSet','DeltaR2XphiIdeFullSet', ...
+            'DeltaR2XpIdeFullSet','R2PIdeFullSet','DeltaR1XpIdeFullSet','R1PIdeFullSet', ...
+            'DeltaXfIdeFullSet','PfIdeFullSet')
+    else
+        save('MTE_results_IdeEKF_60fea_2.mat','poseNum','feaNum', ...
+            'DeltaR1XrIdeFullSet','DeltaR2XrIdeFullSet','DeltaR1XphiIdeFullSet','DeltaR2XphiIdeFullSet', ...
+            'DeltaR2XpIdeFullSet','R2PIdeFullSet','DeltaR1XpIdeFullSet','R1PIdeFullSet', ...
+            'DeltaXfIdeFullSet','PfIdeFullSet')
+    end
 elseif ec == 3
-    save('MTE_results_IdeEKF_100fea.mat','poseNum','feaNum', ...
-        'DeltaR1XrIdeFullSet','DeltaR2XrIdeFullSet','DeltaR1XphiIdeFullSet','DeltaR2XphiIdeFullSet', ...
-        'DeltaR2XpIdeFullSet','R2PIdeFullSet','DeltaR1XpIdeFullSet','R1PIdeFullSet', ...
-        'DeltaXfIdeFullSet','PfIdeFullSet')
-% elseif ec == 4
-%     save('VicP_results_IdeEKF.mat','poseNum','feaNum', ...
-%         'DeltaR1XrIdeFullSet','DeltaR2XrIdeFullSet','DeltaR1XphiIdeFullSet','DeltaR2XphiIdeFullSet', ...
-%         'DeltaR2XpIdeFullSet','R2PIdeFullSet','DeltaR1XpIdeFullSet','R1PIdeFullSet', ...
-%         'DeltaXfIdeFullSet','PfIdeFullSet')
+    if env == 1
+        save('MTE_results_IdeEKF_100fea_1.mat','poseNum','feaNum', ...
+            'DeltaR1XrIdeFullSet','DeltaR2XrIdeFullSet','DeltaR1XphiIdeFullSet','DeltaR2XphiIdeFullSet', ...
+            'DeltaR2XpIdeFullSet','R2PIdeFullSet','DeltaR1XpIdeFullSet','R1PIdeFullSet', ...
+            'DeltaXfIdeFullSet','PfIdeFullSet')
+    else
+        save('MTE_results_IdeEKF_100fea_2.mat','poseNum','feaNum', ...
+            'DeltaR1XrIdeFullSet','DeltaR2XrIdeFullSet','DeltaR1XphiIdeFullSet','DeltaR2XphiIdeFullSet', ...
+            'DeltaR2XpIdeFullSet','R2PIdeFullSet','DeltaR1XpIdeFullSet','R1PIdeFullSet', ...
+            'DeltaXfIdeFullSet','PfIdeFullSet')
+    end
+    % elseif ec == 4
+    %     save('VicP_results_IdeEKF.mat','poseNum','feaNum', ...
+    %         'DeltaR1XrIdeFullSet','DeltaR2XrIdeFullSet','DeltaR1XphiIdeFullSet','DeltaR2XphiIdeFullSet', ...
+    %         'DeltaR2XpIdeFullSet','R2PIdeFullSet','DeltaR1XpIdeFullSet','R1PIdeFullSet', ...
+    %         'DeltaXfIdeFullSet','PfIdeFullSet')
 end
 
 disp('Ide EKF Complete!')

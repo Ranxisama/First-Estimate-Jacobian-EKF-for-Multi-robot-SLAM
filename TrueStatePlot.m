@@ -12,48 +12,63 @@ if ~exist(figuresFolderPath, 'dir')
 end
 
 
-    if ec == 1
-        load('MT_Parameters_20fea.mat', ...
+if ec == 1
+    if env == 1
+        load('MT_Parameters_20fea_1.mat', ...
             'R1XrTrue','R1XphiT','R2XrTrue','R2XphiT','XfTrueAll')
-    elseif ec == 2
-        load('MT_Parameters_60fea.mat', ...
-            'R1XrTrue','R1XphiT','R2XrTrue','R2XphiT','XfTrueAll')
-    elseif ec == 3
-        load('MT_Parameters_100fea.mat', ...
+    else
+        load('MT_Parameters_20fea_2.mat', ...
             'R1XrTrue','R1XphiT','R2XrTrue','R2XphiT','XfTrueAll')
     end
-
-    if ec == 1
-        R1xTrue1 = R1XrTrue(1:2:(end-3),2);
-        R1yTrue1 = R1XrTrue(2:2:(end-2),2);
-        R1xTrue2 = R1XrTrue(3:2:(end-1),2);
-        R1yTrue2 = R1XrTrue(4:2:(end),2);
-        % Average position odometry
-        R1AvepOdo = mean(sqrt((R1xTrue1-R1xTrue2).^2+(R1yTrue1-R1yTrue2).^2));
-
-        R2xTrue1 = R2XrTrue(1:2:(end-3),2);
-        R2yTrue1 = R2XrTrue(2:2:(end-2),2);
-        R2xTrue2 = R2XrTrue(3:2:(end-1),2);
-        R2yTrue2 = R2XrTrue(4:2:(end),2);
-        % Average position odometry
-        R2AvepOdo = mean(sqrt((R2xTrue1-R2xTrue2).^2+(R2yTrue1-R2yTrue2).^2));
-
-        R1phiTrue1 = R1XphiT(1:(end-1),2);
-        R1phiTrue2 = R1XphiT(2:(end),2);
-        % Average heading odometry
-        R1AvehOdo = mean(abs(R1phiTrue2-R1phiTrue1));
-
-        R2phiTrue1 = R2XphiT(1:(end-1),2);
-        R2phiTrue2 = R2XphiT(2:(end),2);
-        % Average heading odometry
-        R2AvehOdo = mean(abs(R2phiTrue2-R2phiTrue1));
-
-        fprintf('average position true odometry of R1: %f\n',R1AvepOdo)
-        fprintf('average position true odometry of R2: %f\n',R2AvepOdo)
-
-        fprintf('average heading true odometry of R1: %f\n',R1AvehOdo)
-        fprintf('average heading true odometry of R2: %f\n',R2AvehOdo)
+elseif ec == 2
+    if env == 1
+        load('MT_Parameters_60fea_1.mat', ...
+            'R1XrTrue','R1XphiT','R2XrTrue','R2XphiT','XfTrueAll')
+    else
+        load('MT_Parameters_60fea_2.mat', ...
+            'R1XrTrue','R1XphiT','R2XrTrue','R2XphiT','XfTrueAll')
     end
+elseif ec == 3
+    if env == 1
+        load('MT_Parameters_100fea_1.mat', ...
+            'R1XrTrue','R1XphiT','R2XrTrue','R2XphiT','XfTrueAll')
+    else
+        load('MT_Parameters_100fea_2.mat', ...
+            'R1XrTrue','R1XphiT','R2XrTrue','R2XphiT','XfTrueAll')
+    end
+end
+
+if ec == 1
+    R1xTrue1 = R1XrTrue(1:2:(end-3),2);
+    R1yTrue1 = R1XrTrue(2:2:(end-2),2);
+    R1xTrue2 = R1XrTrue(3:2:(end-1),2);
+    R1yTrue2 = R1XrTrue(4:2:(end),2);
+    % Average position odometry
+    R1AvepOdo = mean(sqrt((R1xTrue1-R1xTrue2).^2+(R1yTrue1-R1yTrue2).^2));
+
+    R2xTrue1 = R2XrTrue(1:2:(end-3),2);
+    R2yTrue1 = R2XrTrue(2:2:(end-2),2);
+    R2xTrue2 = R2XrTrue(3:2:(end-1),2);
+    R2yTrue2 = R2XrTrue(4:2:(end),2);
+    % Average position odometry
+    R2AvepOdo = mean(sqrt((R2xTrue1-R2xTrue2).^2+(R2yTrue1-R2yTrue2).^2));
+
+    R1phiTrue1 = R1XphiT(1:(end-1),2);
+    R1phiTrue2 = R1XphiT(2:(end),2);
+    % Average heading odometry
+    R1AvehOdo = mean(abs(R1phiTrue2-R1phiTrue1));
+
+    R2phiTrue1 = R2XphiT(1:(end-1),2);
+    R2phiTrue2 = R2XphiT(2:(end),2);
+    % Average heading odometry
+    R2AvehOdo = mean(abs(R2phiTrue2-R2phiTrue1));
+
+    fprintf('average position true odometry of R1: %f\n',R1AvepOdo)
+    fprintf('average position true odometry of R2: %f\n',R2AvepOdo)
+
+    fprintf('average heading true odometry of R1: %f\n',R1AvehOdo)
+    fprintf('average heading true odometry of R2: %f\n',R2AvehOdo)
+end
 
 figure(ec)
 hold on
@@ -97,9 +112,21 @@ set(gca, 'Box', 'on', 'LineWidth', 1, 'GridLineStyle', '--', 'GridAlpha', 0.1); 
 hold off
 
 if ec == 1
-    export_fig(fullfile(figuresFolderPath, 'TrueState20fea.jpg'), '-jpg', '-r300', figure(1));
+    if env == 1
+        export_fig(fullfile(figuresFolderPath, 'TrueState20fea_1.jpg'), '-jpg', '-r300', figure(1));
+    else
+        export_fig(fullfile(figuresFolderPath, 'TrueState20fea_2.jpg'), '-jpg', '-r300', figure(1));
+    end
 elseif ec == 2
-    export_fig(fullfile(figuresFolderPath, 'TrueState60fea.jpg'), '-jpg', '-r300', figure(2));
+    if env == 1
+        export_fig(fullfile(figuresFolderPath, 'TrueState60fea_1.jpg'), '-jpg', '-r300', figure(2));
+    else
+        export_fig(fullfile(figuresFolderPath, 'TrueState60fea_2.jpg'), '-jpg', '-r300', figure(2));
+    end
 elseif ec == 3
-    export_fig(fullfile(figuresFolderPath, 'TrueState100fea.jpg'), '-jpg', '-r300', figure(3));
+    if env == 1
+        export_fig(fullfile(figuresFolderPath, 'TrueState100fea_1.jpg'), '-jpg', '-r300', figure(3));
+    else
+        export_fig(fullfile(figuresFolderPath, 'TrueState100fea_2.jpg'), '-jpg', '-r300', figure(3));
+    end
 end

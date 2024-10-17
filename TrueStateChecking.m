@@ -1,13 +1,21 @@
 close all
 
+clear
+
 Config;
 
 currentFolder = fileparts(mfilename('fullpath'));
 ekfslamv2Folder = fullfile(currentFolder,'ekfslam_v2');
 addpath(ekfslamv2Folder)
 
-R1XState = fullfile(ekfslamv2Folder,'R1_XState.mat');
-R2XState = fullfile(ekfslamv2Folder,'R2_XState.mat');
+if env == 1
+    R1XState = fullfile(ekfslamv2Folder,'R1_XState_1.mat');
+    R2XState = fullfile(ekfslamv2Folder,'R2_XState_1.mat');
+elseif env == 2
+    R1XState = fullfile(ekfslamv2Folder,'R1_XState_2.mat');
+    R2XState = fullfile(ekfslamv2Folder,'R2_XState_2.mat');
+end
+
 if exist(R1XState,'file')
     load(R1XState);
     lm1 = lm;

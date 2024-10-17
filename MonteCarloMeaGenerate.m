@@ -3,7 +3,11 @@ clear
 
 Config;
 
-load('TrueState\RobotsWaypoints.mat')
+if env == 1
+    load('TrueState\RobotsWaypoints_1.mat')
+elseif env == 2
+    load('TrueState\RobotsWaypoints_2.mat')
+end
 
 % wp1 = repmat(wp1,1,cy);
 % wp2 = repmat(wp2,1,cy);
@@ -67,11 +71,23 @@ R1ObsSet = [];
 R2ObsSet = [];
 XfTrueAll = [];
 if ec == 1
-    load('TrueState\CheckedTrueState_20features.mat')
+    if env == 1
+        load('TrueState\CheckedTrueState_20features_1.mat')
+    elseif env == 2
+        load('TrueState\CheckedTrueState_20features_2.mat')
+    end
 elseif ec == 2
-    load('TrueState\CheckedTrueState_60features.mat')
+    if env == 1
+        load('TrueState\CheckedTrueState_60features_1.mat')
+    elseif env == 2
+        load('TrueState\CheckedTrueState_60features_2.mat')
+    end
 elseif ec == 3
-    load('TrueState\CheckedTrueState_100features.mat')
+    if env == 1
+        load('TrueState\CheckedTrueState_100features_1.mat')
+    elseif env == 2
+        load('TrueState\CheckedTrueState_100features_2.mat')
+    end
 end
 XfTrueAll = dataModify(lm);
 XfTrueAll(:,1)=XfTrueAll(:,1)+1;
@@ -102,19 +118,37 @@ end
 
 if ec == 1
     disp(['Number of features: ',num2str(feaNum)])
-    save('MT_Parameters_20fea.mat', ...
-        'R1XrTrue','R1XphiT','R2XrTrue','R2XphiT','XfTrueAll','R1OdoT','R2OdoT','R1ObsT','R2ObsT')
-    save('MT_Measurements_20fea.mat','R1Xp0Set','R1OdoSet','R1ObsSet','R2Xp0Set','R2OdoSet','R2ObsSet')
+    if env == 1
+        save('MT_Parameters_20fea_1.mat', ...
+            'R1XrTrue','R1XphiT','R2XrTrue','R2XphiT','XfTrueAll','R1OdoT','R2OdoT','R1ObsT','R2ObsT')
+        save('MT_Measurements_20fea_1.mat','R1Xp0Set','R1OdoSet','R1ObsSet','R2Xp0Set','R2OdoSet','R2ObsSet')
+    elseif env == 2
+        save('MT_Parameters_20fea_2.mat', ...
+            'R1XrTrue','R1XphiT','R2XrTrue','R2XphiT','XfTrueAll','R1OdoT','R2OdoT','R1ObsT','R2ObsT')
+        save('MT_Measurements_20fea_2.mat','R1Xp0Set','R1OdoSet','R1ObsSet','R2Xp0Set','R2OdoSet','R2ObsSet')
+    end
 elseif ec == 2
     disp(['Number of features: ',num2str(feaNum)])
-    save('MT_Parameters_60fea.mat', ...
-        'R1XrTrue','R1XphiT','R2XrTrue','R2XphiT','XfTrueAll','R1OdoT','R2OdoT','R1ObsT','R2ObsT')
-    save('MT_Measurements_60fea.mat','R1Xp0Set','R1OdoSet','R1ObsSet','R2Xp0Set','R2OdoSet','R2ObsSet')
+    if env == 1
+        save('MT_Parameters_60fea_1.mat', ...
+            'R1XrTrue','R1XphiT','R2XrTrue','R2XphiT','XfTrueAll','R1OdoT','R2OdoT','R1ObsT','R2ObsT')
+        save('MT_Measurements_60fea_1.mat','R1Xp0Set','R1OdoSet','R1ObsSet','R2Xp0Set','R2OdoSet','R2ObsSet')
+    elseif env == 2
+        save('MT_Parameters_60fea_2.mat', ...
+            'R1XrTrue','R1XphiT','R2XrTrue','R2XphiT','XfTrueAll','R1OdoT','R2OdoT','R1ObsT','R2ObsT')
+        save('MT_Measurements_60fea_2.mat','R1Xp0Set','R1OdoSet','R1ObsSet','R2Xp0Set','R2OdoSet','R2ObsSet')
+    end
 elseif ec == 3
     disp(['Number of features: ',num2str(feaNum)])
-    save('MT_Parameters_100fea.mat', ...
-        'R1XrTrue','R1XphiT','R2XrTrue','R2XphiT','XfTrueAll','R1OdoT','R2OdoT','R1ObsT','R2ObsT')
-    save('MT_Measurements_100fea.mat','R1Xp0Set','R1OdoSet','R1ObsSet','R2Xp0Set','R2OdoSet','R2ObsSet')
+    if env == 1
+        save('MT_Parameters_100fea_1.mat', ...
+            'R1XrTrue','R1XphiT','R2XrTrue','R2XphiT','XfTrueAll','R1OdoT','R2OdoT','R1ObsT','R2ObsT')
+        save('MT_Measurements_100fea_1.mat','R1Xp0Set','R1OdoSet','R1ObsSet','R2Xp0Set','R2OdoSet','R2ObsSet')
+    elseif env == 2
+        save('MT_Parameters_100fea_2.mat', ...
+            'R1XrTrue','R1XphiT','R2XrTrue','R2XphiT','XfTrueAll','R1OdoT','R2OdoT','R1ObsT','R2ObsT')
+        save('MT_Measurements_100fea_2.mat','R1Xp0Set','R1OdoSet','R1ObsSet','R2Xp0Set','R2OdoSet','R2ObsSet')
+    end
 end
 
 

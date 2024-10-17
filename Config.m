@@ -1,3 +1,9 @@
+%% choose simulation environment
+% env =
+% 1, environment 1: two intersecting circles
+% 2, environment 2: an '8' in a circle
+env = 1;
+
 %% choose different experiment
 % ec =
 % 1, Simulating data with 20 features
@@ -7,7 +13,7 @@
 ec = 1;
 
 %% Simulation noise choice
-snc = 0; % if 0 (for test), set noise level as 0.02/0.1°; if 1 (for display), set noise level as bigger; 
+snc = 1; % if 0 (for test), set noise level as 0.02/0.1°; if 1 (for display), set noise level as bigger;
 
 %% Number of Monte Carlo experiments
 mcNum = 100;
@@ -41,60 +47,117 @@ if ec ~= 4 % For Simulation
     R2addObsNoise = 1; % if 0, R2 observation is perfect
 
     %% Gaussian noise level settings
-    if snc == 0 % for test
-        % R1
-        % standard deviation of 1th robot position at time 0 (equals to 0 as the origin of the 1D coordinate system)
-        R1sigma_0r = 0.2; % 0.01: 0.01 m
-        R1sigma_0phi = 0.02; % pi/180: 1°/time_step
+    if env == 1
+        if snc == 0 % for test
+            % R1
+            % standard deviation of 1th robot position at time 0 (equals to 0 as the origin of the 1D coordinate system)
+            R1sigma_0r = 0.2; % 0.01: 0.01 m
+            R1sigma_0phi = 0.02; % pi/180: 1°/time_step
 
-        % R2
-        % standard deviation of robot position at time 0 (equals to 0 as the origin of the 1D coordinate system)
-        R2sigma_0r = 1; % m
-        R2sigma_0phi = 0.1; % pi: 180°
-
-
-        % standard deviation of the zero mean Gaussian process noise w(k) of 1th robot
-        R1sigma_uv = 0.2; % 0.025 m/time_step
-        R1sigma_uw = pi/60; % pi: 180°/time_step
-
-        % standard deviation of the zero mean Gaussian process noise w(k) of 2nd robot
-        R2sigma_uv = 0.2; % m/time_step
-        R2sigma_uw = pi/60; % °/time_step
-
-        % standard deviation of the zero mean Gaussian observation noise v(k) of 1th robot
-        R1sigma_zv = 0.6; % m/time_step
-
-        % standard deviation of the zero mean Gaussian observation noise v(k) of 2nd robot
-        R2sigma_zv = 0.6; % m/time_step
-
-    elseif snc == 1 % for display (best)
-        % R1
-        % standard deviation of 1th robot position at time 0 (equals to 0 as the origin of the 1D coordinate system)
-        R1sigma_0r = 0.2; % 0.01: 0.01 m
-        R1sigma_0phi = 0.02; % pi/180: 1°/time_step
-
-        % R2
-        % standard deviation of robot position at time 0 (equals to 0 as the origin of the 1D coordinate system)
-        R2sigma_0r = 2; % m
-        R2sigma_0phi = 0.2; % pi: 180°
+            % R2
+            % standard deviation of robot position at time 0 (equals to 0 as the origin of the 1D coordinate system)
+            R2sigma_0r = 1; % m
+            R2sigma_0phi = 0.1; % pi: 180°
 
 
-        % standard deviation of the zero mean Gaussian process noise w(k) of 1th robot
-        R1sigma_uv = 1; % 0.025 m/time_step
-        R1sigma_uw = 0.05; % pi: 180°/time_step
+            % standard deviation of the zero mean Gaussian process noise w(k) of 1th robot
+            R1sigma_uv = 0.3; % 0.025 m/time_step
+            R1sigma_uw = pi/90; % pi: 180°/time_step
 
-        % standard deviation of the zero mean Gaussian process noise w(k) of 2nd robot
-        R2sigma_uv = 0.8; % m/time_step
-        R2sigma_uw = 0.04; % °/time_step
+            % standard deviation of the zero mean Gaussian process noise w(k) of 2nd robot
+            R2sigma_uv = 0.3; % m/time_step
+            R2sigma_uw = pi/90; % °/time_step
 
-        % standard deviation of the zero mean Gaussian observation noise v(k) of 1th robot
-        R1sigma_zv = 1; % m/time_step
+            % standard deviation of the zero mean Gaussian observation noise v(k) of 1th robot
+            R1sigma_zv = 0.5; % m/time_step
 
-        % standard deviation of the zero mean Gaussian observation noise v(k) of 2nd robot
-        R2sigma_zv = 0.8; % m/time_step
+            % standard deviation of the zero mean Gaussian observation noise v(k) of 2nd robot
+            R2sigma_zv = 0.5; % m/time_step
 
-    else
-        error('Simulation Noise Choice (snc) can onlt be 0 or 1')
+        elseif snc == 1 % for display (best)
+            % R1
+            % standard deviation of 1th robot position at time 0 (equals to 0 as the origin of the 1D coordinate system)
+            R1sigma_0r = 0.2; % 0.01: 0.01 m
+            R1sigma_0phi = 0.02; % pi/180: 1°/time_step
+
+            % R2
+            % standard deviation of robot position at time 0 (equals to 0 as the origin of the 1D coordinate system)
+            R2sigma_0r = 1; % m
+            R2sigma_0phi = 0.1; % pi: 180°
+
+
+            % standard deviation of the zero mean Gaussian process noise w(k) of 1th robot
+            R1sigma_uv = 0.3; % 0.025 m/time_step
+            R1sigma_uw = pi/90; % pi: 180°/time_step
+
+            % standard deviation of the zero mean Gaussian process noise w(k) of 2nd robot
+            R2sigma_uv = 0.3; % m/time_step
+            R2sigma_uw = pi/90; % °/time_step
+
+            % standard deviation of the zero mean Gaussian observation noise v(k) of 1th robot
+            R1sigma_zv = 0.5; % m/time_step
+
+            % standard deviation of the zero mean Gaussian observation noise v(k) of 2nd robot
+            R2sigma_zv = 0.5; % m/time_step
+
+        else
+            error('Simulation Noise Choice (snc) can onlt be 0 or 1')
+        end
+elseif env == 2
+        if snc == 0 % for test
+            % R1
+            % standard deviation of 1th robot position at time 0 (equals to 0 as the origin of the 1D coordinate system)
+            R1sigma_0r = 0.2; % 0.01: 0.01 m
+            R1sigma_0phi = 0.02; % pi/180: 1°/time_step
+
+            % R2
+            % standard deviation of robot position at time 0 (equals to 0 as the origin of the 1D coordinate system)
+            R2sigma_0r = 1; % m
+            R2sigma_0phi = 0.1; % pi: 180°
+
+
+            % standard deviation of the zero mean Gaussian process noise w(k) of 1th robot
+            R1sigma_uv = 0.2; % 0.025 m/time_step
+            R1sigma_uw = pi/60; % pi: 180°/time_step
+
+            % standard deviation of the zero mean Gaussian process noise w(k) of 2nd robot
+            R2sigma_uv = 0.2; % m/time_step
+            R2sigma_uw = pi/60; % °/time_step
+
+            % standard deviation of the zero mean Gaussian observation noise v(k) of 1th robot
+            R1sigma_zv = 0.6; % m/time_step
+
+            % standard deviation of the zero mean Gaussian observation noise v(k) of 2nd robot
+            R2sigma_zv = 0.6; % m/time_step
+
+        elseif snc == 1 % for display (best)
+            % R1
+            % standard deviation of 1th robot position at time 0 (equals to 0 as the origin of the 1D coordinate system)
+            R1sigma_0r = 0.2; % 0.01: 0.01 m
+            R1sigma_0phi = 0.02; % pi/180: 1°/time_step
+
+            % R2
+            % standard deviation of robot position at time 0 (equals to 0 as the origin of the 1D coordinate system)
+            R2sigma_0r = 1; % m
+            R2sigma_0phi = 0.1; % pi: 180°
+
+
+            % standard deviation of the zero mean Gaussian process noise w(k) of 1th robot
+            R1sigma_uv = 0.2; % 0.025 m/time_step
+            R1sigma_uw = pi/60; % pi: 180°/time_step
+
+            % standard deviation of the zero mean Gaussian process noise w(k) of 2nd robot
+            R2sigma_uv = 0.2; % m/time_step
+            R2sigma_uw = pi/60; % °/time_step
+
+            % standard deviation of the zero mean Gaussian observation noise v(k) of 1th robot
+            R1sigma_zv = 0.6; % m/time_step
+
+            % standard deviation of the zero mean Gaussian observation noise v(k) of 2nd robot
+            R2sigma_zv = 0.6; % m/time_step
+        else
+            error('Simulation Noise Choice (snc) can onlt be 0 or 1')
+        end
     end
 
 else % For Victoria Park Dataset experiment
@@ -137,15 +200,19 @@ else % For Victoria Park Dataset experiment
 
 end
 
-%% Robot bearing ranges
-% R1bearingRange = 0; % pi/60: 3°
-% R2bearingRange = 0; % pi/60: 3°
-R1bearingRange = pi/12; % pi/12: 15°
-R2bearingRange = pi/12; % pi/12: 15°
 
-%% Sensor Range
-R1sensorRange = 15; % m/s, R1's observation range for the features
-R2sensorRange = 15; % m/s, R2's observation range for the features
+    %% Robot bearing ranges
+    % R1bearingRange = 0; % pi/60: 3°
+    % R2bearingRange = 0; % pi/60: 3°
+    R1bearingRange = pi/12; % pi/12: 15°
+    R2bearingRange = pi/12; % pi/12: 15°
+
+    %% Sensor Range
+    R1sensorRange = 15; % m/s, R1's observation range for the features
+    R2sensorRange = 15; % m/s, R2's observation range for the features
+
+    %% Required number of shared feature observations at step 0
+    reqSharedObsNum = 2; % Required number of shared feature observations
 
 %% Check Switch
 % Measurements check
@@ -157,8 +224,7 @@ measurementsCheck = 1; % if 1, check the measurements by running MeasurementsGen
 robPositionCovCheck =  0; % if 1, check the position Cov of R1 and R2
 feaCovCheck = 0; % if 1, check the features Cov
 
-%% Required number of shared feature observations at step 0
-reqSharedObsNum = 8; % Required number of shared feature observations
+
 
 %% MarkerSize
 MS = 2;
@@ -269,4 +335,14 @@ if ec ~= 4
     xplot_ub = 250;
 elseif ec == 4
     xplot_ub = 3000;
+end
+
+if ec ~= 4
+    if env == 1
+        disp('----------- The simulation environment is of two intersecting circles -----------')
+    elseif env == 2
+        disp('----------- The simulation environment is of an 8 in a circle -----------')
+    else
+        error('----------- variable env can only be 1 or 2 -----------')
+    end
 end
