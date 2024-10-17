@@ -4,6 +4,14 @@ close all
 
 Config;
 
+%% save output figures
+currentFolder = fileparts(mfilename('fullpath'));
+subFolder = 'saved_figures';
+figuresFolderPath = fullfile(currentFolder, subFolder);
+if ~exist(figuresFolderPath, 'dir')
+    mkdir(figuresFolderPath);
+end
+
 load Zstate_VicPark_6898_loops
 
 poseNum = 6897; % maximum 6897
@@ -369,12 +377,6 @@ set(gcf, 'Color', 'w');  % 将整个图背景设置为白色
 set(gca, 'Box', 'on', 'LineWidth', 1, 'GridLineStyle', '--', 'GridAlpha', 0.1);  % 使边框显示，并增加边框宽度
 hold off
 
-%% save output figures
-currentFolder = fileparts(mfilename('fullpath'));
-subFolder = 'saved_figures';
-figuresFolderPath = fullfile(currentFolder, subFolder);
-if ~exist(figuresFolderPath, 'dir')
-    mkdir(figuresFolderPath);
-end
+
 
 export_fig(fullfile(figuresFolderPath, 'VicP_Xposi_GNI.jpg'), '-jpg', '-r300', figure(4));

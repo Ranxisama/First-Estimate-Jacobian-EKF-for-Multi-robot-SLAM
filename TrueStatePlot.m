@@ -3,6 +3,14 @@ clear
 
 Config;
 
+%% save output figures
+currentFolder = fileparts(mfilename('fullpath'));
+subFolder = 'saved_figures';
+figuresFolderPath = fullfile(currentFolder, subFolder);
+if ~exist(figuresFolderPath, 'dir')
+    mkdir(figuresFolderPath);
+end
+
 
     if ec == 1
         load('MT_Parameters_20fea.mat', ...
@@ -89,9 +97,9 @@ set(gca, 'Box', 'on', 'LineWidth', 1, 'GridLineStyle', '--', 'GridAlpha', 0.1); 
 hold off
 
 if ec == 1
-    export_fig(fullfile(pwd, 'TrueState20fea.jpg'), '-jpg', '-r300', figure(1));
+    export_fig(fullfile(figuresFolderPath, 'TrueState20fea.jpg'), '-jpg', '-r300', figure(1));
 elseif ec == 2
-    export_fig(fullfile(pwd, 'TrueState60fea.jpg'), '-jpg', '-r300', figure(2));
+    export_fig(fullfile(figuresFolderPath, 'TrueState60fea.jpg'), '-jpg', '-r300', figure(2));
 elseif ec == 3
-    export_fig(fullfile(pwd, 'TrueState100fea.jpg'), '-jpg', '-r300', figure(3));
+    export_fig(fullfile(figuresFolderPath, 'TrueState100fea.jpg'), '-jpg', '-r300', figure(3));
 end

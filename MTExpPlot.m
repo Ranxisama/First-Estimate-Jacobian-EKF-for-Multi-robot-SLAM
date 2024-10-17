@@ -496,7 +496,224 @@ elseif ec == 4
 
 end
 
-% 使用export_fig代替exportgraphics来导出高质量的图像
+%% 3 sigma bound plot
+
+    % load('MTE_results_StdEKF_20fea.mat','poseNum','feaNum', ...
+    %     'DeltaR1XrFullSet','DeltaR2XrFullSet','DeltaR1XphiFullSet','DeltaR2XphiFullSet', ...
+    %     'DeltaR2XpFullSet','R2PFullSet','DeltaR1XpFullSet','R1PFullSet', ...
+    %     'DeltaXfFullSet','PfFullSet')
+    % load('MTE_results_IdeEKF_20fea.mat', ...
+    %     'DeltaR1XrIdeFullSet','DeltaR2XrIdeFullSet','DeltaR1XphiIdeFullSet','DeltaR2XphiIdeFullSet', ...
+    %     'DeltaR2XpIdeFullSet','R2PIdeFullSet','DeltaR1XpIdeFullSet','R1PIdeFullSet', ...
+    %     'DeltaXfIdeFullSet','PfIdeFullSet')
+    % load('MTE_results_FejEKF_20fea.mat', ...
+    %     'DeltaR1XrFejFullSet','DeltaR2XrFejFullSet','DeltaR1XphiFejFullSet','DeltaR2XphiFejFullSet', ...
+    %     'DeltaR2XpFejFullSet','R2PFejFullSet','DeltaR1XpFejFullSet','R1PFejFullSet', ...
+    %     'DeltaXfFejFullSet','PfFejFullSet')
+
+if ec == 1
+    %% R1
+    % position
+    %% x
+    figure(25)
+    hold on
+    grid on
+    set(gcf, 'Color', 'w');  % 将整个图背景设置为白色
+    set(gca, 'Box', 'on', 'LineWidth', 1);  % 使边框显示，并增加边框宽度
+    xlabel('step')
+    ylabel('m')
+    title('R1 position x')
+
+    % x error mean
+    % Std EKF
+    R1AvgErr_x = mean(abs(DeltaR1XrFullSet(1:2:(end-1),2:end)),2);
+    R1AvgErrxP = plot((1:poseNum)',R1AvgErr_x,'b','DisplayName','Std error');
+    % FEJ EKF
+    R1FEJAvgErr_x = mean(abs(DeltaR1XrFejFullSet(1:2:(end-1),2:end)),2);
+    R1FEJAvgErrxP = plot((1:poseNum)',R1FEJAvgErr_x,'r','DisplayName','FEJ error');
+    
+    % x standard deviation mean
+    % Std EKF
+    R1PFullSet_x = R1PFullSet(1:3:(end-2),1:3:(end-2));
+    R1AvgSD_x = mean(sqrt(R1PFullSet_x),2); % standard deviation
+    R1AvgPx_P = plot((1:poseNum)',3*R1AvgSD_x','c--','DisplayName','Std 3{\sigma}-bound');
+    % FEJ EKF
+    R1FEJPFullSet_x = R1PIdeFullSet(1:3:(end-2),1:3:(end-2));
+    R1FEJAvgSD_x = mean(sqrt(R1FEJPFullSet_x),2); % standard deviation
+    R1FEJAvgPx_P = plot((1:poseNum)',3*R1FEJAvgSD_x','m--','DisplayName','FEJ 3{\sigma}-bound');
+
+    legend([R1AvgErrxP,R1FEJAvgErrxP,R1AvgPx_P,R1FEJAvgPx_P])
+    hold off
+
+    %% y
+    figure(26)
+    hold on
+    grid on
+    set(gcf, 'Color', 'w');  % 将整个图背景设置为白色
+    set(gca, 'Box', 'on', 'LineWidth', 1);  % 使边框显示，并增加边框宽度
+    xlabel('step')
+    ylabel('m')
+    title('R1 position y')
+
+    % y error mean
+    % Std EKF
+    R1AvgErr_y = mean(abs(DeltaR1XrFullSet(2:2:(end),2:end)),2);
+    R1AvgErryP = plot((1:poseNum)',R1AvgErr_y,'b','DisplayName','Std error');
+    % FEJ EKF
+    R1FEJAvgErr_y = mean(abs(DeltaR1XrFejFullSet(2:2:(end),2:end)),2);
+    R1FEJAvgErryP = plot((1:poseNum)',R1FEJAvgErr_y,'r','DisplayName','FEJ error');
+
+    % y standard deviation mean
+    % Std EKF
+    R1PFullSet_y = R1PFullSet(2:3:(end-1),(2:3:(end-1)));
+    R1AvgSD_y = mean(sqrt(R1PFullSet_y),2); % standard deviation
+    R1AvgPy_P = plot((1:poseNum)',3*R1AvgSD_y','c--','DisplayName','Std 3{\sigma}-bound');
+    % FEJ EKF
+    R1FEJPFullSet_y = R1PFejFullSet(2:3:(end-1),(2:3:(end-1)));
+    R1FEJAvgSD_y = mean(sqrt(R1FEJPFullSet_y),2); % standard deviation
+    R1FEJAvgPy_P = plot((1:poseNum)',3*R1FEJAvgSD_y','m--','DisplayName','Std 3{\sigma}-bound');
+
+    legend([R1AvgErryP,R1FEJAvgErryP,R1AvgPy_P,R1FEJAvgPy_P])
+    hold off
+    
+    %% heading (phi)
+    figure(27)
+    hold on 
+    grid on
+    set(gcf, 'Color', 'w');  % 将整个图背景设置为白色
+    set(gca, 'Box', 'on', 'LineWidth', 1);  % 使边框显示，并增加边框宽度
+    xlabel('step')
+    ylabel('rad')
+    title('R1 heading \phi')
+
+    % phi error mean
+    % Std EKF
+    R1AvgErr_phi = mean(abs(DeltaR1XphiFullSet(:,2:end)),2);
+    R1AvgErrphiP = plot((1:poseNum)',R1AvgErr_phi,'b','DisplayName','Std error');
+    % FEJ EKF
+    R1FEJAvgErr_phi = mean(abs(DeltaR1XphiFejFullSet(:,2:end)),2);
+    R1FEJAvgErrphiP = plot((1:poseNum)',R1FEJAvgErr_phi,'r','DisplayName','FEJ error');
+    
+    % phi standard deviation mean
+    % Std EKF
+    R1PFullSet_phi = R1PFullSet(3:3:(end),3:3:(end));
+    R1AvgSD_phi = mean(sqrt(R1PFullSet_phi),2); % standard deviation
+    R1AvgPphi_P = plot((1:poseNum)',3*R1AvgSD_phi,'c--','DisplayName','Std 3{\sigma}-bound');
+    % FEJ EKF
+    R1FEJPFullSet_phi = R1PFejFullSet(3:3:(end),3:3:(end));
+    R1FEJAvgSD_phi = mean(sqrt(R1FEJPFullSet_phi),2); % standard deviation
+    R1FEJAvgPphi_P = plot((1:poseNum)',3*R1FEJAvgSD_phi,'m--','DisplayName','FEJ 3{\sigma}-bound');
+
+    legend([R1AvgErrphiP,R1FEJAvgErrphiP,R1AvgPphi_P,R1FEJAvgPphi_P])
+    hold off
+
+    %% R2
+    % position
+    %% x
+    figure(28)
+    hold on
+    grid on
+    set(gcf, 'Color', 'w');  % 将整个图背景设置为白色
+    set(gca, 'Box', 'on', 'LineWidth', 1);  % 使边框显示，并增加边框宽度
+    xlabel('step')
+    ylabel('m')
+    title('R2 position x')
+
+    % x error mean
+    % Std EKF
+    R2AvgErr_x = mean(abs(DeltaR2XrFullSet(1:2:(end-1),2:end)),2);
+    R2AvgErrxP = plot((0:poseNum)',R2AvgErr_x,'b','DisplayName','Std error');
+    % FEJ EKF
+    R2FEJAvgErr_x = mean(abs(DeltaR2XrFejFullSet(1:2:(end-1),2:end)),2);
+    R2FEJAvgErrxP = plot((0:poseNum)',R2FEJAvgErr_x,'r','DisplayName','FEJ error');
+    
+    % x standard deviation mean
+    % Std EKF
+    R2PFullSet_x = R2PFullSet(1:3:(end-2),1:3:(end-2));
+    R2AvgSD_x = mean(sqrt(R2PFullSet_x),2); % standard deviation
+    R2AvgPx_P = plot((0:poseNum)',3*R2AvgSD_x','c--','DisplayName','Std 3{\sigma}-bound');
+    % FEJ EKF
+    R2FEJPFullSet_x = R2PIdeFullSet(1:3:(end-2),1:3:(end-2));
+    R2FEJAvgSD_x = mean(sqrt(R2FEJPFullSet_x),2); % standard deviation
+    R2FEJAvgPx_P = plot((0:poseNum)',3*R2FEJAvgSD_x','m--','DisplayName','FEJ 3{\sigma}-bound');
+
+    legend([R2AvgErrxP,R2FEJAvgErrxP,R2AvgPx_P,R2FEJAvgPx_P])
+    hold off
+
+    %% y
+    figure(29)
+    hold on
+    grid on
+    set(gcf, 'Color', 'w');  % 将整个图背景设置为白色
+    set(gca, 'Box', 'on', 'LineWidth', 1);  % 使边框显示，并增加边框宽度
+    xlabel('step')
+    ylabel('m')
+    title('R2 position y')
+
+    % y error mean
+    % Std EKF
+    R2AvgErr_y = mean(abs(DeltaR2XrFullSet(2:2:(end),2:end)),2);
+    R2AvgErryP = plot((0:poseNum)',R2AvgErr_y,'b','DisplayName','Std error');
+    % FEJ EKF
+    R2FEJAvgErr_y = mean(abs(DeltaR2XrFejFullSet(2:2:(end),2:end)),2);
+    R2FEJAvgErryP = plot((0:poseNum)',R2FEJAvgErr_y,'r','DisplayName','FEJ error');
+
+    % y standard deviation mean
+    % Std EKF
+    R2PFullSet_y = R2PFullSet(2:3:(end-1),(2:3:(end-1)));
+    R2AvgSD_y = mean(sqrt(R2PFullSet_y),2); % standard deviation
+    R2AvgPy_P = plot((0:poseNum)',3*R2AvgSD_y','c--','DisplayName','Std 3{\sigma}-bound');
+    % FEJ EKF
+    R2FEJPFullSet_y = R2PFejFullSet(2:3:(end-1),(2:3:(end-1)));
+    R2FEJAvgSD_y = mean(sqrt(R2FEJPFullSet_y),2); % standard deviation
+    R2FEJAvgPy_P = plot((0:poseNum)',3*R2FEJAvgSD_y','m--','DisplayName','Std 3{\sigma}-bound');
+
+    legend([R2AvgErryP,R2FEJAvgErryP,R2AvgPy_P,R2FEJAvgPy_P])
+    hold off
+    
+    %% heading (phi)
+    figure(30)
+    hold on 
+    grid on
+    set(gcf, 'Color', 'w');  % 将整个图背景设置为白色
+    set(gca, 'Box', 'on', 'LineWidth', 1);  % 使边框显示，并增加边框宽度
+    xlabel('step')
+    ylabel('rad')
+    title('R2 heading \phi')
+
+    % phi error mean
+    % Std EKF
+    R2AvgErr_phi = mean(abs(DeltaR2XphiFullSet(:,2:end)),2);
+    R2AvgErrphiP = plot((0:poseNum)',R2AvgErr_phi,'b','DisplayName','Std error');
+    % FEJ EKF
+    R2FEJAvgErr_phi = mean(abs(DeltaR2XphiFejFullSet(:,2:end)),2);
+    R2FEJAvgErrphiP = plot((0:poseNum)',R2FEJAvgErr_phi,'r','DisplayName','FEJ error');
+    
+    % phi standard deviation mean
+    % Std EKF
+    R2PFullSet_phi = R2PFullSet(3:3:(end),3:3:(end));
+    R2AvgSD_phi = mean(sqrt(R2PFullSet_phi),2); % standard deviation
+    R2AvgPphi_P = plot((0:poseNum)',3*R2AvgSD_phi,'c--','DisplayName','Std 3{\sigma}-bound');
+    % FEJ EKF
+    R2FEJPFullSet_phi = R2PFejFullSet(3:3:(end),3:3:(end));
+    R2FEJAvgSD_phi = mean(sqrt(R2FEJPFullSet_phi),2); % standard deviation
+    R2FEJAvgPphi_P = plot((0:poseNum)',3*R2FEJAvgSD_phi,'m--','DisplayName','FEJ 3{\sigma}-bound');
+
+    legend([R2AvgErrphiP,R2FEJAvgErrphiP,R2AvgPphi_P,R2FEJAvgPphi_P])
+    hold off
+
+    export_fig(fullfile(figuresFolderPath, 'R1Posi_x_3SigB_20feas.jpg'), '-jpg', '-r300', figure(25));
+    export_fig(fullfile(figuresFolderPath, 'R1Posi_y_3SigB_20feas.jpg'), '-jpg', '-r300', figure(26));
+    export_fig(fullfile(figuresFolderPath, 'R1Head_phi_3SigB_20feas.jpg'), '-jpg', '-r300', figure(27));
+
+    export_fig(fullfile(figuresFolderPath, 'R2Posi_x_3SigB_20feas.jpg'), '-jpg', '-r300', figure(28));
+    export_fig(fullfile(figuresFolderPath, 'R2Posi_y_3SigB_20feas.jpg'), '-jpg', '-r300', figure(29));
+    export_fig(fullfile(figuresFolderPath, 'R2Head_phi_3SigB_20feas.jpg'), '-jpg', '-r300', figure(30));
+end
+
+
+
+%% 使用export_fig代替exportgraphics来导出高质量的图像
 if ec == 1
     export_fig(fullfile(figuresFolderPath, 'R1Postion_RMSE_20feas.jpg'), '-jpg', '-r300', figure(1));
     export_fig(fullfile(figuresFolderPath, 'R2Postion_RMSE_20feas.jpg'), '-jpg', '-r300', figure(2));
