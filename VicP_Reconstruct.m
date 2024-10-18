@@ -4,6 +4,10 @@ close all
 
 Config;
 
+if ec ~= 4
+    error('ec is not 4! ec = 4 is necessary to run the following, change it in Config.m')
+end
+
 %% save output figures
 currentFolder = fileparts(mfilename('fullpath'));
 subFolder = 'saved_figures';

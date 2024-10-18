@@ -567,6 +567,7 @@ if ec == 1
     set(gca, 'Box', 'on', 'LineWidth', 1);  % 使边框显示，并增加边框宽度
     xlabel('step')
     ylabel('m')
+    xlim([0,xplot_ub])
     title('R1 position x')
 
     % x error mean
@@ -598,6 +599,7 @@ if ec == 1
     set(gca, 'Box', 'on', 'LineWidth', 1);  % 使边框显示，并增加边框宽度
     xlabel('step')
     ylabel('m')
+    xlim([0,xplot_ub])
     title('R1 position y')
 
     % y error mean
@@ -629,6 +631,7 @@ if ec == 1
     set(gca, 'Box', 'on', 'LineWidth', 1);  % 使边框显示，并增加边框宽度
     xlabel('step')
     ylabel('rad')
+    xlim([0,xplot_ub])
     title('R1 heading \phi')
 
     % phi error mean
@@ -662,6 +665,7 @@ if ec == 1
     set(gca, 'Box', 'on', 'LineWidth', 1);  % 使边框显示，并增加边框宽度
     xlabel('step')
     ylabel('m')
+    xlim([0,xplot_ub])
     title('R2 position x')
 
     % x error mean
@@ -693,6 +697,7 @@ if ec == 1
     set(gca, 'Box', 'on', 'LineWidth', 1);  % 使边框显示，并增加边框宽度
     xlabel('step')
     ylabel('m')
+    xlim([0,xplot_ub])
     title('R2 position y')
 
     % y error mean
@@ -724,6 +729,7 @@ if ec == 1
     set(gca, 'Box', 'on', 'LineWidth', 1);  % 使边框显示，并增加边框宽度
     xlabel('step')
     ylabel('rad')
+    xlim([0,xplot_ub])
     title('R2 heading \phi')
 
     % phi error mean

@@ -1,8 +1,4 @@
-%% choose simulation environment
-% env =
-% 1, environment 1: two intersecting circles
-% 2, environment 2: an '8' in a circle
-env = 1;
+
 
 %% choose different experiment
 % ec =
@@ -10,7 +6,15 @@ env = 1;
 % 2, Simulating data with 60 features
 % 3, Simulating data with 100 features
 % 4, Victoria Park dataset
-ec = 1;
+ec = 4;
+
+%% choose simulation environment
+if ec ~= 4
+% env =
+% 1, environment 1: two intersecting circles
+% 2, environment 2: an '8' in a circle
+env = 1;
+end
 
 %% Simulation noise choice
 snc = 1; % if 0 (for test), set noise level as 0.02/0.1°; if 1 (for display), set noise level as bigger;
@@ -103,7 +107,7 @@ if ec ~= 4 % For Simulation
         else
             error('Simulation Noise Choice (snc) can onlt be 0 or 1')
         end
-elseif env == 2
+    elseif env == 2
         if snc == 0 % for test
             % R1
             % standard deviation of 1th robot position at time 0 (equals to 0 as the origin of the 1D coordinate system)
@@ -201,18 +205,18 @@ else % For Victoria Park Dataset experiment
 end
 
 
-    %% Robot bearing ranges
-    % R1bearingRange = 0; % pi/60: 3°
-    % R2bearingRange = 0; % pi/60: 3°
-    R1bearingRange = pi/12; % pi/12: 15°
-    R2bearingRange = pi/12; % pi/12: 15°
+%% Robot bearing ranges
+% R1bearingRange = 0; % pi/60: 3°
+% R2bearingRange = 0; % pi/60: 3°
+R1bearingRange = pi/12; % pi/12: 15°
+R2bearingRange = pi/12; % pi/12: 15°
 
-    %% Sensor Range
-    R1sensorRange = 15; % m/s, R1's observation range for the features
-    R2sensorRange = 15; % m/s, R2's observation range for the features
+%% Sensor Range
+R1sensorRange = 15; % m/s, R1's observation range for the features
+R2sensorRange = 15; % m/s, R2's observation range for the features
 
-    %% Required number of shared feature observations at step 0
-    reqSharedObsNum = 2; % Required number of shared feature observations
+%% Required number of shared feature observations at step 0
+reqSharedObsNum = 2; % Required number of shared feature observations
 
 %% Check Switch
 % Measurements check
@@ -332,7 +336,11 @@ if step0FI_fej ~= 0 && step0FI_fej ~= 1
 end
 
 if ec ~= 4
-    xplot_ub = 250;
+    if env == 1
+        xplot_ub = 350;
+    elseif env == 2
+        xplot_ub = 250;
+    end
 elseif ec == 4
     xplot_ub = 3000;
 end
