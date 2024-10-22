@@ -6,7 +6,7 @@
 % 2, Simulating data with 60 features
 % 3, Simulating data with 100 features
 % 4, Victoria Park dataset
-ec = 4;
+ec = 1;
 
 %% choose simulation environment
 if ec ~= 4

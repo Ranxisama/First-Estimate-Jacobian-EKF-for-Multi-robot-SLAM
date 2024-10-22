@@ -618,7 +618,7 @@ if ec == 1
     % FEJ EKF
     R1FEJPFullSet_y = R1PFejFullSet(2:3:(end-1),(2:3:(end-1)));
     R1FEJAvgSD_y = mean(sqrt(R1FEJPFullSet_y),2); % standard deviation
-    R1FEJAvgPy_P = plot((1:poseNum)',3*R1FEJAvgSD_y','m--','DisplayName','Std 3{\sigma}-bound');
+    R1FEJAvgPy_P = plot((1:poseNum)',3*R1FEJAvgSD_y','m--','DisplayName','FEJ 3{\sigma}-bound');
 
     legend([R1AvgErryP,R1FEJAvgErryP,R1AvgPy_P,R1FEJAvgPy_P])
     hold off
@@ -716,7 +716,7 @@ if ec == 1
     % FEJ EKF
     R2FEJPFullSet_y = R2PFejFullSet(2:3:(end-1),(2:3:(end-1)));
     R2FEJAvgSD_y = mean(sqrt(R2FEJPFullSet_y),2); % standard deviation
-    R2FEJAvgPy_P = plot((0:poseNum)',3*R2FEJAvgSD_y','m--','DisplayName','Std 3{\sigma}-bound');
+    R2FEJAvgPy_P = plot((0:poseNum)',3*R2FEJAvgSD_y','m--','DisplayName','FEJ 3{\sigma}-bound');
 
     legend([R2AvgErryP,R2FEJAvgErryP,R2AvgPy_P,R2FEJAvgPy_P])
     hold off
