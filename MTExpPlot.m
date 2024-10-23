@@ -570,23 +570,39 @@ if ec == 1
     xlim([0,xplot_ub])
     title('R1 position x')
 
-    % x error mean
-    % Std EKF
-    R1AvgErr_x = mean(abs(DeltaR1XrFullSet(1:2:(end-1),2:end)),2);
+
+
+    if mcNum ~= 1
+        % x error mean
+        % Std EKF
+        R1AvgErr_x = mean(abs(DeltaR1XrFullSet(1:2:(end-1),2:end)),2);
+        % FEJ EKF
+        R1FEJAvgErr_x = mean(abs(DeltaR1XrFejFullSet(1:2:(end-1),2:end)),2);
+    else
+        R1AvgErr_x = DeltaR1XrFullSet(1:2:(end-1),2:end);
+        R1FEJAvgErr_x = DeltaR1XrFejFullSet(1:2:(end-1),2:end);
+    end
+
     R1AvgErrxP = plot((1:poseNum)',R1AvgErr_x,'b','DisplayName','Std error');
-    % FEJ EKF
-    R1FEJAvgErr_x = mean(abs(DeltaR1XrFejFullSet(1:2:(end-1),2:end)),2);
     R1FEJAvgErrxP = plot((1:poseNum)',R1FEJAvgErr_x,'r','DisplayName','FEJ error');
 
     % x standard deviation mean
     % Std EKF
     R1PFullSet_x = R1PFullSet(1:3:(end-2),1:3:(end-2));
     R1AvgSD_x = mean(sqrt(R1PFullSet_x),2); % standard deviation
-    R1AvgPx_P = plot((1:poseNum)',3*R1AvgSD_x','c--','DisplayName','Std 3{\sigma}-bound');
     % FEJ EKF
     R1FEJPFullSet_x = R1PIdeFullSet(1:3:(end-2),1:3:(end-2));
     R1FEJAvgSD_x = mean(sqrt(R1FEJPFullSet_x),2); % standard deviation
-    R1FEJAvgPx_P = plot((1:poseNum)',3*R1FEJAvgSD_x','m--','DisplayName','FEJ 3{\sigma}-bound');
+
+    if mcNum ~= 1
+        R1AvgPx_P = plot((1:poseNum)',3*R1AvgSD_x','c--','DisplayName','Std 3{\sigma}-bound');
+        R1FEJAvgPx_P = plot((1:poseNum)',3*R1FEJAvgSD_x','m--','DisplayName','FEJ 3{\sigma}-bound');
+    else
+        R1AvgPx_P = plot((1:poseNum)',3*R1AvgSD_x','c--','DisplayName','Std 3{\sigma}-bound');
+        plot((1:poseNum)',-3*R1AvgSD_x','c--')
+        R1FEJAvgPx_P = plot((1:poseNum)',3*R1FEJAvgSD_x','m--','DisplayName','FEJ 3{\sigma}-bound');
+        plot((1:poseNum)',-3*R1FEJAvgSD_x','m--')
+    end
 
     legend([R1AvgErrxP,R1FEJAvgErrxP,R1AvgPx_P,R1FEJAvgPx_P])
     hold off
@@ -602,23 +618,38 @@ if ec == 1
     xlim([0,xplot_ub])
     title('R1 position y')
 
-    % y error mean
-    % Std EKF
-    R1AvgErr_y = mean(abs(DeltaR1XrFullSet(2:2:(end),2:end)),2);
+    if mcNum ~= 1
+        % y error mean
+        % Std EKF
+        R1AvgErr_y = mean(abs(DeltaR1XrFullSet(2:2:(end),2:end)),2);
+        % FEJ EKF
+        R1FEJAvgErr_y = mean(abs(DeltaR1XrFejFullSet(2:2:(end),2:end)),2);
+    else
+        R1AvgErr_y = DeltaR1XrFullSet(2:2:(end),2:end);
+        R1FEJAvgErr_y = DeltaR1XrFejFullSet(2:2:(end),2:end);
+    end
     R1AvgErryP = plot((1:poseNum)',R1AvgErr_y,'b','DisplayName','Std error');
-    % FEJ EKF
-    R1FEJAvgErr_y = mean(abs(DeltaR1XrFejFullSet(2:2:(end),2:end)),2);
     R1FEJAvgErryP = plot((1:poseNum)',R1FEJAvgErr_y,'r','DisplayName','FEJ error');
+
 
     % y standard deviation mean
     % Std EKF
     R1PFullSet_y = R1PFullSet(2:3:(end-1),(2:3:(end-1)));
     R1AvgSD_y = mean(sqrt(R1PFullSet_y),2); % standard deviation
-    R1AvgPy_P = plot((1:poseNum)',3*R1AvgSD_y','c--','DisplayName','Std 3{\sigma}-bound');
+
     % FEJ EKF
     R1FEJPFullSet_y = R1PFejFullSet(2:3:(end-1),(2:3:(end-1)));
     R1FEJAvgSD_y = mean(sqrt(R1FEJPFullSet_y),2); % standard deviation
-    R1FEJAvgPy_P = plot((1:poseNum)',3*R1FEJAvgSD_y','m--','DisplayName','FEJ 3{\sigma}-bound');
+
+    if mcNum ~= 1
+        R1AvgPy_P = plot((1:poseNum)',3*R1AvgSD_y','c--','DisplayName','Std 3{\sigma}-bound');
+        R1FEJAvgPy_P = plot((1:poseNum)',3*R1FEJAvgSD_y','m--','DisplayName','FEJ 3{\sigma}-bound');
+    else
+        R1AvgPy_P = plot((1:poseNum)',3*R1AvgSD_y','c--','DisplayName','Std 3{\sigma}-bound');
+        plot((1:poseNum)',-3*R1AvgSD_y','c--');
+        R1FEJAvgPy_P = plot((1:poseNum)',3*R1FEJAvgSD_y','m--','DisplayName','FEJ 3{\sigma}-bound');
+        plot((1:poseNum)',-3*R1FEJAvgSD_y','m--');
+    end
 
     legend([R1AvgErryP,R1FEJAvgErryP,R1AvgPy_P,R1FEJAvgPy_P])
     hold off
@@ -634,24 +665,36 @@ if ec == 1
     xlim([0,xplot_ub])
     title('R1 heading \phi')
 
-    % phi error mean
-    % Std EKF
-    R1AvgErr_phi = mean(abs(DeltaR1XphiFullSet(:,2:end)),2);
+    if mcNum ~= 1
+        % phi error mean
+        % Std EKF
+        R1AvgErr_phi = mean(abs(DeltaR1XphiFullSet(:,2:end)),2);
+        % FEJ EKF
+        R1FEJAvgErr_phi = mean(abs(DeltaR1XphiFejFullSet(:,2:end)),2);
+    else
+        R1AvgErr_phi = DeltaR1XphiFullSet(:,2:end);
+        R1FEJAvgErr_phi = DeltaR1XphiFejFullSet(:,2:end);
+    end
     R1AvgErrphiP = plot((1:poseNum)',R1AvgErr_phi,'b','DisplayName','Std error');
-    % FEJ EKF
-    R1FEJAvgErr_phi = mean(abs(DeltaR1XphiFejFullSet(:,2:end)),2);
     R1FEJAvgErrphiP = plot((1:poseNum)',R1FEJAvgErr_phi,'r','DisplayName','FEJ error');
 
     % phi standard deviation mean
     % Std EKF
     R1PFullSet_phi = R1PFullSet(3:3:(end),3:3:(end));
     R1AvgSD_phi = mean(sqrt(R1PFullSet_phi),2); % standard deviation
-    R1AvgPphi_P = plot((1:poseNum)',3*R1AvgSD_phi,'c--','DisplayName','Std 3{\sigma}-bound');
     % FEJ EKF
     R1FEJPFullSet_phi = R1PFejFullSet(3:3:(end),3:3:(end));
     R1FEJAvgSD_phi = mean(sqrt(R1FEJPFullSet_phi),2); % standard deviation
-    R1FEJAvgPphi_P = plot((1:poseNum)',3*R1FEJAvgSD_phi,'m--','DisplayName','FEJ 3{\sigma}-bound');
 
+    if mcNum ~= 1
+        R1AvgPphi_P = plot((1:poseNum)',3*R1AvgSD_phi,'c--','DisplayName','Std 3{\sigma}-bound');
+        R1FEJAvgPphi_P = plot((1:poseNum)',3*R1FEJAvgSD_phi,'m--','DisplayName','FEJ 3{\sigma}-bound');
+    else
+        R1AvgPphi_P = plot((1:poseNum)',3*R1AvgSD_phi,'c--','DisplayName','Std 3{\sigma}-bound');
+        plot((1:poseNum)',-3*R1AvgSD_phi,'c--');
+        R1FEJAvgPphi_P = plot((1:poseNum)',3*R1FEJAvgSD_phi,'m--','DisplayName','FEJ 3{\sigma}-bound');
+        plot((1:poseNum)',-3*R1FEJAvgSD_phi,'m--');
+    end
     legend([R1AvgErrphiP,R1FEJAvgErrphiP,R1AvgPphi_P,R1FEJAvgPphi_P])
     hold off
 
@@ -668,24 +711,36 @@ if ec == 1
     xlim([0,xplot_ub])
     title('R2 position x')
 
-    % x error mean
-    % Std EKF
-    R2AvgErr_x = mean(abs(DeltaR2XrFullSet(1:2:(end-1),2:end)),2);
+    if mcNum ~= 1
+        % x error mean
+        % Std EKF
+        R2AvgErr_x = mean(abs(DeltaR2XrFullSet(1:2:(end-1),2:end)),2);
+        % FEJ EKF
+        R2FEJAvgErr_x = mean(abs(DeltaR2XrFejFullSet(1:2:(end-1),2:end)),2);
+    else
+        R2AvgErr_x = DeltaR2XrFullSet(1:2:(end-1),2:end);
+        R2FEJAvgErr_x = DeltaR2XrFejFullSet(1:2:(end-1),2:end);
+    end
     R2AvgErrxP = plot((0:poseNum)',R2AvgErr_x,'b','DisplayName','Std error');
-    % FEJ EKF
-    R2FEJAvgErr_x = mean(abs(DeltaR2XrFejFullSet(1:2:(end-1),2:end)),2);
     R2FEJAvgErrxP = plot((0:poseNum)',R2FEJAvgErr_x,'r','DisplayName','FEJ error');
 
     % x standard deviation mean
     % Std EKF
     R2PFullSet_x = R2PFullSet(1:3:(end-2),1:3:(end-2));
     R2AvgSD_x = mean(sqrt(R2PFullSet_x),2); % standard deviation
-    R2AvgPx_P = plot((0:poseNum)',3*R2AvgSD_x','c--','DisplayName','Std 3{\sigma}-bound');
     % FEJ EKF
     R2FEJPFullSet_x = R2PIdeFullSet(1:3:(end-2),1:3:(end-2));
     R2FEJAvgSD_x = mean(sqrt(R2FEJPFullSet_x),2); % standard deviation
-    R2FEJAvgPx_P = plot((0:poseNum)',3*R2FEJAvgSD_x','m--','DisplayName','FEJ 3{\sigma}-bound');
 
+    if mcNum ~= 1
+        R2AvgPx_P = plot((0:poseNum)',3*R2AvgSD_x','c--','DisplayName','Std 3{\sigma}-bound');
+        R2FEJAvgPx_P = plot((0:poseNum)',3*R2FEJAvgSD_x','m--','DisplayName','FEJ 3{\sigma}-bound');
+    else
+        R2AvgPx_P = plot((0:poseNum)',3*R2AvgSD_x','c--','DisplayName','Std 3{\sigma}-bound');
+        plot((0:poseNum)',-3*R2AvgSD_x','c--');
+        R2FEJAvgPx_P = plot((0:poseNum)',3*R2FEJAvgSD_x','m--','DisplayName','FEJ 3{\sigma}-bound');
+        plot((0:poseNum)',-3*R2FEJAvgSD_x','m--');
+    end
     legend([R2AvgErrxP,R2FEJAvgErrxP,R2AvgPx_P,R2FEJAvgPx_P])
     hold off
 
@@ -700,23 +755,37 @@ if ec == 1
     xlim([0,xplot_ub])
     title('R2 position y')
 
-    % y error mean
-    % Std EKF
-    R2AvgErr_y = mean(abs(DeltaR2XrFullSet(2:2:(end),2:end)),2);
+    if mcNum ~= 1
+        % y error mean
+        % Std EKF
+        R2AvgErr_y = mean(abs(DeltaR2XrFullSet(2:2:(end),2:end)),2);
+        % FEJ EKF
+        R2FEJAvgErr_y = mean(abs(DeltaR2XrFejFullSet(2:2:(end),2:end)),2);
+    else
+        R2AvgErr_y = DeltaR2XrFullSet(2:2:(end),2:end);
+        R2FEJAvgErr_y = DeltaR2XrFejFullSet(2:2:(end),2:end);
+    end
+
     R2AvgErryP = plot((0:poseNum)',R2AvgErr_y,'b','DisplayName','Std error');
-    % FEJ EKF
-    R2FEJAvgErr_y = mean(abs(DeltaR2XrFejFullSet(2:2:(end),2:end)),2);
     R2FEJAvgErryP = plot((0:poseNum)',R2FEJAvgErr_y,'r','DisplayName','FEJ error');
 
     % y standard deviation mean
     % Std EKF
     R2PFullSet_y = R2PFullSet(2:3:(end-1),(2:3:(end-1)));
     R2AvgSD_y = mean(sqrt(R2PFullSet_y),2); % standard deviation
-    R2AvgPy_P = plot((0:poseNum)',3*R2AvgSD_y','c--','DisplayName','Std 3{\sigma}-bound');
     % FEJ EKF
     R2FEJPFullSet_y = R2PFejFullSet(2:3:(end-1),(2:3:(end-1)));
     R2FEJAvgSD_y = mean(sqrt(R2FEJPFullSet_y),2); % standard deviation
-    R2FEJAvgPy_P = plot((0:poseNum)',3*R2FEJAvgSD_y','m--','DisplayName','FEJ 3{\sigma}-bound');
+
+    if mcNum ~= 1
+        R2AvgPy_P = plot((0:poseNum)',3*R2AvgSD_y','c--','DisplayName','Std 3{\sigma}-bound');
+        R2FEJAvgPy_P = plot((0:poseNum)',3*R2FEJAvgSD_y','m--','DisplayName','FEJ 3{\sigma}-bound');
+    else
+        R2AvgPy_P = plot((0:poseNum)',3*R2AvgSD_y','c--','DisplayName','Std 3{\sigma}-bound');
+        plot((0:poseNum)',-3*R2AvgSD_y','c--');
+        R2FEJAvgPy_P = plot((0:poseNum)',3*R2FEJAvgSD_y','m--','DisplayName','FEJ 3{\sigma}-bound');
+        plot((0:poseNum)',-3*R2FEJAvgSD_y','m--');
+    end
 
     legend([R2AvgErryP,R2FEJAvgErryP,R2AvgPy_P,R2FEJAvgPy_P])
     hold off
@@ -732,23 +801,36 @@ if ec == 1
     xlim([0,xplot_ub])
     title('R2 heading \phi')
 
-    % phi error mean
-    % Std EKF
-    R2AvgErr_phi = mean(abs(DeltaR2XphiFullSet(:,2:end)),2);
+    if mcNum ~= 1
+        % phi error mean
+        % Std EKF
+        R2AvgErr_phi = mean(abs(DeltaR2XphiFullSet(:,2:end)),2);
+        % FEJ EKF
+        R2FEJAvgErr_phi = mean(abs(DeltaR2XphiFejFullSet(:,2:end)),2);
+    else
+        R2AvgErr_phi = DeltaR2XphiFullSet(:,2:end);
+        R2FEJAvgErr_phi = DeltaR2XphiFejFullSet(:,2:end);
+    end
     R2AvgErrphiP = plot((0:poseNum)',R2AvgErr_phi,'b','DisplayName','Std error');
-    % FEJ EKF
-    R2FEJAvgErr_phi = mean(abs(DeltaR2XphiFejFullSet(:,2:end)),2);
     R2FEJAvgErrphiP = plot((0:poseNum)',R2FEJAvgErr_phi,'r','DisplayName','FEJ error');
 
     % phi standard deviation mean
     % Std EKF
     R2PFullSet_phi = R2PFullSet(3:3:(end),3:3:(end));
     R2AvgSD_phi = mean(sqrt(R2PFullSet_phi),2); % standard deviation
-    R2AvgPphi_P = plot((0:poseNum)',3*R2AvgSD_phi,'c--','DisplayName','Std 3{\sigma}-bound');
     % FEJ EKF
     R2FEJPFullSet_phi = R2PFejFullSet(3:3:(end),3:3:(end));
     R2FEJAvgSD_phi = mean(sqrt(R2FEJPFullSet_phi),2); % standard deviation
-    R2FEJAvgPphi_P = plot((0:poseNum)',3*R2FEJAvgSD_phi,'m--','DisplayName','FEJ 3{\sigma}-bound');
+
+    if mcNum ~= 1
+        R2AvgPphi_P = plot((0:poseNum)',3*R2AvgSD_phi,'c--','DisplayName','Std 3{\sigma}-bound');
+        R2FEJAvgPphi_P = plot((0:poseNum)',3*R2FEJAvgSD_phi,'m--','DisplayName','FEJ 3{\sigma}-bound');
+    else
+        R2AvgPphi_P = plot((0:poseNum)',3*R2AvgSD_phi,'c--','DisplayName','Std 3{\sigma}-bound');
+        plot((0:poseNum)',-3*R2AvgSD_phi,'c--');
+        R2FEJAvgPphi_P = plot((0:poseNum)',3*R2FEJAvgSD_phi,'m--','DisplayName','FEJ 3{\sigma}-bound');
+        plot((0:poseNum)',-3*R2FEJAvgSD_phi,'m--');
+    end
 
     legend([R2AvgErrphiP,R2FEJAvgErrphiP,R2AvgPphi_P,R2FEJAvgPphi_P])
     hold off

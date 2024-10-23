@@ -13,14 +13,14 @@ if ec ~= 4
 % env =
 % 1, environment 1: two intersecting circles
 % 2, environment 2: an '8' in a circle
-env = 1;
+env = 2;
 end
 
 %% Simulation noise choice
 snc = 1; % if 0 (for test), set noise level as 0.02/0.1°; if 1 (for display), set noise level as bigger;
 
 %% Number of Monte Carlo experiments
-mcNum = 100;
+mcNum = 1;
 
 %% Number of robot running cycles
 cy = 5;
@@ -92,11 +92,11 @@ if ec ~= 4 % For Simulation
 
             % standard deviation of the zero mean Gaussian process noise w(k) of 1th robot
             R1sigma_uv = 0.3; % 0.025 m/time_step
-            R1sigma_uw = pi/90; % pi: 180°/time_step
+            R1sigma_uw = pi/45; % pi: 180°/time_step
 
             % standard deviation of the zero mean Gaussian process noise w(k) of 2nd robot
             R2sigma_uv = 0.3; % m/time_step
-            R2sigma_uw = pi/90; % °/time_step
+            R2sigma_uw = pi/45; % °/time_step
 
             % standard deviation of the zero mean Gaussian observation noise v(k) of 1th robot
             R1sigma_zv = 0.5; % m/time_step
