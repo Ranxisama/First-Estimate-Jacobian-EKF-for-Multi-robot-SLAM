@@ -1,19 +1,17 @@
-
-
 %% choose different experiment
 % ec =
 % 1, Simulating data with 20 features
 % 2, Simulating data with 60 features
 % 3, Simulating data with 100 features
 % 4, Victoria Park dataset
-ec = 3;
+ec = 1;
 
 %% choose simulation environment
 if ec ~= 4
-% env =
-% 1, environment 1: two intersecting circles
-% 2, environment 2: an '8' in a circle
-env = 2;
+    % env =
+    % 1, environment 1: two intersecting circles
+    % 2, environment 2: an '8' in a circle
+    env = 2;
 end
 
 %% Simulation noise choice
