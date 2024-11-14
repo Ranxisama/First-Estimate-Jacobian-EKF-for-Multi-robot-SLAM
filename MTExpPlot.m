@@ -172,9 +172,9 @@ xlabel('Steps')
 ylabel('R1 Position RMSE (m)')
 xlim([0,xplot_ub])
 if ec ~= 4
-    legend([R1XrRMSEP,R1XrIdeRMSEP,R1XrFejRMSEP])
+    legend([R1XrRMSEP,R1XrIdeRMSEP,R1XrFejRMSEP],'FontSize',20)
 elseif ec == 4
-    legend([R1XrRMSEP,R1XrFejRMSEP])
+    legend([R1XrRMSEP,R1XrFejRMSEP],'FontSize',20)
 end
 set(gcf, 'Color', 'w');  % 将整个图背景设置为白色
 set(gca, 'Box', 'on', 'LineWidth', 1);  % 使边框显示，并增加边框宽度
@@ -200,9 +200,9 @@ xlabel('Steps')
 ylabel('R2 Position RMSE (m)')
 xlim([0,xplot_ub])
 if ec ~= 4
-    legend([R2XrRMSEP,R2XrIdeRMSEP,R2XrFejRMSEP])
+    legend([R2XrRMSEP,R2XrIdeRMSEP,R2XrFejRMSEP],'FontSize',20)
 else
-    legend([R2XrRMSEP,R2XrFejRMSEP])
+    legend([R2XrRMSEP,R2XrFejRMSEP],'FontSize',20)
 end
 set(gcf, 'Color', 'w');  % 将整个图背景设置为白色
 set(gca, 'Box', 'on', 'LineWidth', 1);  % 使边框显示，并增加边框宽度
@@ -229,9 +229,9 @@ xlabel('Steps')
 ylabel('R1 Heading RMSE (rad)')
 xlim([0,xplot_ub])
 if ec ~= 4
-    legend([R1XphiRMSEP,R1XphiIdeRMSEP,R1XphiFejRMSEP])
+    legend([R1XphiRMSEP,R1XphiIdeRMSEP,R1XphiFejRMSEP],'FontSize',20)
 else
-    legend([R1XphiRMSEP,R1XphiFejRMSEP])
+    legend([R1XphiRMSEP,R1XphiFejRMSEP],'FontSize',20)
 end
 set(gcf, 'Color', 'w');  % 将整个图背景设置为白色
 set(gca, 'Box', 'on', 'LineWidth', 1);  % 使边框显示，并增加边框宽度
@@ -255,9 +255,9 @@ xlabel('Steps')
 ylabel('R2 Heading RMSE (rad)')
 xlim([0,xplot_ub])
 if ec ~= 4
-    legend([R2XphiRMSEP,R2XphiIdeRMSEP,R2XphiFejRMSEP])
+    legend([R2XphiRMSEP,R2XphiIdeRMSEP,R2XphiFejRMSEP],'FontSize',20)
 else
-    legend([R2XphiRMSEP,R2XphiFejRMSEP])
+    legend([R2XphiRMSEP,R2XphiFejRMSEP],'FontSize',20)
 end
 set(gcf, 'Color', 'w');  % 将整个图背景设置为白色
 set(gca, 'Box', 'on', 'LineWidth', 1);  % 使边框显示，并增加边框宽度
@@ -409,9 +409,9 @@ xlabel('Steps')
 ylabel('R1 Pose NEES')
 xlim([0,xplot_ub])
 if ec ~= 4
-    legend([R1XpNEESP,R1XpIdeNEESP,R1XpFejNEESP])
+    legend([R1XpNEESP,R1XpIdeNEESP,R1XpFejNEESP],'FontSize',20)
 else
-    legend([R1XpNEESP,R1XpFejNEESP])
+    legend([R1XpNEESP,R1XpFejNEESP],'FontSize',20)
 end
 set(gcf, 'Color', 'w');  % 将整个图背景设置为白色
 set(gca, 'Box', 'on', 'LineWidth', 1);  % 使边框显示，并增加边框宽度
@@ -435,9 +435,9 @@ xlabel('Steps')
 ylabel('R2 Pose NEES')
 xlim([0,xplot_ub])
 if ec ~= 4
-    legend([R2XpNEESP,R2XpIdeNEESP,R2XpFejNEESP])
+    legend([R2XpNEESP,R2XpIdeNEESP,R2XpFejNEESP],'FontSize',20)
 else
-    legend([R2XpNEESP,R2XpFejNEESP])
+    legend([R2XpNEESP,R2XpFejNEESP],'FontSize',20)
 end
 set(gcf, 'Color', 'w');  % 将整个图背景设置为白色
 set(gca, 'Box', 'on', 'LineWidth', 1);  % 使边框显示，并增加边框宽度
@@ -604,7 +604,7 @@ if ec == 1
         plot((1:poseNum)',-3*R1FEJAvgSD_x','m--')
     end
 
-    legend([R1AvgErrxP,R1FEJAvgErrxP,R1AvgPx_P,R1FEJAvgPx_P])
+    legend([R1AvgErrxP,R1FEJAvgErrxP,R1AvgPx_P,R1FEJAvgPx_P],'FontSize',20)
     hold off
 
     %% y
@@ -651,7 +651,7 @@ if ec == 1
         plot((1:poseNum)',-3*R1FEJAvgSD_y','m--');
     end
 
-    legend([R1AvgErryP,R1FEJAvgErryP,R1AvgPy_P,R1FEJAvgPy_P])
+    legend([R1AvgErryP,R1FEJAvgErryP,R1AvgPy_P,R1FEJAvgPy_P],'FontSize',20)
     hold off
 
     %% heading (phi)
@@ -695,7 +695,7 @@ if ec == 1
         R1FEJAvgPphi_P = plot((1:poseNum)',3*R1FEJAvgSD_phi,'m--','DisplayName','FEJ 3{\sigma}-bound');
         plot((1:poseNum)',-3*R1FEJAvgSD_phi,'m--');
     end
-    legend([R1AvgErrphiP,R1FEJAvgErrphiP,R1AvgPphi_P,R1FEJAvgPphi_P])
+    legend([R1AvgErrphiP,R1FEJAvgErrphiP,R1AvgPphi_P,R1FEJAvgPphi_P],'FontSize',20)
     hold off
 
     %% R2
@@ -741,7 +741,7 @@ if ec == 1
         R2FEJAvgPx_P = plot((0:poseNum)',3*R2FEJAvgSD_x','m--','DisplayName','FEJ 3{\sigma}-bound');
         plot((0:poseNum)',-3*R2FEJAvgSD_x','m--');
     end
-    legend([R2AvgErrxP,R2FEJAvgErrxP,R2AvgPx_P,R2FEJAvgPx_P])
+    legend([R2AvgErrxP,R2FEJAvgErrxP,R2AvgPx_P,R2FEJAvgPx_P],'FontSize',20)
     hold off
 
     %% y
@@ -787,7 +787,7 @@ if ec == 1
         plot((0:poseNum)',-3*R2FEJAvgSD_y','m--');
     end
 
-    legend([R2AvgErryP,R2FEJAvgErryP,R2AvgPy_P,R2FEJAvgPy_P])
+    legend([R2AvgErryP,R2FEJAvgErryP,R2AvgPy_P,R2FEJAvgPy_P],'FontSize',20)
     hold off
 
     %% heading (phi)
@@ -832,7 +832,7 @@ if ec == 1
         plot((0:poseNum)',-3*R2FEJAvgSD_phi,'m--');
     end
 
-    legend([R2AvgErrphiP,R2FEJAvgErrphiP,R2AvgPphi_P,R2FEJAvgPphi_P])
+    legend([R2AvgErrphiP,R2FEJAvgErrphiP,R2AvgPphi_P,R2FEJAvgPphi_P],'FontSize',20)
     hold off
 
     if env == 1
