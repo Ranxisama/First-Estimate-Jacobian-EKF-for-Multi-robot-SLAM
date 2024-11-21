@@ -108,8 +108,9 @@ R2ObsSet = [R2Obs(:,1:2),R2ObsSet];
 feaNum = numel(unique([R1ObsSet(:,2);R2ObsSet(:,2)]));
 
 
-disp('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
+disp('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
 %% Shared feature Observation at step 0
+disp(['Number of Monte Carlo simulation(s): ',num2str(mcNum)])
 sharedObs0Num = numel(intersect(R1Obs(R1Obs(:,1)==0,2),R2Obs(R2Obs(:,1)==0,2)));
 disp(['Number of shared feature observations at step 0: ',num2str(sharedObs0Num)])
 if sharedObs0Num < reqSharedObsNum
@@ -153,4 +154,4 @@ end
 
 
 disp('Parameters and measurements generation complete!')
-disp('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
+disp('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')

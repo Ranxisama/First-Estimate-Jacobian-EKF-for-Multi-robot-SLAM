@@ -221,9 +221,7 @@ end
 % Gaussian Newton iterative values with four decimal places retained：
 % [65.0492;7.7931;3.3150];
 
-% The initial pose measurement value of R2 (step 3265) is obtained using
-% the directly calculated value with four decimal places retained：
-% [40.1386;-64.1211;-0.8182];
+% The initial pose measurement value of R2 (step 3265) is obtained using the directly calculated value with four decimal places retained：[40.1386;-64.1211;-0.8182];
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 XrTrue = X(X(:,1)==1,2:3);
@@ -371,18 +369,18 @@ R1XrTrueP = plot(R1XrTrue(1:2:(end-1),2),R1XrTrue(2:2:end,2),'c-','DisplayName',
 R2XrTrueP = plot(R2XrTrue(1:2:(end-1),2),R2XrTrue(2:2:end,2),'m--','DisplayName','R2 trajectory','MarkerSize',2);
 FeaTrueP = plot(XfTrueAll(1:2:(end-1),2),XfTrueAll(2:2:end,2),'k^','DisplayName','Feature position','MarkerSize',3);
 
-% Create a label of normal size for the legend (not shown in the image)
-R1XrTruePHandle = plot(NaN, NaN, 'c-','DisplayName','R1 trajectory', 'MarkerSize', 8);  % Normal size marking
-R2XrTruePHandle = plot(NaN, NaN, 'm--','DisplayName','R2 trajectory', 'MarkerSize', 8);  % Normal size marking
-FeaTruePHandle = plot(NaN, NaN, 'k^','DisplayName','Feature position', 'MarkerSize', 8);  % Normal size marking
+% 为 legend 创建正常尺寸的标记（不显示在图中）
+R1XrTruePHandle = plot(NaN, NaN, 'c-','DisplayName','R1 trajectory', 'MarkerSize', 8);  % 正常尺寸标记
+R2XrTruePHandle = plot(NaN, NaN, 'm--','DisplayName','R2 trajectory', 'MarkerSize', 8);  % 正常尺寸标记
+FeaTruePHandle = plot(NaN, NaN, 'k^','DisplayName','Feature position', 'MarkerSize', 8);  % 正常尺寸标记
 
 legend([R1XrTruePHandle,R2XrTruePHandle,FeaTruePHandle])
 
 xlabel('x (m)')
 ylabel('y (m)')
 
-set(gcf, 'Color', 'w');  % Set the entire image background to white
-set(gca, 'Box', 'on', 'LineWidth', 1, 'GridLineStyle', '--', 'GridAlpha', 0.1);  % Display the border and increase the border width
+set(gcf, 'Color', 'w');  % 将整个图背景设置为白色
+set(gca, 'Box', 'on', 'LineWidth', 1, 'GridLineStyle', '--', 'GridAlpha', 0.1);  % 使边框显示，并增加边框宽度
 hold off
 
 

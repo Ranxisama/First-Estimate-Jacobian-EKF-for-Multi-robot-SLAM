@@ -15,14 +15,14 @@ clear
 % disp('The null space of N1 is:');
 % disp(null_N1);
 J = [0,-1;1,0];
-syms a b c d e f g h x1 x2 x3 x4 x5 x6 x7 x8 % 定义符号变量
+syms a b c d e f g h x1 x2 x3 x4 x5 x6 x7 x8 % Define Symbolic Variables
 N2 = [-eye(2),-J*[a-b;c-d],zeros(2,2),zeros(2,1),eye(2),zeros(2,2);
       -eye(2),-J*[e-b;f-d],zeros(2,2),zeros(2,1),zeros(2,2),eye(2);
       zeros(2,2),zeros(2,1),-eye(2),-J*[a-g;c-h],eye(2),zeros(2,2);
-      zeros(2,2),zeros(2,1),-eye(2),-J*[e-g;f-h],zeros(2,2),eye(2)];       % 定义带字母的矩阵
-% x = [x1; x2; x3; x4; x5; x6; x7; x8];          % 定义未知向量
-% eqns = N2*x == 0;           % 矩阵方程 A*x = 0
-% S = solve(eqns, [x1 x2 x3 x4 x5 x6 x7 x8]);  % 求解矩阵方程
+      zeros(2,2),zeros(2,1),-eye(2),-J*[e-g;f-h],zeros(2,2),eye(2)];       % Define a matrix with letters
+% x = [x1; x2; x3; x4; x5; x6; x7; x8];          % Define unknown vectors
+% eqns = N2*x == 0;           % Matrix equation A*x = 0
+% S = solve(eqns, [x1 x2 x3 x4 x5 x6 x7 x8]);  %Solving the matrix equation
 % disp(S);
 null_N2 = null(N2);
 disp('The null space of N2 is:')

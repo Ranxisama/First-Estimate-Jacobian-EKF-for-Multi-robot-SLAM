@@ -18,7 +18,7 @@ end
 snc = 0; % if 0, for test; if 1, for display;
 
 %% Number of Monte Carlo experiments
-mcNum = 1; % if 1, plot nornmal error and 3-sigma bound; if >1, plot absolute value of error and 3-sigma bound
+mcNum = 20; % if 1, plot nornmal error and 3-sigma bound; if >1, plot absolute value of error and 3-sigma bound
 
 %% Number of robot running cycles
 cy = 5;
@@ -52,18 +52,18 @@ if ec ~= 4 % For Simulation
     if env == 1
         if snc == 0 % for test, feel free to change the noise level
             % standard deviation of the zero mean Gaussian process noise w(k) of 1th robot
-            R1sigma_uv = 1; % 0.025 m/time_step
+            R1sigma_uv = 0.5; % 0.025 m/time_step
             R1sigma_uw = pi/18; % pi: 180°/time_step
 
             % standard deviation of the zero mean Gaussian process noise w(k) of 2nd robot
-            R2sigma_uv = 1; % m/time_step
+            R2sigma_uv = 0.5; % m/time_step
             R2sigma_uw = pi/18; % °/time_step
 
             % standard deviation of the zero mean Gaussian observation noise v(k) of 1th robot
-            R1sigma_zv = 1; % m/time_step
+            R1sigma_zv = 0.5; % m/time_step
 
             % standard deviation of the zero mean Gaussian observation noise v(k) of 2nd robot
-            R2sigma_zv = 1; % m/time_step
+            R2sigma_zv = 0.5; % m/time_step
 
             % R1
             % standard deviation of 1th robot position at time 0 (equals to 0 as the origin of the 1D coordinate system)
@@ -204,8 +204,8 @@ end
 %% Robot bearing ranges
 % R1bearingRange = 0; % pi/60: 3°
 % R2bearingRange = 0; % pi/60: 3°
-R1bearingRange = pi/9; % pi/12: 15°
-R2bearingRange = pi/9; % pi/12: 15°
+R1bearingRange = pi/12; % pi/12: 15°
+R2bearingRange = pi/12; % pi/12: 15°
 
 %% Sensor Range
 R1sensorRange = 15; % m/s, R1's observation range for the features
@@ -341,12 +341,12 @@ elseif ec == 4
     xplot_ub = 3000;
 end
 
-% if ec ~= 4
-%     if env == 1
-%         disp('----------- The simulation environment is of two intersecting circles -----------')
-%     elseif env == 2
-%         disp('----------- The simulation environment is of an 8 in a circle -----------')
-%     else
-%         error('----------- variable env can only be 1 or 2 -----------')
-%     end
-% end
+if ec ~= 4
+    if env == 1
+        disp('----------- The simulation environment is of two intersecting circles -----------')
+    elseif env == 2
+        disp('----------- The simulation environment is of an 8 in a circle -----------')
+    else
+        error('----------- variable env can only be 1 or 2 -----------')
+    end
+end

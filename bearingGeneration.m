@@ -12,9 +12,9 @@ for i = 1:(size(Phi,1))
     DPhi = Phi(i,1)-Phi(i-1,1);
     if abs(DPhi) > bearingRange
         if DPhi > 0
-            Xphi(i,2) = Phi(i,1) - bearingRange;
+            Xphi(i,2) = Phi(i,1) - bearingRange*rand;
         else
-            Xphi(i,2) = Phi(i,1) + bearingRange;
+            Xphi(i,2) = Phi(i,1) + bearingRange*rand;
         end
     else
         Xphi(i,2) = Phi(i,1);

@@ -176,8 +176,8 @@ if ec ~= 4
 elseif ec == 4
     legend([R1XrRMSEP,R1XrFejRMSEP],'FontSize',10)
 end
-set(gcf, 'Color', 'w');  % Set the entire image background to white
-set(gca, 'Box', 'on', 'LineWidth', 1);  % Display the border and increase the border width
+set(gcf, 'Color', 'w');  % 将整个图背景设置为白色
+set(gca, 'Box', 'on', 'LineWidth', 1);  % 使边框显示，并增加边框宽度
 
 hold off
 
@@ -204,8 +204,8 @@ if ec ~= 4
 else
     legend([R2XrRMSEP,R2XrFejRMSEP],'FontSize',10)
 end
-set(gcf, 'Color', 'w');  % Set the entire image background to white
-set(gca, 'Box', 'on', 'LineWidth', 1);  % Display the border and increase the border width
+set(gcf, 'Color', 'w');  % 将整个图背景设置为白色
+set(gca, 'Box', 'on', 'LineWidth', 1);  % 使边框显示，并增加边框宽度
 
 hold off
 
@@ -233,8 +233,8 @@ if ec ~= 4
 else
     legend([R1XphiRMSEP,R1XphiFejRMSEP],'FontSize',10)
 end
-set(gcf, 'Color', 'w');  % Set the entire image background to white
-set(gca, 'Box', 'on', 'LineWidth', 1);  % Display the border and increase the border width
+set(gcf, 'Color', 'w');  % 将整个图背景设置为白色
+set(gca, 'Box', 'on', 'LineWidth', 1);  % 使边框显示，并增加边框宽度
 
 hold off
 
@@ -259,8 +259,8 @@ if ec ~= 4
 else
     legend([R2XphiRMSEP,R2XphiFejRMSEP],'FontSize',10)
 end
-set(gcf, 'Color', 'w');  % Set the entire image background to white
-set(gca, 'Box', 'on', 'LineWidth', 1);  % Display the border and increase the border width
+set(gcf, 'Color', 'w');  % 将整个图背景设置为白色
+set(gca, 'Box', 'on', 'LineWidth', 1);  % 使边框显示，并增加边框宽度
 
 hold off
 
@@ -413,8 +413,8 @@ if ec ~= 4
 else
     legend([R1XpNEESP,R1XpFejNEESP],'FontSize',10)
 end
-set(gcf, 'Color', 'w');  % Set the entire image background to white
-set(gca, 'Box', 'on', 'LineWidth', 1);  % Display the border and increase the border width
+set(gcf, 'Color', 'w');  % 将整个图背景设置为白色
+set(gca, 'Box', 'on', 'LineWidth', 1);  % 使边框显示，并增加边框宽度
 
 hold off
 
@@ -439,8 +439,8 @@ if ec ~= 4
 else
     legend([R2XpNEESP,R2XpFejNEESP],'FontSize',10)
 end
-set(gcf, 'Color', 'w');  % Set the entire image background to white
-set(gca, 'Box', 'on', 'LineWidth', 1);  % Display the border and increase the border width
+set(gcf, 'Color', 'w');  % 将整个图背景设置为白色
+set(gca, 'Box', 'on', 'LineWidth', 1);  % 使边框显示，并增加边框宽度
 
 hold off
 
@@ -464,13 +464,13 @@ if ec == 1
     StdEKFColumn = arrayfun(@(x) sprintf('%.4f', x), StdEKFColumn, 'UniformOutput', false);
     FejEKFColumn = arrayfun(@(x) sprintf('%.4f', x), FejEKFColumn, 'UniformOutput', false);
 
-    % Create a table and insert dynamic column names
+    % 创建表格并插入动态列名称
     T = table(IdeEKFColumn, StdEKFColumn,FejEKFColumn,'VariableNames',{'Ideal EKF','Std EKF','FEJ EKF'});
 
-    % Set row name
+    % 设置行名称
     T.Properties.RowNames = {'R1 Pose NEES','R1 Position Err.RMS (m)','R1 Heading Err.RMS (rad)','R2 Pose NEES','R2 Position Err.RMS (m)','R2 Heading Err.RMS (rad)','Feature Position NEES','Feature Position Err.RMS (m)'};
 
-    % Display Table
+    % 显示表格
     disp(T);
     disp('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
 
@@ -485,13 +485,13 @@ elseif ec == 2
     StdEKFColumn = arrayfun(@(x) sprintf('%.4f', x), StdEKFColumn, 'UniformOutput', false);
     FejEKFColumn = arrayfun(@(x) sprintf('%.4f', x), FejEKFColumn, 'UniformOutput', false);
 
-    % Create a table and insert dynamic column names
+    % 创建表格并插入动态列名称
     T = table(IdeEKFColumn, StdEKFColumn,FejEKFColumn,'VariableNames',{'Ideal EKF','Std EKF','FEJ EKF'});
 
-    % Set row name
+    % 设置行名称
     T.Properties.RowNames = {'R1 Pose NEES','R1 Position Err.RMS (m)','R1 Heading Err.RMS (rad)','R2 Pose NEES','R2 Position Err.RMS (m)','R2 Heading Err.RMS (rad)','Feature Position NEES','Feature Position Err.RMS (m)'};
 
-    % Display Table
+    % 显示表格
     disp(T);
     disp('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
 
@@ -506,13 +506,13 @@ elseif ec == 3
     StdEKFColumn = arrayfun(@(x) sprintf('%.4f', x), StdEKFColumn, 'UniformOutput', false);
     FejEKFColumn = arrayfun(@(x) sprintf('%.4f', x), FejEKFColumn, 'UniformOutput', false);
 
-    % Create a table and insert dynamic column names
+    % 创建表格并插入动态列名称
     T = table(IdeEKFColumn, StdEKFColumn,FejEKFColumn,'VariableNames',{'Ideal EKF','Std EKF','FEJ EKF'});
 
-    % Set row name
+    % 设置行名称
     T.Properties.RowNames = {'R1 Pose NEES','R1 Position Err.RMS (m)','R1 Heading Err.RMS (rad)','R2 Pose NEES','R2 Position Err.RMS (m)','R2 Heading Err.RMS (rad)','Feature Position NEES','Feature Position Err.RMS (m)'};
 
-    % Display Table
+    % 显示表格
     disp(T);
     disp('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
 
@@ -527,16 +527,15 @@ elseif ec == 4
     StdEKFColumn = arrayfun(@(x) sprintf('%.4f', x), StdEKFColumn, 'UniformOutput', false);
     FejEKFColumn = arrayfun(@(x) sprintf('%.4f', x), FejEKFColumn, 'UniformOutput', false);
 
-    % Create a table and insert dynamic column names
+    % 创建表格并插入动态列名称
     % T = table(IdeEKFColumn, StdEKFColumn,FejEKFColumn,'VariableNames',{'Ideal EKF','Std EKF','FEJ EKF'});
     T = table(StdEKFColumn,FejEKFColumn,'VariableNames',{'Std EKF','FEJ EKF'});
 
 
-    % Set row name
-
+    % 设置行名称
     T.Properties.RowNames = {'R1 Pose NEES','R1 Position Err.RMS (m)','R1 Heading Err.RMS (rad)','R2 Pose NEES','R2 Position Err.RMS (m)','R2 Heading Err.RMS (rad)','Feature Position NEES','Feature Position Err.RMS (m)'};
 
-    % Display the table
+    % 显示表格
     disp(T);
     disp('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
 
@@ -564,8 +563,8 @@ if ec == 1
     figure(25)
     hold on
     grid on
-    set(gcf, 'Color', 'w');  % Set the entire background of the image to white
-    set(gca, 'Box', 'on', 'LineWidth', 1);  % Display the border and increase the border width
+    set(gcf, 'Color', 'w');  % 将整个图背景设置为白色
+    set(gca, 'Box', 'on', 'LineWidth', 1);  % 使边框显示，并增加边框宽度
     xlabel('step')
     ylabel('m')
     xlim([0,xplot_ub])
@@ -612,8 +611,8 @@ if ec == 1
     figure(26)
     hold on
     grid on
-    set(gcf, 'Color', 'w');  % Set the entire background of the image to white
-    set(gca, 'Box', 'on', 'LineWidth', 1);  % Display the border and increase the border width
+    set(gcf, 'Color', 'w');  % 将整个图背景设置为白色
+    set(gca, 'Box', 'on', 'LineWidth', 1);  % 使边框显示，并增加边框宽度
     xlabel('step')
     ylabel('m')
     xlim([0,xplot_ub])
@@ -659,8 +658,8 @@ if ec == 1
     figure(27)
     hold on
     grid on
-    set(gcf, 'Color', 'w');  % Set the entire background of the image to white
-    set(gca, 'Box', 'on', 'LineWidth', 1);  % Display the border and increase the border width
+    set(gcf, 'Color', 'w');  % 将整个图背景设置为白色
+    set(gca, 'Box', 'on', 'LineWidth', 1);  % 使边框显示，并增加边框宽度
     xlabel('step')
     ylabel('rad')
     xlim([0,xplot_ub])
@@ -705,8 +704,8 @@ if ec == 1
     figure(28)
     hold on
     grid on
-    set(gcf, 'Color', 'w');  % Set the entire background of the image to white
-    set(gca, 'Box', 'on', 'LineWidth', 1);  % Display the border and increase the border width
+    set(gcf, 'Color', 'w');  % 将整个图背景设置为白色
+    set(gca, 'Box', 'on', 'LineWidth', 1);  % 使边框显示，并增加边框宽度
     xlabel('step')
     ylabel('m')
     xlim([0,xplot_ub])

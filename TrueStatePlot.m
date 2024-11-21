@@ -101,14 +101,14 @@ FeaposiTP = plot(XfTrueAll(1:2:(end-1),2),XfTrueAll(2:2:end,2),'k^','MarkerSize'
 % for legend
 FeaposiTPHandle = plot(NaN,NaN,'k^','MarkerSize',8,'DisplayName','Feature position');
 
-% 创建自定义图例
+% Create custom legend
 % hLegend = legend('R_1 true position', 'R_2 true position', 'R_1 true heading', 'R_2 true heading', 'True feature', 'Location', 'northeast','FontSize', FS);
 hLegend = legend([R1WaypointsTPHandle,R1HeadingTP,R2WaypointsTPHandle,R2HeadingTP,FeaposiTPHandle]);
 xlabel('x (m)')
 ylabel('y (m)')
 
-set(gcf, 'Color', 'w');  % 将整个图背景设置为白色
-set(gca, 'Box', 'on', 'LineWidth', 1, 'GridLineStyle', '--', 'GridAlpha', 0.1);  % 使边框显示，并增加边框宽度
+set(gcf, 'Color', 'w');  % Set the entire image background to white
+set(gca, 'Box', 'on', 'LineWidth', 1, 'GridLineStyle', '--', 'GridAlpha', 0.1);  % Display the border and increase the border width
 hold off
 
 if ec == 1
