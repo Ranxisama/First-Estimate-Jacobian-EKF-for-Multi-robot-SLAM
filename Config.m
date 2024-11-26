@@ -18,7 +18,7 @@ end
 snc = 0; % if 0, for test; if 1, for display;
 
 %% Number of Monte Carlo experiments
-mcNum = 1; % if 1, plot nornmal error and 3-sigma bound; if >1, plot absolute value of error and 3-sigma bound
+mcNum = 1; % if 1, plot nornmal error and 3-sigma bound; if > 1, plot absolute value of error and 3-sigma bound
 
 %% Number of robot running cycles
 cy = 5;
